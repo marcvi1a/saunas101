@@ -594,12 +594,6 @@ const el=(t,a={})=>{const e=document.createElementNS(ns,t);for(const k in a)e.se
   const g=document.getElementById('planks');
   const bg=el('rect',{x:22,y:8,width:376,height:290}); bg.setAttribute('fill','var(--wood1)'); g.appendChild(bg);
   for(let m=0.2;m<2.1;m+=0.2){const y=298-m*138; g.appendChild(el('line',{x1:22,y1:y,x2:398,y2:y,class:'plank'}));}
-  const r=document.getElementById('ruler');
-  [[298,'0'],[160,'1 m'],[22,'2 m']].forEach(([y,t])=>{
-    r.appendChild(el('line',{x1:-10,y1:y,x2:-2,y2:y,class:'ruler'}));
-    const tx=el('text',{x:-14,y:y+3,'text-anchor':'end',class:'rulerT'}); tx.textContent=t; r.appendChild(tx);
-  });
-  r.appendChild(el('line',{x1:-6,y1:8,x2:-6,y2:298,class:'ruler'}));
 })();
 
 function particle(pathD,color,dur,offset,size){

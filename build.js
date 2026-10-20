@@ -23,6 +23,8 @@ const must = (ok, m) => { if (!ok) fail(m); };
 const read = f => fs.readFileSync(f, "utf8");
 const stamp = f => crypto.createHash("sha1").update(fs.readFileSync(f)).digest("hex").slice(0, 8);
 const lastmod = f => { try { return execSync("git log -1 --format=%cs -- " + f, { stdio: ["ignore", "pipe", "ignore"] }).toString().trim() || null; } catch (e) { return null; } };
+const UNIT_RE = /(\d)[ \u2009\u202F](?=(?:mm|cm|km|m³|m²|m|kW|W|°C|°F|l\/s|ppm|Pa|kg|ft³|ft²|ft|in|cfm|%)(?![A-Za-z0-9²³]))/g;
+const tie = html => html.replace(/>([^<]*)</g, (m, t) => ">" + t.replace(UNIT_RE, "$1\u202F") + "<");
 const fill = (t, map) => t.replace(/\{\{(\w+)\}\}/g, (_, k) => { must(k in map, "unknown placeholder " + k); return map[k]; });
 
 /* the rules: a title in words with no full stop, a description of 140 to 160 characters, units as symbols, no brands */
@@ -71,7 +73,7 @@ for (const p of PAGES) {
   const scripts = p.scripts.map(s => '<script src="/' + s + "?v=" + V[s] + '" defer></script>').join("\n");
   const html = fill(layout, { title: p.title, head, tabs, page: p.page, content: number(content, starts[p.src]), footer, scripts, css: V["styles.css"] });
   checkIds(html, p.out);
-  fs.writeFileSync(p.out, html);
+  fs.writeFileSync(p.out, tie(html));
   console.log(p.out.padEnd(18) + (rules ? rules + " rules, " + (starts[p.src] + 1) + " to " + (starts[p.src] + rules) : ""));
 }
 

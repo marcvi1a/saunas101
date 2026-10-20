@@ -270,8 +270,6 @@ section.notes{margin-top:40px;display:grid;grid-template-columns:1fr 1fr;gap:20p
 .sensorBad{fill:var(--bad-bg);stroke:var(--bad)}
 .jet{fill:var(--fresh);opacity:.14}
 .jetBad{fill:var(--bad);opacity:.2}
-.ruler{stroke:var(--line);stroke-width:1}
-.rulerT{font-family:var(--mono);font-size:8px;fill:var(--muted)}
 @media (prefers-reduced-motion: reduce){ .pathGuide{stroke:var(--muted)} }
 
 /* ---------- footer: powered by Lava ---------- */

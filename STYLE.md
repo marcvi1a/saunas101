@@ -5,7 +5,7 @@ The page follows saunaslava.com.br: EB Garamond for headings, Manrope for text, 
 ## Writing
 
 1. Numbers are always digits: 2 bathers, 3 changes an hour, 20 cm, 90 °C. The only number written as a word is one. Fractions stay words: half, a third, a quarter.
-2. Units as symbols with a thin space, never spelled out: 20 cm, 90 °C, 6 l/s, 1 kW per m³. A spelled-out metre does not convert and reads wrong in Imperial. Metric is the source; the Imperial toggle converts every figure on the page, so never hand-write an imperial value.
+2. Units as symbols, never spelled out: 20 cm, 90 °C, 6 l/s, 1 kW per m³. A figure never parts from its unit at a line break: the build puts a narrow no-break space (U+202F) between them in every page, and `site.js` does the same in every text it writes or converts, so the sources can use a plain space. A spelled-out metre does not convert and reads wrong in Imperial. Metric is the source; the Imperial toggle converts every figure on the page, so never hand-write an imperial value.
 3. Short sentences. No exclamation marks. No "the user". No brand names in the rules, and no mention of Lava anywhere: the page reads as an objective guide.
 4. Rule titles name the rule in words and carry no figures and no final full stop (Low ceiling, Warm feet); the figures go in the description, which runs 2 lines on desktop: between 140 and 160 characters, checked at build. Rules are numbered in the title's own type and the numbers run on across pages (construction 1 to 9, heater 10 on): the build writes them, the sources carry none.
 5. Rules are about building. Upkeep (restacking stones, cleaning) is not a rule.

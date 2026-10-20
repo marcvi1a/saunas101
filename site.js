@@ -42,13 +42,17 @@ function toImperial(t, short){
   const L = short ? ftinShort : ftin;
   return s.replace(M_RULE,(m,a,b)=> b!=null ? L(numOf(a))+' to '+L(numOf(b)) : L(numOf(a)));
 }
+/* a figure never parts from its unit: a narrow no-break space (U+202F) between them, whatever wrote the text */
+const UNIT_RE = /(\d)[ \u2009\u202F](?=(?:mm|cm|km|m³|m²|m|kW|W|°C|°F|l\/s|ppm|Pa|kg|ft³|ft²|ft|in|cfm|%)(?![A-Za-z0-9²³]))/g;
+const tie = t => t.replace(UNIT_RE, '$1\u202F');
 function applyUnits(){
   const w=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
   let n; while((n=w.nextNode())){
     const p=n.parentNode; if(!p || p.nodeName==='SCRIPT' || p.nodeName==='STYLE' || (p.closest && p.closest('[data-nounits]'))) continue;
     if(n._metric==null) n._metric=n.nodeValue;
     const short = !!(p.classList && p.classList.contains('rulerT'));
-    const v = units==='imperial' ? toImperial(n._metric, short) : n._metric;
+    const src = n._metric.replace(/\u202F/g, ' ');
+    const v = tie(units==='imperial' ? toImperial(src, short) : src);
     if(v!==n.nodeValue) n.nodeValue=v;
   }
   document.querySelectorAll('#units button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.u===units ? 'true':'false'));
@@ -81,9 +85,9 @@ function renderCalc(fill){
   document.querySelectorAll('#calc [data-u="len"]').forEach(s=>{ s.textContent = imp ? 'ft' : 'm'; });
   document.querySelectorAll('#calc [data-u="area"]').forEach(s=>{ s.textContent = imp ? 'ft²' : 'm²'; });
   const vol = calc.w*calc.d*calc.h, eff = vol + 1.2*calc.g, kw = Math.ceil(eff - 1e-9);
-  const volTxt = m3 => imp ? Math.round(m3/(FT*FT*FT))+' ft³' : calcFmt(m3)+' m³';
+  const volTxt = m3 => imp ? Math.round(m3/(FT*FT*FT))+'\u202Fft³' : calcFmt(m3)+'\u202Fm³';
   if(!(vol>0)){ out.textContent = 'Enter the width, depth and height of the room.'; return; }
-  out.innerHTML = '<strong>'+volTxt(vol)+'</strong> of room' + (calc.g>0 ? ', counted as <strong>'+volTxt(eff)+'</strong> with the glass' : '') + ', so a heater of about <strong>'+kw+' kW</strong>. Round up to the next size on sale.';
+  out.innerHTML = '<strong>'+volTxt(vol)+'</strong> of room' + (calc.g>0 ? ', counted as <strong>'+volTxt(eff)+'</strong> with the glass' : '') + ', so a heater of about <strong>'+kw+'\u202FkW</strong>. Round up to the next size on sale.';
 }
 for(const k in calcIds){ const el = document.getElementById(calcIds[k]); if(!el) continue;
   el.addEventListener('input', ()=>{ const n = parseFloat(el.value); const v = isFinite(n) && n>0 ? n : 0; const imp = units==='imperial';
