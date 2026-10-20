@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&family=Manrope:wght@400;500;600;700&display=swap">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="styles.css?v=202610192201">
+<link rel="stylesheet" href="styles.css?v=202610192206">
 </head>
 <body>
 <div class="wrap">
@@ -17,7 +17,7 @@
   <header class="top">
     <div>
       <h1>Saunas 101</h1>
-      <p class="sub">Understand the physics of a proper Finnish sauna with an <b>electric heater</b>, so you can engineer and build your own.</p>
+      <p class="sub">How a proper Finnish sauna works, so you can build your own.</p>
     </div>
     <div class="units" id="units" role="group" aria-label="Units"><button type="button" data-u="metric" aria-pressed="true">Metric</button><span class="sep">·</span><button type="button" data-u="imperial" aria-pressed="false">Imperial</button></div>
   </header>
@@ -29,7 +29,7 @@
   </div>
   <section class="tab" id="tab-construction" role="tabpanel">
   <ul class="facts">
-    <li><h4>As small as needed.</h4><p>Do not build a big sauna if 90 % of the time only two people will use it. It costs more to build, takes longer to warm up, and needs a bigger heater to do it.</p></li>
+    <li><h4>As small as needed.</h4><p>Do not build a big sauna if 90 % of the time only 2 people will use it. It costs more to build, takes longer to warm up, and needs a bigger heater to do it.</p></li>
     <li><h4>Ceiling at 2.1 to 2.3 m.</h4><p>Heat stacks under the ceiling; every centimetre above your head is volume to heat for nothing. HUUM: 2.1 to 2.3 m, never under 1.95.</p></li>
     <li><h4>Upper bench 1.1 to 1.3 m below the ceiling.</h4><p>So your head sits in the hot layer. The lower bench a step down, at 45 cm, for the feet and for getting up.</p></li>
     <li><h4>Head to feet under 20 °C.</h4><p>The whole point of the heights and the ventilation. A sauna with cold feet is a badly built sauna, however hot the ceiling.</p></li>
@@ -93,7 +93,7 @@
     <div class="verdict" id="verdict"></div>
   </div>
   </div>
-  <aside class="rank" aria-label="The eight air layouts, ranked">
+  <aside class="rank" aria-label="The 8 air layouts, ranked">
     <div class="eyebrow">Layouts scored 0 to 100 · M mechanical · G gravity</div>
     <ol id="rank"></ol>
   </aside>
@@ -104,7 +104,7 @@
       <h2>How the score is built</h2>
       <p>One formula for all seventeen layouts, so the gaps between the numbers mean something: 100 against 42 is the fan itself; 42 against 19 is where the inlet sits.</p>
       <ol>
-        <li><b>Breathing.</b> Fresh air that reaches the breathing zone, as a share of what two bathers need: 20 l/s, six changes of this 12 m³ room, the rate that holds 1,000 ppm. Inlet above with a fan delivers all six. The gravity chimney (inlet above, duct rising, no fan) about 2.5. The fan's floor short circuit about 1.8: the heater lifts roughly a third of the fan's air, the rest crosses the floor to the grille; VTT's tracer tests found humidity at head height two to three times the high-inlet value in this layout. The Finnish gravity sauna (inlet low, duct up) about 1.5. Harvia's low-in, low-out drawing about 0.9. The reversal 0.5. A sealed room 0.2, through the door gaps.</li>
+        <li><b>Breathing.</b> Fresh air that reaches the breathing zone, as a share of what 2 bathers need: 20 l/s, 6 changes of this 12 m³ room, the rate that holds 1,000 ppm. Inlet above with a fan delivers all 6. The gravity chimney (inlet above, duct rising, no fan) about 2.5. The fan's floor short circuit about 1.8: the heater lifts roughly a third of the fan's air, the rest crosses the floor to the grille; VTT's tracer tests found humidity at head height 2 to 3 times the high-inlet value in this layout. The Finnish gravity sauna (inlet low, duct up) about 1.5. Harvia's low-in, low-out drawing about 0.9. The reversal 0.5. A sealed room 0.2, through the door gaps.</li>
         <li><b>Feet.</b> A comfort factor from 0.5 to 1: warm feet 1, cold at the heater or the floor 0.75, a cold layer across the floor 0.625, a draught on the ankles 0.55. Cold feet can halve a score, never zero it; breathing comes first.</li>
         <li><b>Fans always run.</b> A power cut stops the heater too, so each layout is scored as it runs. What a fan layout turns into without its fan, the gravity chimney for a rising duct, the reversal for a straight one, is told in its verdict, not in the number. G and C therefore tie.</li>
       </ol>
@@ -116,20 +116,20 @@
         <li><b>Heater.</b> Closed is a floor-standing casing heater: a sheet-metal chimney with the elements inside, stones on top, air drawn in at the base and thrown out over the stones. Open is a stone pillar, HUUM's Hive or Harvia's Legend: no casing, stones exposed on every side, air seeping in through them; it radiates more and steams from its whole surface, but it does not pull floor air into itself, so the layouts that feed air in at the floor lose some of their lift. Wall is the short casing heater hung on brackets, Harvia's and Tylö's small models: the same chimney with its intake 30 cm off the floor, above the cold pool a low inlet makes, so those layouts lose a little; it is the heater Tylö draws its under-the-heater inlet for. The high inlet does not care which heater is under it.</li>
         <li><b>Exhaust fan.</b> An inline fan in the exhaust duct, outside the hot room, wired to run whenever the heater runs. "No fan" is the same physics whether the fan failed or was never fitted: only buoyancy moves the air.</li>
         <li><b>Ventilation.</b> None is a room with no inlet and no exhaust, the common sauna in Brazil: the heater's loop goes round, the bathers' breath stays. Everything else on the page assumes both openings exist. An exhaust fan on its own does not count: VTT 2002 found that with no inlet the gap under the door takes over, and the fan short-circuits along the floor.</li>
-        <li><b>Inlet.</b> Four positions. <b>Above</b>: 20 cm above the stones, 1 m off the floor, where Harvia, Helo and the VTT studies put the fan-driven inlet (Helo's manual draws 500 mm as its minimum, and the only reason it gives is the thermostat; with the sensor clear of the inlet, 20 cm drops the fresh air straight into the plume). <b>Middle</b>: at half the heater's height, facing it; no manual draws it, and what it does depends on the heater, a casing deflects, a pillar admits. <b>Bottom</b>: 10 cm off the floor beside the heater, Harvia's and HUUM's gravity position. <b>Under</b>: through the floor directly under the heater, Tylö's position; the heater draws the air up through itself, and the floor must be open to outside air or ducted to a wall that is.</li>
+        <li><b>Inlet.</b> 4 positions. <b>Above</b>: 20 cm above the stones, 1 m off the floor, where Harvia, Helo and the VTT studies put the fan-driven inlet (Helo's manual draws 500 mm as its minimum, and the only reason it gives is the thermostat; with the sensor clear of the inlet, 20 cm drops the fresh air straight into the plume). <b>Middle</b>: at half the heater's height, facing it; no manual draws it, and what it does depends on the heater, a casing deflects, a pillar admits. <b>Bottom</b>: 10 cm off the floor beside the heater, Harvia's and HUUM's gravity position. <b>Under</b>: through the floor directly under the heater, Tylö's position; the heater draws the air up through itself, and the floor must be open to outside air or ducted to a wall that is.</li>
         <li><b>Exhaust.</b> Where the used air leaves, always on the wall away from the heater. <b>Under the lower bench</b>, 26 cm up, is the manuals' position and VTT's most even one: the fan or the stack draws from the coldest layer and the whole height of the room takes part. <b>Under the upper bench</b>, 75 cm up, is HUUM's limit taken to its end: it breaks the floor short circuit of a low inlet and turns the half-height inlet the right way round, but the lowest 75 cm drop out of the loop.</li>
         <li><b>Inlet angle.</b> The hole through the wall either goes straight through or climbs into the room at 45°. For buoyancy only the heights of the outside mouths count, so the tilt lowers the inlet's outside mouth by 14 cm through a 20 cm wall: every right-way gravity loop gets 14 cm more chimney, the reversal gets 14 cm less, and neither changes sign. With a fan the tilt aims the jet at the ceiling, where the thermostat is.</li>
-        <li><b>Duct.</b> A bare pipe outside the sauna, from one of the holes to a mouth somewhere else. Gravity ventilation is the weight difference between the warm column inside and the cold column outside, over the height where the inside is warm, so what counts is which pipe is full of warm air. <b>Exhaust</b>: a pipe from the low grille up to an outlet above the room, at 2 m here; <b>Half exhaust</b> is the same pipe stopping at 1.2 m, and since the chimney is the pipe top minus the inlet height and flow goes with the square root of it, the high inlet keeps under half its flow and the low inlets about three quarters. It carries the room's warm air up and out, flowing keeps it warm, and the outlet counts at the pipe's top; Helo's and Sawo's drawing. Bare, its air cools a few degrees on the way up, 5 to 10 % of the flow. It must be primed: cold at start-up it can carry the loop backwards and stay there; a minute of fan or of open drying vent starts it. <b>Inlet</b>: a pipe from a mouth at floor level up to the inlet. Carrying fresh air it is cold, a piece of the outside, and changes nothing. In a layout that runs backwards it fills with the escaping hot air, becomes a piece of the room, and pushes the other way; cold air climbs, cools it, the push flips back, and the two cancel: a warm plug sits in the top of the pipe and the air stalls. The reversal is gone, and so is the ventilation. <b>None</b>: both openings straight through the wall.</li>
+        <li><b>Duct.</b> A bare pipe outside the sauna, from one of the holes to a mouth somewhere else. Gravity ventilation is the weight difference between the warm column inside and the cold column outside, over the height where the inside is warm, so what counts is which pipe is full of warm air. <b>Exhaust</b>: a pipe from the low grille up to an outlet above the room, at 2 m here; <b>Half exhaust</b> is the same pipe stopping at 1.2 m, and since the chimney is the pipe top minus the inlet height and flow goes with the square root of it, the high inlet keeps under half its flow and the low inlets about 3/4. It carries the room's warm air up and out, flowing keeps it warm, and the outlet counts at the pipe's top; Helo's and Sawo's drawing. Bare, its air cools a few degrees on the way up, 5 to 10 % of the flow. It must be primed: cold at start-up it can carry the loop backwards and stay there; a minute of fan or of open drying vent starts it. <b>Inlet</b>: a pipe from a mouth at floor level up to the inlet. Carrying fresh air it is cold, a piece of the outside, and changes nothing. In a layout that runs backwards it fills with the escaping hot air, becomes a piece of the room, and pushes the other way; cold air climbs, cools it, the push flips back, and the 2 cancel: a warm plug sits in the top of the pipe and the air stalls. The reversal is gone, and so is the ventilation. <b>None</b>: both openings straight through the wall.</li>
         <li><b>Drying vent.</b> A closable vent near the ceiling on the exhaust wall. Closed while bathing; opened afterwards, with the fan running, to dry the wood. Left open during the session it either exhales the hottest air in the room or, under a strong fan, lets cool air fall onto the top bench; both lose the löyly layer.</li>
         <li><b>Heater sensor.</b> Not a switch, because it has one correct place and no second one worth drawing: on the wall directly above the heater, on its centre line, about 10 cm below the ceiling, where it reads the plume and nothing else. Harvia and Helo both draw it there; Helo adds 1 m from a round vent, 0.5 m from a louver aimed away. Harvia: never where the supply air can cool it. With the inlet under or beside the heater, never built into the heater's base either, where the incoming air would read cold and keep the elements on until the limiter trips.</li>
       </ol>
-      <div class="try">Try this: set fan running, inlet above, duct rising, vent closed. Stop the fan. Switch the duct to straight. Open the drying vent. That is the whole decision in four clicks, and the first row of the ranked list brings you back. One rule under all of it: air only crosses the walls on its own when the outlet is higher than the inlet, and the higher the better.</div>
+      <div class="try">Try this: set fan running, inlet above, duct rising, vent closed. Stop the fan. Switch the duct to straight. Open the drying vent. That is the whole decision in 4 clicks, and the first row of the ranked list brings you back. One rule under all of it: air only crosses the walls on its own when the outlet is higher than the inlet, and the higher the better.</div>
     </div>
     <div class="card">
       <h2>Sources the states are built from</h2>
       <div class="src">
         <a href="https://publications.vtt.fi/pdf/tiedotteet/1992/T1431.pdf" target="_blank" rel="noopener">VTT 1431 (1992), Äikäs &amp; Holmberg: lab sauna, 4 inlet × 3 exhaust heights <span>· feet 20–35 °C warmer with inlet above, exhaust low</span></a>
-        <a href="https://sarjaweb.vtt.fi/pdf/tiedotteet/2002/T2144.pdf" target="_blank" rel="noopener">VTT 2144 (2002), Saari et al.: nine Helsinki saunas <span>· hot air measured leaving the high inlet with an exhaust-only fan</span></a>
+        <a href="https://sarjaweb.vtt.fi/pdf/tiedotteet/2002/T2144.pdf" target="_blank" rel="noopener">VTT 2144 (2002), Saari et al.: 9 Helsinki saunas <span>· hot air measured leaving the high inlet with an exhaust-only fan</span></a>
         <a href="https://support.harvia.com/hc/en-gb/articles/21953036825628-Ventilation-in-the-sauna" target="_blank" rel="noopener">Harvia, Ventilation in the sauna <span>· inlet above with a fan, below without; sensor never in the supply air</span></a>
         <a href="https://exacta-sweden.com/wp-content/uploads/support/manualer/Elektriska%20bastuaggregat/Helo/Himalaya.pdf" target="_blank" rel="noopener">Helo Himalaya manual <span>· inlet ≥500 mm above the heater, exhaust low and ducted up; 1 m from the sensor</span></a>
         <a href="https://irp.cdn-website.com/6ce92147/files/uploaded/TAURUS+Manual_En1015.pdf" target="_blank" rel="noopener">Sawo Taurus manual <span>· exhaust under the platform, may be piped to a ceiling vent</span></a>
@@ -142,10 +142,10 @@
     </div>
   </section>
 
-  <footer>Airflow is schematic, not CFD. Stack pressure for the fan-off states: about 2 Pa per metre of height between the openings at 90 °C inside and 25 °C outside, 1.7 at 35 °C. CO₂ figures come from one mixing model: 0.04 m³/h for two seated bathers, 420 ppm outside, the breathing zone mixed at its own exchange rate and read 30 minutes into the session; cross-checked against one published measurement. The door is taken as sealed; a gap under it is one more low inlet that the fan or the stack will use first.</footer>
+  <footer>Airflow is schematic, not CFD. Stack pressure for the fan-off states: about 2 Pa per metre of height between the openings at 90 °C inside and 25 °C outside, 1.7 at 35 °C. CO₂ figures come from one mixing model: 0.04 m³/h for 2 seated bathers, 420 ppm outside, the breathing zone mixed at its own exchange rate and read 30 minutes into the session; cross-checked against one published measurement. The door is taken as sealed; a gap under it is one more low inlet that the fan or the stack will use first.</footer>
   </section>
 </div>
 
-<script src="app.js?v=202610192201" defer></script>
+<script src="app.js?v=202610192206" defer></script>
 </body>
 </html>
