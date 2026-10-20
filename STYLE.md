@@ -25,6 +25,10 @@ The path names the page; the fragment names the view inside it. A rule's anchor 
 
 The Heater page carries a small calculator, a white card to the right of the rules from 1200 px up and above the rules below that (never between rules), styled as a tool (eyebrow title, plain labels) so it never reads as a rule, and sticky under the masthead on wide screens until the rules end (the masthead height is measured into `--masthead`): width, depth, height and the area of glass or bare wall give the room volume (plus 1.2 m³ per m² of bare wall) and the heater size, 1 kW per m³ rounded up. It keeps its figures in metres and renders them itself in the reader's units, so its block is marked `data-nounits` and the text converter skips it.
 
+## Construction pictures
+
+The first 3 rules are drawn: three white cards at the right of the rules (sticky like the calculator, above the rules under 1200 px), each an inline SVG in the lab's own style: wood interior, black outline, the lab's benches and heater block, the lab's white seated figure (`#bather`, defined once in the first picture and reused with `use`), a red ✗ over each wrong room and a green ✓ over the right one, a mono label under each room. Rooms are to scale within a picture (40 px per metre in the first two, 30 in the third); the hot layer is the top 60 cm of the room. Sizes and figures are built from `src/construction.html`'s markup only; no image files.
+
 ## Ventilation page
 
 The löyly rule opens the page (it is the reason ventilation matters), then the switches read down the left column like rules: a serif title, one line on the job, the segmented control; the verdict follows them. The score and the drawing sit in a 495 px column at the right, sticky under the masthead until the left column ends. The ranked list and the notes run full width below. Under 1200 px the order is rule, score and drawing, switches, verdict, ranked list, notes.

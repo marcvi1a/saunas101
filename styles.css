@@ -84,6 +84,20 @@ h1{font-size:2.2rem;font-weight:400;letter-spacing:0;line-height:1.1}
 .share.is-copied .share-label,.share.is-copied svg{display:none}
 .share.is-copied .share-done{display:inline}
 @media (max-width:1199px){.page--heater{display:block}.calc{position:static;max-width:720px;margin:8px 0 24px}}
+/* the construction page: the rules at the left, three drawn rules at the right in the lab's style, sticky like the calculator */
+.page--construction{display:grid;grid-template-columns:720px minmax(0,1fr);column-gap:48px;align-items:start}
+.page--construction .facts{grid-column:1;grid-row:1}
+.pics{grid-column:2;grid-row:1;margin-top:8px;position:sticky;top:calc(var(--masthead) + 32px);display:flex;flex-direction:column;gap:12px}
+.pic{margin:0;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px}
+.pic svg{width:100%;height:auto;display:block}
+.pic .wall{stroke-width:3}
+.wood{fill:var(--wood1)}
+.hblk{fill:var(--stone)}
+.heatband{fill:var(--hot);opacity:.16}
+.mark{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mark-bad{stroke:var(--bad)}
+.mark-good{stroke:var(--good)}
+@media (max-width:1199px){.page--construction{display:block}.pics{position:static;max-width:720px;margin:8px 0 24px}}
 /* the ventilation page: the rule, the switches and the verdict read down the left like rules; the score and the drawing stay in view on the right */
 .page--ventilation{display:grid;grid-template-columns:minmax(0,1fr) 495px;column-gap:48px;align-items:start}
 .page--ventilation > .facts{grid-column:1;grid-row:1;padding-bottom:0;max-width:none}
