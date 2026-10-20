@@ -196,12 +196,17 @@ h1{font-size:30px;font-weight:400;letter-spacing:0;line-height:1.1}
 .tip.on{opacity:1}
 .room svg{width:100%;height:auto;display:block;max-width:100%}
 .controls{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-top:10px;flex-wrap:wrap}
-.legend{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:7.7%}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 .legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
 .dot--fresh{background:var(--fresh)} .dot--hot{background:var(--hot)} .dot--stale{background:var(--stale)}
 .btn{appearance:none;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:6px;padding:6px 10px;font:inherit;font-size:13px;cursor:pointer}
 .btn:focus-visible{outline:2px solid var(--fresh);outline-offset:2px}
+.btn--icon{width:28px;height:28px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-color:transparent;color:var(--muted);transition:color .15s,border-color .15s}
+.btn--icon:hover{color:var(--ink);border-color:var(--line)}
+.btn--icon svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn--icon .i-play{fill:currentColor;stroke:none}
+.btn--icon[data-state="playing"] .i-play,.btn--icon[data-state="paused"] .i-pause{display:none}
 
 .readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
 .ro .k{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}

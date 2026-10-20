@@ -844,7 +844,7 @@ function render(){
 function applyPause(){
   const svg=document.getElementById('svg');
   if(paused||reduce) svg.pauseAnimations(); else svg.unpauseAnimations();
-  document.getElementById('toggle').textContent = (paused||reduce)?'Play':'Pause';
+  const t=document.getElementById('toggle'), p=(paused||reduce); t.dataset.state = p?'paused':'playing'; t.setAttribute('aria-label', p?'Play':'Pause'); t.title = p?'Play':'Pause';
 }
 document.querySelectorAll('.seg').forEach(seg=>{
   seg.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; if(seg.dataset.key!=='vent' && seg.dataset.key!=='heater') state.vent='yes'; state[seg.dataset.key]=b.dataset.v; render(); });
