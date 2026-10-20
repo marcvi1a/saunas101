@@ -124,10 +124,7 @@ h1{font-size:30px;font-weight:400;letter-spacing:0;line-height:1.1}
 .draw svg{width:100%;height:auto;display:block;max-width:100%}
 .lab-left .rank{margin-top:40px}
 .lab-left .rank ol{grid-template-columns:1fr}
-.lab-left .notes{grid-template-columns:1fr}
-.lab-left .card{background:none;border:0;border-radius:0;padding:0}
-@media (max-width:1199px){.lab-left .rank ol{grid-template-columns:repeat(2,minmax(0,1fr))}.lab-left .notes{grid-template-columns:1fr 1fr}}
-@media (max-width:820px){.lab-left .notes{grid-template-columns:1fr}}
+@media (max-width:1199px){.lab-left .rank ol{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:560px){.lab-left .rank ol{grid-template-columns:1fr}}
 /* the switches: one row each under the drawing, the title column starting at the room's left wall (7.7 % of the card, like the legend), the control beside it */
 .lab-card .switches{display:grid;grid-template-columns:max-content 1fr;gap:5px 14px;align-items:center;margin:0 0 0 7.7%;padding-top:6px}
@@ -212,17 +209,11 @@ h1{font-size:30px;font-weight:400;letter-spacing:0;line-height:1.1}
 .heater[data-g="warn"]{border-color:var(--warn);background:var(--warn-bg)}
 .heater[data-g="bad"]{border-color:var(--bad);background:var(--bad-bg)}
 .heater b{font-weight:600}
-.modelnote{font-size:12px;color:var(--muted);margin-top:10px}
 
 
-section.notes{margin-top:40px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
-@media (max-width:820px){section.notes{grid-template-columns:1fr}}
-.card{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:18px 20px;min-width:0}
-.card h2{font-size:24px;font-weight:500;margin-bottom:8px}
-.card p,.card li{max-width:62ch}
-.card ol,.card ul{padding-left:20px;margin:8px 0 0}
-.card li{margin-bottom:6px}
 .modelnote-foot{margin-top:36px;color:var(--muted);font-size:13px;max-width:70ch}
+.modelnote-foot p{margin:0 0 10px}
+.modelnote-foot b{font-weight:600}
 
 /* SVG parts */
 .wall{fill:none;stroke:var(--ink);stroke-width:4}
