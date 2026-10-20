@@ -1,7 +1,7 @@
 /* Saunas 101 · styles. Colours, fonts and type scale follow saunaslava.com.br (lava.css): EB Garamond + Manrope, page background #FDF2EF, full-bleed with 3.75rem gutters. */
 /* Layout: four switches above one animated cross-section; the verdict and the heater readout beside it; sources below. */
 :root{
-  --masthead:170px;
+  --masthead:170px; --col-tool:495px;
   --bg:#FDF2EF; --paper:#FFFFFF; --ink:#111111; --muted:#7C6A64; --line:#EAD9D3; --track:#EDECEA;
   --cedar:#A8663A; --cedar-soft:#E9D6C6; --stone:#4a4a4a;
   --fresh:#378DE2; --hot:#E8603A; --stale:#9A9A9A;
@@ -62,7 +62,7 @@ h1{font-size:2.2rem;font-weight:400;letter-spacing:0;line-height:1.1}
 .facts h4{margin:0 0 10px;font-family:var(--serif);font-weight:400;font-size:21px;line-height:1.15;color:var(--ink);text-wrap:balance}
 .facts p{margin:0;font-size:14px;line-height:1.55;color:rgba(17,17,17,.78);max-width:64ch}
 .top{margin-bottom:34px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
-.page--heater{display:grid;grid-template-columns:720px minmax(0,1fr);column-gap:48px;align-items:start}
+.page--heater{display:grid;grid-template-columns:minmax(0,1fr) var(--col-tool);column-gap:48px;align-items:start}
 .page--heater .facts{grid-column:1;grid-row:1}
 .calc{grid-column:2;grid-row:1;margin-top:8px;position:sticky;top:calc(var(--masthead) + 32px);display:flex;flex-direction:column;align-items:stretch}
 .calc-card{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:18px 20px 20px}
@@ -85,7 +85,7 @@ h1{font-size:2.2rem;font-weight:400;letter-spacing:0;line-height:1.1}
 .share.is-copied .share-done{display:inline}
 @media (max-width:1199px){.page--heater{display:block}.calc{position:static;max-width:720px;margin:8px 0 24px}}
 /* the construction page: the rules at the left, three drawn rules at the right in the lab's style, sticky like the calculator */
-.page--construction{display:grid;grid-template-columns:720px minmax(0,1fr);column-gap:48px;align-items:start}
+.page--construction{display:grid;grid-template-columns:minmax(0,1fr) var(--col-tool);column-gap:48px;align-items:start}
 .page--construction .facts{grid-column:1;grid-row:1}
 .pics{grid-column:2;grid-row:1;margin-top:8px;position:sticky;top:calc(var(--masthead) + 32px);display:flex;flex-direction:column;gap:12px}
 .pic{margin:0;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px}
@@ -99,13 +99,17 @@ h1{font-size:2.2rem;font-weight:400;letter-spacing:0;line-height:1.1}
 .mark-good{stroke:var(--good)}
 @media (max-width:1199px){.page--construction{display:block}.pics{position:static;max-width:720px;margin:8px 0 24px}}
 /* the ventilation page: the rule, the switches and the verdict read down the left like rules; the score and the drawing stay in view on the right */
-.page--ventilation{display:grid;grid-template-columns:minmax(0,1fr) 495px;column-gap:48px;align-items:start}
+.page--ventilation{display:grid;grid-template-columns:minmax(0,1fr) var(--col-tool);column-gap:48px;align-items:start}
 .page--ventilation > .facts{grid-column:1;grid-row:1;padding-bottom:0;max-width:none}
 .lab-left{grid-column:1;grid-row:2;min-width:0}
 .lab-right{grid-column:2;grid-row:1/3;position:sticky;top:calc(var(--masthead) + 32px);margin-top:8px;display:flex;flex-direction:column;gap:12px}
 .lab-right .scoreRow{width:auto;margin-top:0}
-.page--ventilation > .rank{grid-column:1/-1;margin-top:40px}
-.page--ventilation > .notes,.page--ventilation > .modelnote-foot{grid-column:1/-1}
+.lab-left .rank{margin-top:40px}
+.lab-left .rank ol{grid-template-columns:1fr}
+.lab-left .notes{grid-template-columns:1fr}
+@media (max-width:1199px){.lab-left .rank ol{grid-template-columns:repeat(2,minmax(0,1fr))}.lab-left .notes{grid-template-columns:1fr 1fr}}
+@media (max-width:820px){.lab-left .notes{grid-template-columns:1fr}}
+@media (max-width:560px){.lab-left .rank ol{grid-template-columns:1fr}}
 .lab-left .switches{grid-template-columns:1fr;gap:26px;margin-top:26px}
 .lab-left .sw,.lab-left .sw--hot,.lab-left .sw--air,.lab-left .sw--air.sw--hot{background:none;border:0;border-radius:0;padding:0}
 .lab-left .sw .eyebrow{font-family:var(--serif);font-size:21px;letter-spacing:0;text-transform:none;line-height:1.15;color:var(--ink);margin:0 0 10px;text-wrap:balance;transition:color .15s}

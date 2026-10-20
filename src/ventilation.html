@@ -13,39 +13,6 @@
     <div class="sw"><div class="eyebrow">Duct</div><div class="job">Keeps the air flowing the right way without a fan.</div><div class="seg seg--grid" data-key="duct"><button type="button" data-v="straight">None</button><button type="button" data-v="inletduct" title="A bare pipe from a mouth at floor level up to the inlet">Inlet</button><button type="button" data-v="half" title="A bare pipe from the exhaust grille up to an outlet at 1.2 m">Half exhaust</button><button type="button" data-v="riser" title="A bare pipe from the exhaust grille up to an outlet at 2 m, above the room">Exhaust</button></div></div>
   </div>
     <div class="verdict" id="verdict"></div>
-  </div>
-  <div class="lab-right">
-  <div class="sw sw--score scoreRow" id="scoreCard" data-g="good"><div class="eyebrow">Score</div><div class="scoreBig"><span id="scoreNum">100</span><small>/ 100</small></div><div class="scoreWord" id="scoreWord">Best choice</div></div>
-  <div class="room">
-    <svg id="svg" viewBox="-42 0 482 326" role="img" aria-label="Animated cross-section of a sauna showing the air path for the chosen switches">
-      <defs><clipPath id="roomclip"><rect x="-4" y="12" width="424" height="290"/></clipPath></defs>
-      <g id="planks"></g>
-      <g id="ruler"></g>
-      <g id="duct"></g>
-      <g id="glow"></g>
-      <g id="heaterg"></g>
-      <text x="73" y="318" text-anchor="middle" class="lbl">HEATER</text>
-      <rect x="230" y="174" width="168" height="13.8" class="bench"/>
-      <rect x="200" y="236" width="198" height="13.8" class="bench"/>
-      <text x="392" y="170" text-anchor="end" class="lbl">UPPER BENCH</text>
-      <text x="300" y="232" text-anchor="middle" class="lbl">LOWER BENCH</text>
-      <g class="person" transform="translate(300 173) scale(0.7211) translate(-650 -361)"><circle cx="650" cy="199.5" r="28.5"/><path d="M650 228 C 648.1 273.6, 651.9 321.1, 650 361 M650 258.4 C 619.3 276.2, 598.3 297.1, 587 327.8 M650 258.4 C 682.3 274.5, 703.3 294, 716.2 324.6 M650 361 C 632.9 364.8, 617.7 370.5, 606.3 378.1 C 602.5 389, 602.5 419, 604.4 448 M650 361 C 667.1 364.8, 684.2 370.5, 697.5 378.1 C 701.3 389, 701.3 419, 699.4 448"/></g>
-      <rect x="22" y="22" width="376" height="276" class="wall"/>
-      <g id="sensorg"></g>
-      <g id="vents"></g>
-      <g id="dyn" clip-path="url(#roomclip)"></g>
-    </svg>
-    <div class="tip" id="tip" role="tooltip"></div>
-    <div class="controls">
-      <div class="legend">
-        <span><i class="dot dot--fresh"></i>fresh air</span>
-        <span><i class="dot dot--hot"></i>heated air</span>
-        <span id="legStale"><i class="dot dot--stale"></i>stagnant / CO₂</span>
-      </div>
-      <button class="btn" id="toggle" type="button">Pause</button>
-    </div>
-  </div>
-  </div>
   <aside class="rank" aria-label="The 8 air layouts, ranked">
     <div class="eyebrow">Layouts scored 0 to 100 · M mechanical · G gravity</div>
     <ol id="rank"></ol>
@@ -94,3 +61,36 @@
   </section>
 
   <footer class="modelnote-foot">Airflow is schematic, not CFD. Stack pressure for the fan-off states: about 2 Pa per metre of height between the openings at 90 °C inside and 25 °C outside, 1.7 at 35 °C. CO₂ figures come from one mixing model: 0.04 m³/h for 2 seated bathers, 420 ppm outside, the breathing zone mixed at its own exchange rate and read 30 minutes into the session; cross-checked against one published measurement. The door is taken as sealed; a gap under it is one more low inlet that the fan or the stack will use first.</footer>
+  </div>
+  <div class="lab-right">
+  <div class="sw sw--score scoreRow" id="scoreCard" data-g="good"><div class="eyebrow">Score</div><div class="scoreBig"><span id="scoreNum">100</span><small>/ 100</small></div><div class="scoreWord" id="scoreWord">Best choice</div></div>
+  <div class="room">
+    <svg id="svg" viewBox="-42 0 482 326" role="img" aria-label="Animated cross-section of a sauna showing the air path for the chosen switches">
+      <defs><clipPath id="roomclip"><rect x="-4" y="12" width="424" height="290"/></clipPath></defs>
+      <g id="planks"></g>
+      <g id="ruler"></g>
+      <g id="duct"></g>
+      <g id="glow"></g>
+      <g id="heaterg"></g>
+      <text x="73" y="318" text-anchor="middle" class="lbl">HEATER</text>
+      <rect x="230" y="174" width="168" height="13.8" class="bench"/>
+      <rect x="200" y="236" width="198" height="13.8" class="bench"/>
+      <text x="392" y="170" text-anchor="end" class="lbl">UPPER BENCH</text>
+      <text x="300" y="232" text-anchor="middle" class="lbl">LOWER BENCH</text>
+      <g class="person" transform="translate(300 173) scale(0.7211) translate(-650 -361)"><circle cx="650" cy="199.5" r="28.5"/><path d="M650 228 C 648.1 273.6, 651.9 321.1, 650 361 M650 258.4 C 619.3 276.2, 598.3 297.1, 587 327.8 M650 258.4 C 682.3 274.5, 703.3 294, 716.2 324.6 M650 361 C 632.9 364.8, 617.7 370.5, 606.3 378.1 C 602.5 389, 602.5 419, 604.4 448 M650 361 C 667.1 364.8, 684.2 370.5, 697.5 378.1 C 701.3 389, 701.3 419, 699.4 448"/></g>
+      <rect x="22" y="22" width="376" height="276" class="wall"/>
+      <g id="sensorg"></g>
+      <g id="vents"></g>
+      <g id="dyn" clip-path="url(#roomclip)"></g>
+    </svg>
+    <div class="tip" id="tip" role="tooltip"></div>
+    <div class="controls">
+      <div class="legend">
+        <span><i class="dot dot--fresh"></i>fresh air</span>
+        <span><i class="dot dot--hot"></i>heated air</span>
+        <span id="legStale"><i class="dot dot--stale"></i>stagnant / CO₂</span>
+      </div>
+      <button class="btn" id="toggle" type="button">Pause</button>
+    </div>
+  </div>
+  </div>

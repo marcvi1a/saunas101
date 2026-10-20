@@ -21,6 +21,10 @@ Three pages, one per section, each with its own title, description, canonical ad
 
 The path names the page; the fragment names the view inside it. A rule's anchor is its id: `/construction#ceiling`, `/heater#glass`. A click on a rule puts its anchor in the address. The calculator's sizes live in the fragment of the heater page, in metres: `/heater#2.1x2.1x2.1` (width × depth × height) and `/heater#2.1x2.1x2.1+1` with 1 m² of glass; the calculator rewrites it on every input, and the Share control under it copies one line and that link (the system share sheet on touch devices, "Link copied" for 2 s elsewhere), the control copied from saunaslava.com.br. The lab's layout lives in the fragment of the ventilation page: `/ventilation#on-above-riser` (fan, inlet, duct, then `-open`, `-up45`, `-pillar` or `-wall`, `-upper`, `-induct` or `-half`, or `none`); the lab rewrites it on every change, so the address always reopens the same view. Never a query string: a query would make every layout a crawlable address. No units in any address: units are the reader's preference, kept in localStorage. The old single-page addresses (`/#heater`, `/#ventilation.state`, `/#construction.rule`) are forwarded by `site.js` to the page they named.
 
+## Columns
+
+Every page is two columns from 1200 px up: the text column at the left (`minmax(0,1fr)`, 557 px inside the 1100 px content column) and the tool column at the right (`--col-tool`, 495 px, the 45 % the drawing was given), 48 px apart. The text column is wider than the paragraphs' 64ch (about 530 px), so rule descriptions keep their 2 lines. Left holds everything that is read: rules, switches, verdict, ranked list, notes. Right holds only a tool: the pictures, the calculator, the score and the drawing. Under 1200 px the pages are one column.
+
 ## Heater calculator
 
 The Heater page carries a small calculator, a white card to the right of the rules from 1200 px up and above the rules below that (never between rules), styled as a tool (eyebrow title, plain labels) so it never reads as a rule, and sticky under the masthead on wide screens until the rules end (the masthead height is measured into `--masthead`): width, depth, height and the area of glass or bare wall give the room volume (plus 1.2 m³ per m² of bare wall) and the heater size, 1 kW per m³ rounded up. It keeps its figures in metres and renders them itself in the reader's units, so its block is marked `data-nounits` and the text converter skips it.
@@ -31,7 +35,7 @@ The first 3 rules are drawn: three white cards at the right of the rules (sticky
 
 ## Ventilation page
 
-The löyly rule opens the page (it is the reason ventilation matters), then the switches read down the left column like rules: a serif title, one line on the job, the segmented control; the verdict follows them. The score and the drawing sit in a 495 px column at the right, sticky under the masthead until the left column ends. The ranked list and the notes run full width below. Under 1200 px the order is rule, score and drawing, switches, verdict, ranked list, notes.
+The löyly rule opens the page (it is the reason ventilation matters), then the switches read down the left column like rules: a serif title, one line on the job, the segmented control; the verdict follows them. The ranked list, the notes and the model note follow the verdict in the same column, one column wide. The score and the drawing sit in the tool column at the right, sticky under the masthead until the left column ends. Under 1200 px the order is rule, score and drawing, switches, verdict, ranked list, notes.
 
 ## Footer
 
