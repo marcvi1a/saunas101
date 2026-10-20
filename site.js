@@ -3,12 +3,15 @@
 /* the old single-page addresses (#heater, #ventilation.state, #construction.rule) go to the pages they named */
 (function(){
   const m = location.hash.match(/^#(construction|heater|ventilation)(?:\.([\w-]+))?$/); if(!m) return;
-  location.replace('/'+m[1] + (m[2] ? '#'+m[2] : ''));
+  location.replace('/'+m[1] + location.search + (m[2] ? '#'+m[2] : ''));
 })();
 
 /* ---------- units ---------- */
 let units = 'metric';
 try{ if(new URLSearchParams(location.search).get('units')==='imperial') units='imperial'; else if(localStorage.getItem('units')==='imperial') units='imperial'; }catch(e){}
+/* the address says when Imperial is on, so a copied address carries the units; Metric, the default, carries nothing */
+function syncUnitsUrl(){ try{ history.replaceState(null, '', location.pathname + (units==='imperial' ? '?units=imperial' : '') + location.hash); }catch(e){} }
+syncUnitsUrl();
 const numOf = s => parseFloat(String(s).replace(',',''));
 function inFrac(inches){
   if(inches >= 1.5) return Math.round(inches) + ' in';
@@ -57,7 +60,7 @@ function applyUnits(){
   }
   document.querySelectorAll('#units button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.u===units ? 'true':'false'));
 }
-document.getElementById('units').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; units=b.dataset.u; try{ localStorage.setItem('units',units); }catch(e){} applyUnits(); renderCalc(true); });
+document.getElementById('units').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; units=b.dataset.u; try{ localStorage.setItem('units',units); }catch(e){} syncUnitsUrl(); applyUnits(); renderCalc(true); });
 
 /* ---------- the footer wordmark: the site's flow, loaded when the footer comes near ---------- */
 (function(){
