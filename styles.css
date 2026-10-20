@@ -110,6 +110,7 @@ h1{font-size:30px;font-weight:400;letter-spacing:0;line-height:1.1}
 @media (min-width:1200px) and (max-height:780px){.lab-right{position:static}}
 .lab-card{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:4px}
 .lab-top{display:flex;flex-direction:column;gap:4px}
+.lab-top .draw{margin-top:-6px}
 .scoreline{display:flex;align-items:baseline;gap:10px;padding:0 4px 0 7.7%;min-height:24px}
 .scoreline .scoreBig{font-size:24px;margin-top:0}
 .scoreline .scoreWord{font-size:13px;margin-top:0}
@@ -132,7 +133,7 @@ h1{font-size:30px;font-weight:400;letter-spacing:0;line-height:1.1}
 .lab-card .sw,.lab-card .sw--hot{display:grid;grid-template-columns:subgrid;grid-column:1/-1;align-items:center;background:none;border:0;border-radius:0;padding:0}
 .lab-card .sw .eyebrow{margin:0;font-size:10px;line-height:1.3;cursor:help;transition:color .15s}
 .lab-card .sw--hot .eyebrow{color:var(--cedar)}
-.lab-card .seg,.lab-card .seg.seg--grid,.lab-card .seg.seg--stack{display:inline-flex;grid-template-columns:none;max-width:100%;flex-wrap:wrap;justify-self:start;padding:2px;gap:3px;border-radius:7px}
+.lab-card .seg,.lab-card .seg.seg--grid,.lab-card .seg.seg--stack{display:inline-flex;grid-template-columns:none;max-width:100%;flex-wrap:wrap;justify-self:start;padding:2px;gap:5px;border-radius:7px}
 .lab-card .seg button{flex:0 0 auto;padding:3px 8px;font-size:10px;border-radius:5px}
 /* narrow screens: the title scrolls away and only the tabs stay; on phones the card splits, the score line and the drawing stay under the tabs while the switches, 2 columns with the 4-way pills folded, scroll beneath them */
 @media (max-width:1199px){.masthead{display:contents}.top{display:block;position:relative;padding-top:28px;margin-bottom:22px}.units{position:absolute;right:0;top:28px}.tabs{position:sticky;top:0;z-index:20;background:var(--bg);padding-top:14px}}
