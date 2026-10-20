@@ -180,25 +180,14 @@ function co2After(aHead, hours, people){ const a=Math.max(aHead,1e-6); return Ma
 const scoreGrade = s => s>=70?'good':s>=35?'warn':'bad';
 
 /* ---------- the layouts, ranked ---------- */
-const RANK = [
-  ['G','on', 'above','riser',   'Inlet above the heater, fan running, with exhaust duct','Best'],
-  ['C','on', 'above','straight','Inlet above the heater, fan running, no exhaust duct',  'Best; the duct adds nothing while the fan runs'],
-  ['H','off','above','riser',   'Inlet above the heater, no fan, with exhaust duct',     'Slow, the right way round'],
-  ['F','off','below','riser',   'Inlet at the bottom, by the heater, no fan, with exhaust duct',     'Slow, cold at the feet'],
-  ['E','on', 'below','riser',   'Inlet at the bottom, by the heater, fan running, with exhaust duct','Floor short circuit'],
-  ['A','on', 'below','straight','Inlet at the bottom, by the heater, fan running, no exhaust duct',  'Floor short circuit'],
-  ['B','off','below','straight','Inlet at the bottom, by the heater, no fan, no exhaust duct',       'Weak, about one change an hour'],
-  ['D','off','above','straight','Inlet above the heater, no fan, no exhaust duct',       'Runs backwards'],
-  ['I','on', 'bottom','riser',   'Inlet under the heater, fan running, with exhaust duct', 'Tylö\'s inlet with a fan; needs a floor to the outside'],
-  ['J','on', 'bottom','straight','Inlet under the heater, fan running, no exhaust duct',   'Tylö\'s inlet with a fan; cannot reverse'],
-  ['K','off','bottom','riser',   'Inlet under the heater, no fan, with exhaust duct',      'The heater as the chimney'],
-  ['L','on', 'middle','riser',   'Inlet at the heater\'s middle, fan running, with exhaust duct', 'Depends on the heater: a pillar admits, a casing deflects'],
-  ['M','on', 'middle','straight','Inlet at the heater\'s middle, fan running, no exhaust duct',   'Depends on the heater: a pillar admits, a casing deflects'],
-  ['N','off','middle','riser',   'Inlet at the heater\'s middle, no fan, with exhaust duct',      'Half-height gravity'],
-  ['O','off','bottom','straight','Inlet under the heater, no fan, no exhaust duct',        'Weak, cannot reverse'],
-  ['P','off','middle','straight','Inlet at the heater\'s middle, no fan, no exhaust duct',        'A weak reversal'],
-  ['0','none',null,null,'No ventilation: no inlet, no exhaust','Most saunas in Brazil']
+/* the 4 layouts the page names: every switch fixed, so each score is a constant of the model */
+const PRESETS = [
+  {name:'No ventilation',         vent:'none', heater:'open'},
+  {name:'Gravity ventilation',    vent:'yes', fan:'off', inlet:'below', duct:'straight', exhaust:'upper', heater:'open', angle:'straight', dry:'closed'},
+  {name:'Mechanical ventilation', vent:'yes', fan:'on',  inlet:'above', duct:'straight', exhaust:'lower', heater:'open', angle:'straight', dry:'closed'},
+  {name:'Best',                   vent:'yes', fan:'on',  inlet:'above', duct:'riser',    exhaust:'lower', heater:'open', angle:'straight', dry:'closed'}
 ];
+const PRESET_KEYS = ['fan','inlet','duct','exhaust','heater','angle','dry'];
 
 /* ---------- state ---------- */
 const state = { vent:'yes', fan:'on', inlet:'above', angle:'straight', heater:'open', exhaust:'lower', duct:'riser', dry:'closed', none:false };
@@ -716,8 +705,8 @@ function render(){
   const dimSeg=(k,off)=>{ const seg=document.querySelector('[data-key="'+k+'"]'); if(!seg) return; if(seg.closest('.sw')) seg.closest('.sw').classList.toggle('sw--off', none || off); seg.querySelectorAll('button').forEach(b=>{ b.disabled = off; }); };
   dimSeg('angle', state.inlet==='bottom' || induct);
   document.querySelectorAll('[data-key="duct"] button[data-v="inletduct"]').forEach(b=>{ b.disabled = state.inlet==='bottom'; });
-  if(rankList.dataset.variant!==state.angle+state.heater+state.exhaust+state.dry){ buildRank(); rankList.dataset.variant=state.angle+state.heater+state.exhaust+state.dry; }
-  document.querySelectorAll('.rk').forEach(b=>b.setAttribute('aria-pressed', (b.dataset.none ? none : (!none && b.dataset.fan===state.fan && b.dataset.inlet===state.inlet && b.dataset.duct===state.duct)) ? 'true':'false'));
+  if(!rankList.dataset.built){ buildRank(); rankList.dataset.built='1'; }
+  document.querySelectorAll('.rk').forEach(b=>{ const p=PRESETS[+b.dataset.i]; const on = p.vent==='none' ? none : (!none && PRESET_KEYS.every(f=>state[f]===p[f])); b.setAttribute('aria-pressed', on ? 'true':'false'); });
   applyPause();
   labState = none ? 'none' : key.replace(/\|/g,'-')+(state.dry==='open'?'-open':'')+(state.angle==='up45'?'-up45':'')+(state.heater==='open'?'-pillar':state.heater==='wall'?'-wall':'')+(state.exhaust==='upper'?'-upper':'')+(induct?'-induct':'')+(half?'-half':'');
   writeHash();
@@ -735,20 +724,17 @@ document.getElementById('toggle').addEventListener('click',()=>{paused=!paused; 
 const rankList=document.getElementById('rank');
 function buildRank(){
 rankList.innerHTML='';
-const ranked = RANK.map(r=>{ const k = r[1]==='none' ? 'none' : [r[1],r[2],r[3]].join('|'); return {r, k, s:score(k, state.angle, state.heater, state.exhaust, false, false, k!=='none' && state.dry==='open')}; });
-ranked.sort((a,b)=>b.s-a.s || RANK.indexOf(a.r)-RANK.indexOf(b.r));
-ranked.forEach(({r:[L,fan,inlet,duct,text,word],k,s},i)=>{
-  const isNone = fan==='none';
-  const g = scoreGrade(s);
+PRESETS.forEach((p,i)=>{
+  const k = p.vent==='none' ? 'none' : [p.fan,p.inlet,p.duct].join('|');
+  const s = score(k, p.angle||'straight', p.heater, p.exhaust||'lower', false, false, false), g = scoreGrade(s);
   const li=document.createElement('li');
-  li.innerHTML='<button type="button" class="rk '+g+(isNone?' rk--base':'')+'"'+(isNone?' data-none="1"':' data-fan="'+fan+'" data-inlet="'+inlet+'" data-duct="'+duct+'"')+'>'
-    +'<span class="rk-l">'+(i+1)+'.</span><span class="rk-t">'+text+'</span><span class="rk-g '+g+'">'+word+'</span>'
-    +'<span class="rk-s">'+s+'</span><span class="rk-bar"><i style="width:'+s+'%"></i></span></button>'
-    +'<span class="rk-gm" title="'+(isNone?'No ventilation':fan==='on'?'Mechanical: an exhaust fan moves the air':'Gravity: buoyancy alone moves the air')+'">'+(isNone?'':fan==='on'?'M':'G')+'</span>';
+  li.innerHTML='<button type="button" class="rk '+g+'" data-i="'+i+'">'
+    +'<span class="rk-l">'+(i+1)+'.</span><span class="rk-t">'+p.name+'</span>'
+    +'<span class="rk-s">'+s+'</span><span class="rk-bar"><i style="width:'+s+'%"></i></span></button>';
   rankList.appendChild(li);
 });
 }
-rankList.addEventListener('click',e=>{ const b=e.target.closest('.rk'); if(!b) return; if(b.dataset.none){ state.vent='none'; } else { state.vent='yes'; state.fan=b.dataset.fan; state.inlet=b.dataset.inlet; state.duct=b.dataset.duct; } render(); });
+rankList.addEventListener('click',e=>{ const b=e.target.closest('.rk'); if(!b) return; const p=PRESETS[+b.dataset.i]; if(!p) return; if(p.vent==='none'){ state.vent='none'; state.heater=p.heater; } else { state.vent='yes'; PRESET_KEYS.forEach(f=>{ state[f]=p[f]; }); } render(); });
 if(reduce) paused=true;
 
 
