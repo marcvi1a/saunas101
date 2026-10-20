@@ -202,9 +202,9 @@ const darkUI = document.documentElement.dataset.theme==='dark' || (document.docu
 const FRESH_HEX = darkUI ? '#63B3D6' : '#378DE2', HOT_HEX = darkUI ? '#F09A52' : '#E8603A';
 
 /* ---------- geometry ---------- */
-const IN_ABOVE={x:22,y:160}, IN_MIDDLE={x:22,y:236}, IN_BELOW={x:22,y:283}, IN_BOTTOM={x:73,y:298}, OUT={x:398,y:262}, SENSOR={x:73,y:36};
-const DUCT_UP=' C 404 260, 408 200, 408 150 C 408 100, 408 60, 408 8';
-const DUCT_UP_HI=' C 404 194, 408 150, 408 110 C 408 70, 408 40, 408 8';
+const IN_ABOVE={x:22,y:160}, IN_MIDDLE={x:22,y:236}, IN_BELOW={x:22,y:283}, IN_BOTTOM={x:73,y:298}, OUT={x:398,y:262}, SENSOR={x:73,y:22};
+const DUCT_UP=' C 404 260, 408 200, 408 150 C 408 100, 408 50, 408 -6';
+const DUCT_UP_HI=' C 404 194, 408 150, 408 110 C 408 60, 408 30, 408 -6';
 const DUCT_UP_HALF=' C 404 260, 408 230, 408 200 C 408 170, 408 150, 408 128';
 const DUCT_UP_HI_HALF=' C 404 194, 408 180, 408 165 C 408 150, 408 140, 408 128';
 const HALF_TOP = 132;   // 1.2 m
@@ -592,14 +592,14 @@ const el=(t,a={})=>{const e=document.createElementNS(ns,t);for(const k in a)e.se
 
 (function(){
   const g=document.getElementById('planks');
-  const bg=el('rect',{x:22,y:22,width:376,height:276}); bg.setAttribute('fill','var(--wood1)'); g.appendChild(bg);
-  for(let m=0.2;m<2;m+=0.2){const y=298-m*138; g.appendChild(el('line',{x1:22,y1:y,x2:398,y2:y,class:'plank'}));}
+  const bg=el('rect',{x:22,y:8,width:376,height:290}); bg.setAttribute('fill','var(--wood1)'); g.appendChild(bg);
+  for(let m=0.2;m<2.1;m+=0.2){const y=298-m*138; g.appendChild(el('line',{x1:22,y1:y,x2:398,y2:y,class:'plank'}));}
   const r=document.getElementById('ruler');
   [[298,'0'],[160,'1 m'],[22,'2 m']].forEach(([y,t])=>{
     r.appendChild(el('line',{x1:-10,y1:y,x2:-2,y2:y,class:'ruler'}));
     const tx=el('text',{x:-14,y:y+3,'text-anchor':'end',class:'rulerT'}); tx.textContent=t; r.appendChild(tx);
   });
-  r.appendChild(el('line',{x1:-6,y1:22,x2:-6,y2:298,class:'ruler'}));
+  r.appendChild(el('line',{x1:-6,y1:8,x2:-6,y2:298,class:'ruler'}));
 })();
 
 function particle(pathD,color,dur,offset,size){
@@ -723,7 +723,7 @@ function render(){
   const angleEff = state.angle; ANGLE_EFF = angleEff;
   drawHeater();
   const dyn=document.getElementById('dyn'); dyn.innerHTML='';
-  const glow=document.getElementById('glow'); glow.innerHTML=''; glow.appendChild(el('path',{d:'M52 200 C 40 140, 60 60, 100 40 L 130 30 C 100 90, 110 140, 94 200 Z',class:'heatglow'}));
+  const glow=document.getElementById('glow'); glow.innerHTML=''; glow.appendChild(el('path',{d:'M52 200 C 40 140, 60 48, 100 26 L 130 16 C 100 80, 110 140, 94 200 Z',class:'heatglow'}));
   // stagnant air: grey balls circling slowly inside the zone, instead of a grey wash
   const zone = o.stagnant && o.stagnant.match(/M(\d+) (\d+) h(\d+) v(\d+)/);
   if(zone){
@@ -754,7 +754,7 @@ function render(){
     dg.appendChild(el('path',{d:'M13 '+(yIn-7)+' H4 V284 H-2 M18 '+(yIn+7)+' V298 H-2',class:'duct'}));
     const t=el('text',{x:15,y:278,class:'lbl',transform:'rotate(-90 15 278)'}); t.textContent='INLET PIPE · OUTSIDE'; dg.appendChild(t);
   } else if(withDuct){
-    const top = half ? HALF_TOP : 4;
+    const top = half ? HALF_TOP : -10;
     dg.appendChild(el('path',{d:'M400 '+top+' V'+(outPos().y+12)+' H416 V'+top,class:'duct'}));
     const t=el('text',{x:418,y:top+10,class:'lbl',transform:'rotate(90 418 '+(top+10)+')'}); t.textContent= half ? 'EXHAUST PIPE · OUTSIDE · OUTLET AT 1.2 m' : 'EXHAUST PIPE · OUTSIDE · OUTLET ABOVE THE INLET'; dg.appendChild(t);
   }
@@ -786,7 +786,7 @@ function render(){
   }
   }
   if(!none){
-    const dry=ventEl(398,36, dryOpen ? {t: 'DRYING VENT|HOT AIR OUT', c:'lblBad'} : {t:'DRYING VENT',c:''}, dryOpen?'vent':'ventIdle', false);
+    const dry=ventEl(398,22, dryOpen ? {t: 'DRYING VENT|HOT AIR OUT', c:'lblBad'} : {t:'DRYING VENT',c:''}, dryOpen?'vent':'ventIdle', false);
     linkToSwitch(dry, 'dry', ()=>{ state.dry = state.dry==='open' ? 'closed' : 'open'; });
     vents.appendChild(dry);
   }
