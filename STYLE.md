@@ -23,7 +23,7 @@ The path names the page; the fragment names the view inside it. A rule's anchor 
 
 ## Columns
 
-Every page is two columns from 1200 px up: the text column at the left (`minmax(0,1fr)`, 612 px inside the 1100 px content column) and the tool column at the right (`--col-tool`, 440 px, 40 % of the content column), 48 px apart. The text column is wider than the paragraphs' 64ch (about 530 px), so rule descriptions keep their 2 lines. Left holds everything that is read: rules, switches, verdict, ranked list, notes. Right holds only a tool: the pictures, the calculator, the score and the drawing. Under 1200 px the pages are one column.
+Every page is two columns from 1200 px up: the text column at the left (`minmax(0,1fr)`, 582 px inside the 1100 px content column) and the tool column at the right (`--col-tool`, 470 px, 43 % of the content column), 48 px apart. The text column is wider than the paragraphs' 64ch (about 530 px), so rule descriptions keep their 2 lines. Left holds everything that is read: rules, switches, verdict, ranked list, notes. Right holds only a tool: the pictures, the calculator, the score and the drawing. Under 1200 px the pages are one column.
 
 ## Heater calculator
 

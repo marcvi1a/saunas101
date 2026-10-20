@@ -1,7 +1,7 @@
 /* Saunas 101 · styles. Colours, fonts and type scale follow saunaslava.com.br (lava.css): EB Garamond + Manrope, page background #FDF2EF, full-bleed with 3.75rem gutters. */
 /* Layout: four switches above one animated cross-section; the verdict and the heater readout beside it; sources below. */
 :root{
-  --masthead:170px; --col-tool:440px;
+  --masthead:170px; --col-tool:470px;
   --bg:#FDF2EF; --paper:#FFFFFF; --ink:#111111; --muted:#7C6A64; --line:#EAD9D3; --track:#EDECEA;
   --cedar:#A8663A; --cedar-soft:#E9D6C6; --stone:#4a4a4a;
   --fresh:#378DE2; --hot:#E8603A; --stale:#9A9A9A;
