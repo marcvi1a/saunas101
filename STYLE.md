@@ -7,7 +7,7 @@ The page follows saunaslava.com.br: EB Garamond for headings, Manrope for text, 
 1. Numbers are always digits: 2 bathers, 3 changes an hour, 20 cm, 90 °C. The only number written as a word is one. Fractions stay words: half, a third, a quarter.
 2. Units with a thin space: 20 cm, 90 °C, 6 l/s. Metric is the source; the Imperial toggle converts every figure on the page, so never hand-write an imperial value.
 3. Short sentences. No exclamation marks. No "the user". No brand names in the rules, and no mention of Lava anywhere: the page reads as an objective guide.
-4. Rule titles name the rule in words and carry no figures and no final full stop (Low ceiling, Warm feet); the figures go in the description, which is at most 2 lines on desktop: 160 characters, checked at build. Rules are numbered 1., 2., 3. in the title's own type.
+4. Rule titles name the rule in words and carry no figures and no final full stop (Low ceiling, Warm feet); the figures go in the description, which runs 2 lines on desktop: between 140 and 160 characters, checked at build. Rules are numbered 1., 2., 3. in the title's own type.
 
 ## Addresses
 
