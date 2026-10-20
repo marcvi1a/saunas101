@@ -62,7 +62,7 @@ h1{font-size:30px;font-weight:400;letter-spacing:0;line-height:1.1}
 .facts li{min-width:0;scroll-margin-top:220px;cursor:default}
 .facts h4{margin:0 0 10px;font-family:var(--serif);font-weight:400;font-size:21px;line-height:1.15;color:var(--ink);text-wrap:balance}
 .facts p{margin:0;font-size:14px;line-height:1.55;color:rgba(17,17,17,.78);max-width:64ch}
-.top{margin-bottom:34px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.top{margin-bottom:30px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
 .page--heater{display:grid;grid-template-columns:minmax(0,1fr) var(--col-tool);column-gap:48px;align-items:start}
 .page--heater .facts{grid-column:1;grid-row:1}
 .calc{grid-column:2;grid-row:1;margin-top:8px;position:sticky;top:calc(var(--masthead) + 32px);display:flex;flex-direction:column;align-items:stretch}
@@ -130,7 +130,7 @@ h1{font-size:30px;font-weight:400;letter-spacing:0;line-height:1.1}
 .units button:not([aria-pressed="true"]):hover{color:var(--ink)}
 .units .sep{color:var(--line)}
 .units button:focus-visible{outline:2px solid var(--fresh);outline-offset:2px}
-.sub{color:rgba(17,17,17,.78);font-size:14px;line-height:1.6;margin:10px 0 0}
+.sub{color:rgba(17,17,17,.78);font-size:14px;line-height:1.6;margin:8px 0 0}
 .eyebrow{font-family:var(--sans);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:rgba(17,17,17,.6)}
 
 .switches{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:0}
