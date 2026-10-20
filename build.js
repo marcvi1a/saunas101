@@ -10,7 +10,7 @@ const PAGES = [
   { out: "index.html", path: "/", canonical: "/construction", src: "src/construction.html", page: "construction", title: "Saunas 101 · How a proper Finnish sauna works",
     description: "8 rules for building a proper Finnish sauna: size, benches, ceiling, wood, metal, door, floor and walls.", scripts: ["site.js"] },
   { out: "heater.html", path: "/heater", src: "src/heater.html", page: "heater", title: "Heater · Saunas 101",
-    description: "How to size an electric sauna heater, with a calculator, and the rules on stones, clearances, the sensor and the wiring.", scripts: ["site.js"] },
+    description: "How to size an electric sauna heater, with a calculator, and the rules on stones, warm-up time, the sensor and safety.", scripts: ["site.js"] },
   { out: "ventilation.html", path: "/ventilation", src: "src/ventilation.html", page: "ventilation", title: "Ventilation · Saunas 101",
     description: "What löyly is, and an interactive lab that scores 17 sauna ventilation layouts: inlet position and angle, exhaust height, fan, duct and heater type.", scripts: ["site.js", "lab.js"] },
   { out: "404.html", path: null, src: "src/404.html", page: "notfound", title: "Not found · Saunas 101", description: "", scripts: ["site.js"] }

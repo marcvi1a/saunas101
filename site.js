@@ -94,17 +94,21 @@ for(const k in calcIds){ const el = document.getElementById(calcIds[k]); if(!el)
     calc[k] = k==='g' ? (imp ? v*FT*FT : v) : (imp ? v*FT : v); renderCalc(false); try{ history.replaceState(null,'', calcHash()); }catch(x){} }); }
 renderCalc(true);
 
-/* share the heater size: the system share sheet where there is one and no mouse, the clipboard everywhere else, as on saunaslava.com.br */
+/* share: the system share sheet where there is one and no mouse, the clipboard everywhere else, as on saunaslava.com.br; each control says what it shares */
 (function(){
-  const b = document.getElementById('calcShare'); if(!b) return;
   const copy = text => (navigator.clipboard && navigator.clipboard.writeText) ? navigator.clipboard.writeText(text) : Promise.reject(new Error('no clipboard'));
-  b.addEventListener('click', ()=>{
-    const url = location.origin + '/heater' + calcHash();
-    const text = 'Saunas 101: ' + document.getElementById('calcOut').textContent.split('. ')[0].trim() + '.';
+  const canonical = () => { const l = document.querySelector('link[rel="canonical"]'); return l ? l.href : location.origin + location.pathname; };
+  const payload = {
+    calc: () => ({ text: 'Saunas 101: ' + document.getElementById('calcOut').textContent.split('. ')[0].trim() + '.', url: location.origin + '/heater' + calcHash() }),
+    page: () => { const d = (document.querySelector('meta[name="description"]') || {}).content || ''; return { text: 'Saunas 101: ' + d.split(':')[0].trim() + '.', url: canonical() }; },
+    lab: () => { const h = document.querySelector('#verdict h2'), s = document.getElementById('scoreNum'); return { text: 'Saunas 101: ' + (h ? h.textContent.trim() : 'a sauna ventilation layout') + (s ? ', scored ' + s.textContent.trim() + ' of 100.' : '.'), url: canonical() + location.hash }; }
+  };
+  document.querySelectorAll('.share[data-share]').forEach(b => b.addEventListener('click', ()=>{
+    const { text, url } = payload[b.dataset.share]();
     const noMouse = window.matchMedia && window.matchMedia('(hover: none)').matches;
     if(noMouse && navigator.share){ navigator.share({ title: document.title, text, url }).catch(()=>{}); return; }
     copy(text + ' ' + url).then(()=>{ b.classList.add('is-copied'); clearTimeout(b._t); b._t = setTimeout(()=>b.classList.remove('is-copied'), 2000); }).catch(()=>{ window.prompt('Copy the link', url); });
-  });
+  }));
 })();
 
 /* the masthead is sticky; its measured height feeds the calculator's sticky offset */
