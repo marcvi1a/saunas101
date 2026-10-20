@@ -938,7 +938,7 @@ function applyLabState(st){
   }
 }
 function showTab(t, st){
-  tab = TABS.includes(t) ? t : 'ventilation';
+  tab = TABS.includes(t) ? t : 'construction';
   document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected', b.dataset.tab===tab ? 'true':'false'));
   document.querySelectorAll('.tab').forEach(s=>{ s.hidden = s.id!=='tab-'+tab; });
   if(tab==='ventilation'){ if(st) applyLabState(st); render(); }
@@ -950,8 +950,8 @@ function readHash(){
 }
 document.getElementById('tabs').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b){ ruleId=''; showTab(b.dataset.tab); } });
 window.addEventListener('hashchange',()=>{ const {t,st}=readHash(); if(t!==tab || st!==(tab==='ventilation'?labState:ruleId)) showTab(t,st); });
-document.querySelectorAll('.tab').forEach(p=>p.addEventListener('click',e=>{ const li=e.target.closest('li[id^="rule-"]'); if(!li) return; ruleId=li.id.slice(5); writeHash(); }));
-(function(){ const {t,st}=readHash(); showTab(t||'ventilation', st); })();
+document.querySelectorAll('.tab').forEach(p=>p.addEventListener('click',e=>{ if(e.target.closest('a')) return; const li=e.target.closest('li[id^="rule-"]'); if(!li) return; ruleId=li.id.slice(5); writeHash(); }));
+(function(){ const {t,st}=readHash(); showTab(t||'construction', st); })();
 
 /* ---------- the footer wordmark: the site's flow, loaded when the footer comes near ---------- */
 (function(){
