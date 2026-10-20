@@ -1,7 +1,7 @@
 /* Saunas 101 · styles. Colours, fonts and type scale follow saunaslava.com.br (lava.css): EB Garamond + Manrope, page background #FDF2EF, full-bleed with 3.75rem gutters. */
 /* Layout: four switches above one animated cross-section; the verdict and the heater readout beside it; sources below. */
 :root{
-  --masthead:170px; --col-tool:470px;
+  --masthead:170px; --tabs:48px; --col-tool:470px;
   --bg:#FDF2EF; --paper:#FFFFFF; --ink:#111111; --muted:#7C6A64; --line:#EAD9D3; --track:#EDECEA;
   --cedar:#A8663A; --cedar-soft:#E9D6C6; --stone:#4a4a4a;
   --fresh:#378DE2; --hot:#E8603A; --stale:#9A9A9A;
@@ -122,7 +122,10 @@ h1{font-size:30px;font-weight:400;letter-spacing:0;line-height:1.1}
 .lab-left .seg,.lab-left .seg.seg--grid,.lab-left .seg.seg--stack{display:inline-flex;grid-template-columns:none;max-width:100%;flex-wrap:wrap}
 .lab-left .seg button{flex:0 0 auto;padding:8px 10px}
 .lab-left .verdict{margin-top:32px}
-@media (max-width:1199px){.page--ventilation{display:flex;flex-direction:column;align-items:stretch}.page--ventilation > .facts{order:-2}.lab-right{order:-1;position:static;margin-top:24px}.lab-left .switches{margin-top:32px}.page--ventilation > .rank{margin-top:32px}}
+/* narrow screens: the title scrolls away and only the tabs stay; on phones the score and the drawing stay under the tabs while the switches scroll beneath them */
+@media (max-width:1199px){.masthead{display:contents}.top{padding-top:28px}.tabs{position:sticky;top:0;z-index:20;background:var(--bg);padding-top:6px}}
+@media (max-width:560px){.lab-right{position:sticky;top:calc(var(--tabs) + 12px);z-index:10;background:var(--bg)}}
+@media (max-width:1199px){.page--ventilation{display:flex;flex-direction:column;align-items:stretch}.page--ventilation > .facts{order:-2}.lab-right{order:-1;margin-top:24px}.lab-left .switches{margin-top:32px}.page--ventilation > .rank{margin-top:32px}}
 .notfound h2{margin:8px 0 10px;font-family:var(--serif);font-weight:400;font-size:21px;line-height:1.15}
 .notfound p{margin:0;font-size:14px;line-height:1.55;color:rgba(17,17,17,.78);max-width:64ch}
 .units{display:flex;flex:none;gap:6px;background:none;border:0;padding:0;margin-top:14px;font-family:var(--sans);font-size:13px}

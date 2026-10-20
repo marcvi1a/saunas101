@@ -116,7 +116,7 @@ renderCalc(true);
 })();
 
 /* the masthead is sticky; its measured height feeds the calculator's sticky offset */
-function setMasthead(){ const m = document.querySelector('.masthead'); if(m) document.documentElement.style.setProperty('--masthead', Math.round(m.getBoundingClientRect().height)+'px'); }
+function setMasthead(){ const r = document.documentElement.style, m = document.querySelector('.masthead'), t = document.querySelector('.tabs'); if(m) r.setProperty('--masthead', Math.round(m.getBoundingClientRect().height)+'px'); if(t) r.setProperty('--tabs', Math.round(t.getBoundingClientRect().height)+'px'); }
 setMasthead(); window.addEventListener('resize', setMasthead); if(document.fonts && document.fonts.ready) document.fonts.ready.then(setMasthead);
 
 /* a click on a rule puts its anchor in the address, so the view can be shared; a link inside the rule is not a rule click */
