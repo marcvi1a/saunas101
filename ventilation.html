@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&family=Manrope:wght@400;500;600;700&display=swap">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="stylesheet" href="/styles.css?v=d88f3273">
+<link rel="stylesheet" href="/styles.css?v=653d8db1">
 </head>
 <body>
 <div class="wrap">
@@ -95,7 +95,6 @@
   <div class="lab-card">
   <div class="lab-top">
     <div class="scoreline" id="scoreCard" data-g="good"><span class="eyebrow">Score</span><span class="scoreBig"><span id="scoreNum">100</span><small>/ 100</small></span><span class="scoreWord" id="scoreWord">Best choice</span>
-      <button class="btn btn--icon" id="toggle" type="button" aria-label="Pause" title="Pause" data-state="playing"><svg class="i-pause" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M5 3v10M11 3v10"/></svg><svg class="i-play" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M5 3l8 5-8 5z"/></svg></button>
     </div>
     <div class="draw">
     <svg id="svg" viewBox="-14 -14 448 322" role="img" aria-label="Animated cross-section of a sauna showing the air path for the chosen switches">
@@ -115,12 +114,15 @@
       <g id="vents"></g>
       <g id="dyn" clip-path="url(#roomclip)"></g>
     </svg>
+      <div class="tip" id="tip" role="tooltip"></div>
+    </div>
+    <div class="under">
       <div class="legend">
         <span><i class="dot dot--fresh"></i>fresh air</span>
         <span><i class="dot dot--hot"></i>heated air</span>
         <span id="legStale"><i class="dot dot--stale"></i>stagnant / CO₂</span>
       </div>
-      <div class="tip" id="tip" role="tooltip"></div>
+            <button class="btn btn--icon" id="toggle" type="button" aria-label="Pause" title="Pause" data-state="playing"><svg class="i-pause" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M5 3v10M11 3v10"/></svg><svg class="i-play" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M5 3l8 5-8 5z"/></svg></button>
     </div>
   </div>
   <div class="switches" id="switches">
