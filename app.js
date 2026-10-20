@@ -34,8 +34,8 @@ const GEN2 = 3333;                   // ppm per hour added by 2 seated bathers i
 const TILT = {
   'on|above|riser':    {f:1,    note:'The jet now aims at the ceiling. At the fan\'s 2.5 m/s it gets there, spreads under it and comes down over the top bench, where the fan collects it as before: the exchange where you breathe does not change. What changes is the sensor. The jet is now pointed at the place where the thermostat lives; keep the sensor 1 m from the louver, or aim the louver into the plume instead.'},
   'on|above|straight': {f:1,    note:'The jet now aims at the ceiling. At the fan\'s 2.5 m/s it gets there, spreads under it and comes down over the top bench, where the fan collects it as before: the exchange where you breathe does not change. What changes is the sensor. The jet is now pointed at the place where the thermostat lives; keep the sensor 1 m from the louver, or aim the louver into the plume instead.'},
-  'on|below|riser':    {f:1,    note:'Tilted up, the floor inlet throws its air at the side of the heater. At the fan\'s speed the stream still falls within half a metre and the fan drags it along the floor to the grille; the short circuit stays. The heater catches a little more of it, not enough to change the number.'},
-  'on|below|straight': {f:1,    note:'Tilted up, the floor inlet throws its air at the side of the heater. At the fan\'s speed the stream still falls within half a metre and the fan drags it along the floor to the grille; the short circuit stays. The heater catches a little more of it, not enough to change the number.'},
+  'on|below|riser':    {f:1,    note:'Tilted up, the floor inlet throws its air at the side of the heater. At the fan\'s speed the stream still falls within 50 cm and the fan drags it along the floor to the grille; the short circuit stays. The heater catches a little more of it, not enough to change the number.'},
+  'on|below|straight': {f:1,    note:'Tilted up, the floor inlet throws its air at the side of the heater. At the fan\'s speed the stream still falls within 50 cm and the fan drags it along the floor to the grille; the short circuit stays. The heater catches a little more of it, not enough to change the number.'},
   'off|above|riser':   {f:1.07, note:'Buoyancy only counts the heights where the holes meet the outside air. Tilting the hole up puts its outside mouth 14 cm lower, so the chimney from inlet to duct outlet is 14 cm taller: about 7 % more flow. Inside, the air moves at about 1 m/s, climbs some 30 cm off the tilt and falls into the plume as before.'},
   'off|above|straight':{f:0.9, note:'Warm air does go up, and it still comes out of this hole, because it is pushed: at 1 m the room sits about 0.7 Pa above the outside, and that pressure drives air down a short slope without noticing it. What the tilt does is lower the outside mouth by 14 cm, which takes 14 cm off the 74 cm that drive the reversal: about 10 % slower, still backwards. To stop it you would have to bring the inlet\'s outside mouth down to the exhaust\'s height, and then nothing moves at all. Gravity needs the outlet above the inlet; no angle on the inlet changes that.'},
   'off|below|riser':   {f:1.04, note:'The outside mouth drops 14 cm, which adds 14 cm to an already tall chimney: about 4 % more flow. The cold air still arrives at the floor by the heater.'},
@@ -119,7 +119,7 @@ function comboOf(k, exhaust, induct){ return (induct && exhaust==='upper' && COM
 const BARE = 0.93;   // a bare exhaust pipe outdoors: its air cools a few degrees on the way up, about 7 % less flow than an insulated one
 /* the half pipe: outlet at 1.2 m instead of 2 m. Chimney = pipe top − inlet height; flow ∝ √height */
 const HALF = {
-  'off|above|riser':  {f:0.45, note:'The pipe top at 1.2 m is only 20 cm above the inlet at 1 m: a 20 cm chimney instead of a metre. Flow goes with the square root of the height, so under half the flow, about one change an hour. Still the right way round, and it still needs priming.'},
+  'off|above|riser':  {f:0.45, note:'The pipe top at 1.2 m is only 20 cm above the inlet at 1 m: a 20 cm chimney instead of 1 m. Flow goes with the square root of the height, so under half the flow, about one change an hour. Still the right way round, and it still needs priming.'},
   'off|middle|riser': {f:0.70, note:'Chimney from the 45 cm inlet to the 1.2 m outlet: 75 cm instead of 1.55 m. About 70 % of the flow.'},
   'off|below|riser':  {f:0.76, note:'Chimney from the 10 cm inlet to the 1.2 m outlet: 1.1 m instead of 1.9 m. About 3/4 of the flow.'},
   'off|bottom|riser': {f:0.77, note:'Chimney from the floor to 1.2 m instead of 2 m. About 3/4 of the flow.'},
@@ -679,6 +679,8 @@ const RULES = [
   [/about 2 Pa per metre of height/g, 'about 0.6 Pa per foot of height'],
   [/, 1\.7 at 35 °C/g, ', 0.5 at 95 °F'],
   [/2 l\/s per m²/g, '0.4 cfm per ft²'],
+  [/per m³/g, 'per 35 ft³'],
+  [/per m²/g, 'per 11 ft²'],
   [new RegExp(RNG+' °C(?=\\s+(?:warmer|colder|below|above|hotter|cooler|lower|higher|difference|less|more))','g'), (m,a,b)=>(b!=null ? Math.round(numOf(a)*1.8)+' to '+Math.round(numOf(b)*1.8) : Math.round(numOf(a)*1.8))+' °F'],
   [new RegExp(RNG+' °C','g'), (m,a,b)=>(b!=null ? Math.round(numOf(a)*1.8+32)+' to '+Math.round(numOf(b)*1.8+32) : Math.round(numOf(a)*1.8+32))+' °F'],
   [new RegExp(RNG+' m³\\/h','g'), (m,a,b)=>{ const f=x=>x<1?Math.round(x*58.86)/100:Math.round(x*0.5886); return (b!=null ? f(numOf(a))+' to '+f(numOf(b)) : f(numOf(a)))+' cfm'; }],
