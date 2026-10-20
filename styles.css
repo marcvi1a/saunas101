@@ -87,7 +87,7 @@ h1{font-size:30px;font-weight:400;letter-spacing:0;line-height:1.1}
 .share-done{display:none}
 .share.is-copied .share-label,.share.is-copied svg{display:none}
 .share.is-copied .share-done{display:inline}
-@media (max-width:1199px){.page--heater{display:block}.calc{position:static;max-width:720px;margin:8px 0 24px}}
+@media (max-width:1199px){.page--heater{display:flex;flex-direction:column;align-items:stretch}.calc{position:static;max-width:720px;margin:0;order:1}}
 /* the construction page: the rules at the left, three drawn rules at the right in the lab's style, sticky like the calculator */
 .page--construction{display:grid;grid-template-columns:minmax(0,1fr) var(--col-tool);column-gap:48px;align-items:start}
 .page--construction .facts{grid-column:1;grid-row:1}
@@ -101,7 +101,7 @@ h1{font-size:30px;font-weight:400;letter-spacing:0;line-height:1.1}
 .mark{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .mark-bad{stroke:var(--bad)}
 .mark-good{stroke:var(--good)}
-@media (max-width:1199px){.page--construction{display:block}.pics{position:static;max-width:720px;margin:8px 0 24px}}
+@media (max-width:1199px){.page--construction{display:flex;flex-direction:column;align-items:stretch}.pics{position:static;max-width:720px;margin:0;order:1}}
 /* the ventilation page: the rule, the switches and the verdict read down the left like rules; the score and the drawing stay in view on the right */
 .page--ventilation{display:grid;grid-template-columns:minmax(0,1fr) var(--col-tool);column-gap:48px;align-items:start}
 .page--ventilation > .facts{grid-column:1;grid-row:1;padding-bottom:0;max-width:none}
@@ -123,12 +123,12 @@ h1{font-size:30px;font-weight:400;letter-spacing:0;line-height:1.1}
 .lab-left .seg button{flex:0 0 auto;padding:8px 10px}
 .lab-left .verdict{margin-top:32px}
 /* narrow screens: the title scrolls away and only the tabs stay; on phones the score and the drawing stay under the tabs while the switches scroll beneath them */
-@media (max-width:1199px){.masthead{display:contents}.top{padding-top:28px}.tabs{position:sticky;top:0;z-index:20;background:var(--bg);padding-top:6px}}
+@media (max-width:1199px){.masthead{display:contents}.top{display:block;position:relative;padding-top:28px}.units{position:absolute;right:0;top:28px}.tabs{position:sticky;top:0;z-index:20;background:var(--bg);padding-top:6px}}
 @media (max-width:560px){.lab-right{position:sticky;top:calc(var(--tabs) + 12px);z-index:10;background:var(--bg)}}
 @media (max-width:1199px){.page--ventilation{display:flex;flex-direction:column;align-items:stretch}.page--ventilation > .facts{order:-2}.lab-right{order:-1;margin-top:24px}.lab-left .switches{margin-top:32px}.page--ventilation > .rank{margin-top:32px}}
 .notfound h2{margin:8px 0 10px;font-family:var(--serif);font-weight:400;font-size:21px;line-height:1.15}
 .notfound p{margin:0;font-size:14px;line-height:1.55;color:rgba(17,17,17,.78);max-width:64ch}
-.units{display:flex;flex:none;gap:6px;background:none;border:0;padding:0;margin-top:14px;font-family:var(--sans);font-size:13px}
+.units{display:flex;flex:none;gap:6px;background:none;border:0;padding:0;margin-top:4px;font-family:var(--sans);font-size:13px}
 .units button{appearance:none;border:0;background:transparent;color:var(--muted);padding:2px 0;font:inherit;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;border-bottom:1px solid transparent}
 .units button[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--ink);cursor:default}
 .units button:not([aria-pressed="true"]):hover{color:var(--ink)}
