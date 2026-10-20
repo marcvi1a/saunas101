@@ -58,13 +58,12 @@ h1{font-size:2.2rem;font-weight:400;letter-spacing:0;line-height:1.1}
 .tabs a:focus-visible{outline:2px solid var(--fresh);outline-offset:2px}
 .soon{color:var(--muted);margin:0 0 34px}
 .facts{list-style:none;margin:0;padding:8px 0 24px;display:grid;grid-template-columns:1fr;gap:26px;max-width:720px}
-.facts a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
-.facts a:hover{text-decoration-color:var(--cedar)}
+.facts a,.notfound a{color:var(--muted);text-decoration:none}
+.facts a:hover,.notfound a:hover{color:color-mix(in srgb,var(--muted) 72%,var(--ink))}
 .facts li{min-width:0;scroll-margin-top:220px;cursor:default}
-.facts{counter-reset:rule}
 .facts h4{margin:0 0 10px;font-family:var(--serif);font-weight:400;font-size:21px;line-height:1.15;color:var(--ink);text-wrap:balance}
-.facts.cont{counter-reset:none}
-.facts h4::before{counter-increment:rule;content:counter(rule) ". "}
+.facts.cont{padding-top:0}
+.page--heater .facts:first-child{padding-bottom:26px}
 .facts p{margin:0;font-size:14px;line-height:1.55;color:rgba(17,17,17,.78);max-width:64ch}
 .top{margin-bottom:34px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
 .page--heater{display:grid;grid-template-columns:720px minmax(0,1fr);column-gap:48px;align-items:start}
@@ -84,8 +83,6 @@ h1{font-size:2.2rem;font-weight:400;letter-spacing:0;line-height:1.1}
 @media (max-width:1199px){.page--heater{display:block}.calc{position:static;max-width:720px;margin:0 0 32px}}
 .notfound h2{margin:8px 0 10px;font-family:var(--serif);font-weight:400;font-size:21px;line-height:1.15}
 .notfound p{margin:0;font-size:14px;line-height:1.55;color:rgba(17,17,17,.78);max-width:64ch}
-.notfound a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
-.notfound a:hover{text-decoration-color:var(--cedar)}
 .units{display:flex;gap:10px;background:none;border:0;padding:0;margin-top:14px;font-family:var(--sans);font-size:13px}
 .units button{appearance:none;border:0;background:transparent;color:var(--muted);padding:2px 0;font:inherit;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;border-bottom:1px solid transparent}
 .units button[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--ink);cursor:default}

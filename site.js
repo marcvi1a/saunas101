@@ -3,7 +3,7 @@
 /* the old single-page addresses (#heater, #ventilation.state, #construction.rule) go to the pages they named */
 (function(){
   const m = location.hash.match(/^#(construction|heater|ventilation)(?:\.([\w-]+))?$/); if(!m) return;
-  location.replace((m[1]==='construction' ? '/' : '/'+m[1]) + (m[2] ? '#'+m[2] : ''));
+  location.replace('/'+m[1] + (m[2] ? '#'+m[2] : ''));
 })();
 
 /* ---------- units ---------- */

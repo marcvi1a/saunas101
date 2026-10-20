@@ -7,18 +7,19 @@ The page follows saunaslava.com.br: EB Garamond for headings, Manrope for text, 
 1. Numbers are always digits: 2 bathers, 3 changes an hour, 20 cm, 90 °C. The only number written as a word is one. Fractions stay words: half, a third, a quarter.
 2. Units as symbols with a thin space, never spelled out: 20 cm, 90 °C, 6 l/s, 1 kW per m³. A spelled-out metre does not convert and reads wrong in Imperial. Metric is the source; the Imperial toggle converts every figure on the page, so never hand-write an imperial value.
 3. Short sentences. No exclamation marks. No "the user". No brand names in the rules, and no mention of Lava anywhere: the page reads as an objective guide.
-4. Rule titles name the rule in words and carry no figures and no final full stop (Low ceiling, Warm feet); the figures go in the description, which runs 2 lines on desktop: between 140 and 160 characters, checked at build. Rules are numbered 1., 2., 3. in the title's own type.
+4. Rule titles name the rule in words and carry no figures and no final full stop (Low ceiling, Warm feet); the figures go in the description, which runs 2 lines on desktop: between 140 and 160 characters, checked at build. Rules are numbered in the title's own type and the numbers run on across pages (construction 1 to 9, heater 10 on): the build writes them, the sources carry none.
 5. Rules are about building. Upkeep (restacking stones, cleaning) is not a rule.
+6. Links inside text look as on saunaslava.com.br: no underline, the muted brown (#7C6A64), a shade darker on hover.
 
 ## Pages and addresses
 
 Three pages, one per section, each with its own title, description, canonical address and place in `sitemap.xml`:
 
-1. `/` is Construction (`index.html`).
+1. `/construction` is Construction (`construction.html`). The root `/` (`index.html`) serves the same page and names `/construction` as its canonical address, so the home is never empty and search engines count one page.
 2. `/heater` (`heater.html`; GitHub Pages serves the file at the extensionless address).
 3. `/ventilation` (`ventilation.html`).
 
-The path names the page; the fragment names the view inside it. A rule's anchor is its id: `/#ceiling`, `/heater#glass`. A click on a rule puts its anchor in the address. The lab's layout lives in the fragment of the ventilation page: `/ventilation#on-above-riser` (fan, inlet, duct, then `-open`, `-up45`, `-pillar` or `-wall`, `-upper`, `-induct` or `-half`, or `none`); the lab rewrites it on every change, so the address always reopens the same view. Never a query string: a query would make every layout a crawlable address. No units in any address: units are the reader's preference, kept in localStorage. The old single-page addresses (`/#heater`, `/#ventilation.state`, `/#construction.rule`) are forwarded by `site.js` to the page they named.
+The path names the page; the fragment names the view inside it. A rule's anchor is its id: `/construction#ceiling`, `/heater#glass`. A click on a rule puts its anchor in the address. The lab's layout lives in the fragment of the ventilation page: `/ventilation#on-above-riser` (fan, inlet, duct, then `-open`, `-up45`, `-pillar` or `-wall`, `-upper`, `-induct` or `-half`, or `none`); the lab rewrites it on every change, so the address always reopens the same view. Never a query string: a query would make every layout a crawlable address. No units in any address: units are the reader's preference, kept in localStorage. The old single-page addresses (`/#heater`, `/#ventilation.state`, `/#construction.rule`) are forwarded by `site.js` to the page they named.
 
 ## Heater calculator
 
@@ -30,7 +31,7 @@ Every page ends with "Powered by" and the Lava wordmark, the site's own: `assets
 
 ## Code
 
-1. Content lives in `src/`: `layout.html` is the document (head, masthead, tabs, footer slot, scripts), `construction.html`, `heater.html` and `ventilation.html` are the page bodies, `footer.html` the shared footer, `404.html` the not-found page. `build.js` holds the page table (titles, descriptions, scripts) and writes the pages and the sitemap; it fails the build on a rule that breaks the writing rules, a duplicate id or an inline style.
+1. Content lives in `src/`: `layout.html` is the document (head, masthead, tabs, footer slot, scripts), `construction.html`, `heater.html` and `ventilation.html` are the page bodies, `footer.html` the shared footer, `404.html` the not-found page. `build.js` holds the page table (titles, descriptions, scripts) and numbers the rules, writes the pages and the sitemap; it fails the build on a rule that breaks the writing rules, a duplicate id or an inline style.
 2. All CSS lives in `styles.css`; `site.js` runs on every page (old addresses, units, calculator, masthead, footer, rule anchors) and `lab.js` only on the ventilation page. No inline `style` attributes; the only style set from script is data (a bar's width, the masthead height).
 3. Run `node build.js` before every push and commit the built pages with the sources. The script links carry a hash of the file's content as `?v=`, so a changed file is fetched fresh past GitHub Pages' 10-minute cache and an unchanged one stays cached.
 4. Paths in the pages are absolute (`/styles.css`, `/assets/…`), so the folder must be served over HTTP to be viewed locally.
