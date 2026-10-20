@@ -471,12 +471,12 @@ const DRY = {
   'off|below|straight':{grade:'ok', ach:'2 to 4 / h', achG:'warn', headN:2.5, head:'2 to 3 / h', headG:'warn', feet:'coldest of all', feetG:'bad', co2:1500, co28:3500}
 };
 const DRY_PATHS = {
-  offMiddle: [{d:'M22 236 C 40 240, 50 256, 58 278 C 64 292, 70 296, 74 296 C 76 290, 74 240, 74 200 C 74 150, 95 70, 160 48 C 240 32, 330 36, 398 36', color:'gradient', kt:'0;0.2;0.32;1', dur:8, n:7, size:3, noguide:true}],
-  offBottom: [{d:'M73 312 L 73 200 C 74 150, 95 70, 160 48 C 240 32, 330 36, 398 36', color:'gradient', kt:'0;0.12;0.28;1', dur:8, n:7, size:3, noguide:true}],
+  offMiddle: [{d:'M22 236 C 40 240, 50 256, 58 278 C 64 292, 70 296, 74 296 C 76 290, 74 240, 74 200 C 74 150, 95 70, 160 48 C 240 32, 330 24, 398 22', color:'gradient', kt:'0;0.2;0.32;1', dur:8, n:7, size:3, noguide:true}],
+  offBottom: [{d:'M73 312 L 73 200 C 74 150, 95 70, 160 48 C 240 32, 330 24, 398 22', color:'gradient', kt:'0;0.12;0.28;1', dur:8, n:7, size:3, noguide:true}],
   on:  [{d:'M110 60 C 200 34, 310 36, 398 36', color:'hot', dur:5, n:5, size:2.8, noguide:true}],
   offAbove: [{d:'M60 60 C 180 34, 300 36, 398 36', color:'hot', dur:5, n:5, size:2.8, noguide:true},
              {d:'M398 262 C 370 266, 300 280, 230 284', color:'fresh', dur:5, n:4, size:2.6, noguide:true}],
-  offBelow: [{d:'M22 283 C 60 282, 74 262, 80 215 C 92 150, 95 70, 160 48 C 240 32, 330 36, 398 36', color:'gradient', dur:8, n:7, size:3, noguide:true}]
+  offBelow: [{d:'M22 283 C 60 282, 74 262, 80 215 C 92 150, 95 70, 160 48 C 240 32, 330 24, 398 22', color:'gradient', dur:8, n:7, size:3, noguide:true}]
 };
 
 /* ---------- the drying vent left open while bathing ---------- */
