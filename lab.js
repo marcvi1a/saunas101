@@ -136,8 +136,14 @@ function feetOf(k, heater, exhaust, induct){
   if(induct && IDUCT[k] && IDUCT[k].feet!=null) f = Math.max(f, IDUCT[k].feet);
   return f;
 }
-function runScore(k, angle, heater, exhaust, induct, half){ return Math.min(headOf(k,angle,heater,exhaust,induct,half)/NEED,1)*(0.5+0.5*feetOf(k,heater,exhaust,induct)); }
-function score(k, angle, heater, exhaust, induct, half){ return Math.round(100*runScore(k, angle, heater, exhaust, induct, half)); }
+/* the drying vent open while bathing: the hottest air leaves at the ceiling, so the feet term halves, and the head air is capped at the figure the vent's own verdict gives (or cut by a fifth where it gives none); it never raises a score */
+const DRY_HEAD = 0.8, DRY_FEET = 0.5;
+function runScore(k, angle, heater, exhaust, induct, half, dry){
+  let head = headOf(k,angle,heater,exhaust,induct,half), feet = feetOf(k,heater,exhaust,induct);
+  if(dry){ const d = DRY[k]; head = Math.min(head, (d && d.headN!=null) ? d.headN : head*DRY_HEAD); feet = feet*DRY_FEET; }
+  return Math.min(head/NEED,1)*(0.5+0.5*feet);
+}
+function score(k, angle, heater, exhaust, induct, half, dry){ return Math.round(100*runScore(k, angle, heater, exhaust, induct, half, dry)); }
 const ROCK_FILLS=['#6a6a6a','#595959','#4e4e4e','#444444','#5f5f5f','#3c3c3c'];
 function rock(cx,cy,R,rnd){
   const k=5+Math.floor(rnd()*3), sx=1+rnd()*0.35, rot=rnd()*Math.PI, pts=[];
@@ -823,12 +829,12 @@ function render(){
   document.querySelectorAll('.sw:not(.sw--score)').forEach(c=>{ const seg=c.querySelector('.seg'); c.classList.toggle('sw--off', none && !(seg && (seg.dataset.key==='vent' || seg.dataset.key==='heater'))); });
   document.querySelectorAll('.sw--hot').forEach(c=>c.classList.remove('sw--hot'));
   if(hotKey){ const c=cardOf(hotKey); if(c) c.classList.add('sw--hot'); }
-  const sNow = score(key, angleEff, state.heater, state.exhaust, induct, half), card=document.getElementById('scoreCard');
+  const sNow = score(key, angleEff, state.heater, state.exhaust, induct, half, dryOpen), card=document.getElementById('scoreCard');
   if(card){ const g=scoreGrade(sNow); card.dataset.g = g; document.getElementById('scoreNum').textContent = sNow; document.getElementById('scoreWord').textContent = {good:'Best choice',warn:'Acceptable',bad:'Avoid'}[g]; }
   const dimSeg=(k,off)=>{ const seg=document.querySelector('[data-key="'+k+'"]'); if(!seg) return; if(seg.closest('.sw')) seg.closest('.sw').classList.toggle('sw--off', none || off); seg.querySelectorAll('button').forEach(b=>{ b.disabled = off; }); };
   dimSeg('angle', state.inlet==='bottom' || induct);
   document.querySelectorAll('[data-key="duct"] button[data-v="inletduct"]').forEach(b=>{ b.disabled = state.inlet==='bottom'; });
-  if(rankList.dataset.variant!==state.angle+state.heater+state.exhaust){ buildRank(); rankList.dataset.variant=state.angle+state.heater+state.exhaust; }
+  if(rankList.dataset.variant!==state.angle+state.heater+state.exhaust+state.dry){ buildRank(); rankList.dataset.variant=state.angle+state.heater+state.exhaust+state.dry; }
   document.querySelectorAll('.rk').forEach(b=>b.setAttribute('aria-pressed', (b.dataset.none ? none : (!none && b.dataset.fan===state.fan && b.dataset.inlet===state.inlet && b.dataset.duct===state.duct)) ? 'true':'false'));
   applyPause();
   labState = none ? 'none' : key.replace(/\|/g,'-')+(state.dry==='open'?'-open':'')+(state.angle==='up45'?'-up45':'')+(state.heater==='open'?'-pillar':state.heater==='wall'?'-wall':'')+(state.exhaust==='upper'?'-upper':'')+(induct?'-induct':'')+(half?'-half':'');
@@ -847,7 +853,7 @@ document.getElementById('toggle').addEventListener('click',()=>{paused=!paused; 
 const rankList=document.getElementById('rank');
 function buildRank(){
 rankList.innerHTML='';
-const ranked = RANK.map(r=>{ const k = r[1]==='none' ? 'none' : [r[1],r[2],r[3]].join('|'); return {r, k, s:score(k, state.angle, state.heater, state.exhaust)}; });
+const ranked = RANK.map(r=>{ const k = r[1]==='none' ? 'none' : [r[1],r[2],r[3]].join('|'); return {r, k, s:score(k, state.angle, state.heater, state.exhaust, false, false, k!=='none' && state.dry==='open')}; });
 ranked.sort((a,b)=>b.s-a.s || RANK.indexOf(a.r)-RANK.indexOf(b.r));
 ranked.forEach(({r:[L,fan,inlet,duct,text,word],k,s},i)=>{
   const isNone = fan==='none';
