@@ -191,6 +191,10 @@ const PRESET_KEYS = ['fan','inlet','duct','exhaust','heater','angle','dry'];
 
 /* ---------- state ---------- */
 const state = { vent:'yes', fan:'on', inlet:'above', angle:'straight', heater:'open', exhaust:'lower', duct:'straight', dry:'closed', none:false };
+/* the address: 7 words in switch order (inlet, exhaust, fan, duct, heater, inlet angle, drying vent), the switches' own words; no ventilation is no-<heater> */
+const HASH_WORD = { inlet:{above:'above', middle:'middle', below:'low', bottom:'floor'}, fan:{on:'exhaust', off:'none'}, duct:{straight:'none', riser:'long', half:'short', inletduct:'inlet'}, angle:{straight:'straight', up45:'45'} };
+const HASH_KEY = {}; for(const k in HASH_WORD){ HASH_KEY[k]={}; for(const v in HASH_WORD[k]) HASH_KEY[k][HASH_WORD[k][v]]=v; }
+const HEATERS = ['open','closed','wall'];
 let paused=false;
 const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const darkUI = document.documentElement.dataset.theme==='dark' || (document.documentElement.dataset.theme!=='light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -708,7 +712,7 @@ function render(){
   if(!rankList.dataset.built){ buildRank(); rankList.dataset.built='1'; }
   document.querySelectorAll('.rk').forEach(b=>{ const p=PRESETS[+b.dataset.i]; const on = p.vent==='none' ? none : (!none && PRESET_KEYS.every(f=>state[f]===p[f])); b.setAttribute('aria-pressed', on ? 'true':'false'); });
   applyPause();
-  labState = none ? 'none' : key.replace(/\|/g,'-')+(state.dry==='open'?'-open':'')+(state.angle==='up45'?'-up45':'')+(state.heater==='open'?'-pillar':state.heater==='wall'?'-wall':'')+(state.exhaust==='upper'?'-upper':'')+(induct?'-induct':'')+(half?'-half':'');
+  labState = none ? 'no-'+state.heater : [HASH_WORD.inlet[state.inlet], state.exhaust, HASH_WORD.fan[state.fan], HASH_WORD.duct[state.duct], state.heater, HASH_WORD.angle[state.angle], state.dry].join('-');
   writeHash();
   applyUnits();
 }
@@ -743,15 +747,11 @@ let labState = '';
 function writeHash(){ try{ history.replaceState(null,'', '#'+labState); }catch(e){} }
 function applyLabState(st){
   const m = st.split('-');
-  if(m[0]==='none'){ state.vent='none'; return; }
-  if(m.length>=3 && AIR[[m[0],m[1],m[2]].join('|')]){
-    state.vent='yes'; state.fan=m[0]; state.inlet=m[1]; state.duct=m[2];
-    state.dry = m.slice(3).includes('open') ? 'open' : 'closed';
-    state.angle = m.includes('up45') ? 'up45' : 'straight';
-    state.heater = m.includes('pillar') ? 'open' : m.includes('wall') ? 'wall' : 'closed';
-    state.exhaust = m.includes('upper') ? 'upper' : 'lower';
-    if(m.includes('induct')) state.duct='inletduct'; else if(m.includes('half')) state.duct='half';
-  }
+  if(m[0]==='no'){ state.vent='none'; if(HEATERS.includes(m[1])) state.heater=m[1]; return; }
+  if(m.length!==7) return;
+  const inlet=HASH_KEY.inlet[m[0]], exhaust=(m[1]==='lower'||m[1]==='upper')?m[1]:null, fan=HASH_KEY.fan[m[2]], duct=HASH_KEY.duct[m[3]], heater=HEATERS.includes(m[4])?m[4]:null, angle=HASH_KEY.angle[m[5]], dry=(m[6]==='closed'||m[6]==='open')?m[6]:null;
+  if(!inlet||!exhaust||!fan||!duct||!heater||!angle||!dry) return;
+  Object.assign(state,{vent:'yes', inlet, exhaust, fan, duct, heater, angle, dry});
 }
 window.addEventListener('hashchange',()=>{ const st = location.hash.slice(1); if(st!==labState){ applyLabState(st); render(); } });
 (function(){ const st = location.hash.slice(1); if(st) applyLabState(st); render(); })();

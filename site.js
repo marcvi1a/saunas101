@@ -1,10 +1,4 @@
-/* Saunas 101 · site script: old addresses, units, the footer wordmark, the heater calculator, the masthead, rule anchors. */
-
-/* the old single-page addresses (#heater, #ventilation.state, #construction.rule) go to the pages they named */
-(function(){
-  const m = location.hash.match(/^#(construction|heater|ventilation)(?:\.([\w-]+))?$/); if(!m) return;
-  location.replace('/'+m[1] + location.search + (m[2] ? '#'+m[2] : ''));
-})();
+/* Saunas 101 · site script: units, the footer wordmark, the heater calculator, the masthead, rule anchors. */
 
 /* ---------- units ---------- */
 let units = 'metric';
