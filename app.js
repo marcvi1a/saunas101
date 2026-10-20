@@ -876,7 +876,8 @@ function render(){
   if(rankList.dataset.variant!==state.angle+state.heater+state.exhaust){ buildRank(); rankList.dataset.variant=state.angle+state.heater+state.exhaust; }
   document.querySelectorAll('.rk').forEach(b=>b.setAttribute('aria-pressed', (b.dataset.none ? none : (!none && b.dataset.fan===state.fan && b.dataset.inlet===state.inlet && b.dataset.duct===state.duct)) ? 'true':'false'));
   applyPause();
-  try{ history.replaceState(null,'', none ? '#none' : '#'+key.replace(/\|/g,'-')+(state.dry==='open'?'-open':'')+(state.angle==='up45'?'-up45':'')+(state.heater==='open'?'-pillar':state.heater==='wall'?'-wall':'')+(state.exhaust==='upper'?'-upper':'')+(induct?'-induct':'')+(half?'-half':'')); }catch(e){}
+  labState = none ? 'none' : key.replace(/\|/g,'-')+(state.dry==='open'?'-open':'')+(state.angle==='up45'?'-up45':'')+(state.heater==='open'?'-pillar':state.heater==='wall'?'-wall':'')+(state.exhaust==='upper'?'-upper':'')+(induct?'-induct':'')+(half?'-half':'');
+  if(tab==='ventilation') writeHash();
   applyUnits();
 }
 function applyPause(){
@@ -906,27 +907,40 @@ ranked.forEach(({r:[L,fan,inlet,duct,text,word],k,s},i)=>{
 }
 rankList.addEventListener('click',e=>{ const b=e.target.closest('.rk'); if(!b) return; if(b.dataset.none){ state.vent='none'; } else { state.vent='yes'; state.fan=b.dataset.fan; state.inlet=b.dataset.inlet; state.duct=b.dataset.duct; } render(); });
 if(reduce) paused=true;
-try{
-  const m=location.hash.replace('#','').split('-');
-  const flags=()=>{ if(m.slice(3).includes('open')) state.dry='open'; if(m.includes('up45')) state.angle='up45'; if(m.includes('pillar')) state.heater='open'; if(m.includes('wall')) state.heater='wall'; if(m.includes('upper')) state.exhaust='upper'; if(m.includes('induct')) state.duct='inletduct'; if(m.includes('half')) state.duct='half'; };
-  if(m[0]==='none'){ state.vent='none'; }
-  else if(m.length>=3 && AIR[[m[0],m[1],m[2]].join('|')]){ state.fan=m[0]; state.inlet=m[1]; state.duct=m[2]; flags(); }
-}catch(e){}
 document.getElementById('units').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; units=b.dataset.u; try{ localStorage.setItem('units',units); }catch(e){} applyUnits(); });
-/* tabs */
-let tab = 'construction';
-function showTab(t){
-  tab = t;
-  document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected', b.dataset.tab===t ? 'true':'false'));
-  document.querySelectorAll('.tab').forEach(s=>{ s.hidden = s.id!=='tab-'+t; });
-  try{ localStorage.setItem('tab', t); }catch(e){}
-  if(t==='ventilation') render();
+
+/* ---------- the address: #tab or #tab.state ---------- */
+const TABS = ['construction','heater','ventilation'];
+let tab = 'construction', labState = '', ruleId = '';
+function writeHash(){
+  const st = tab==='ventilation' ? labState : tab==='construction' ? ruleId : '';
+  try{ history.replaceState(null,'', '#'+tab+(st?'.'+st:'')); }catch(e){}
 }
-document.getElementById('tabs').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) showTab(b.dataset.tab); });
-(function(){
-  let t = 'construction';
-  try{ const saved=localStorage.getItem('tab'); if(saved) t=saved; }catch(e){}
-  if(location.hash.length>1) t='ventilation';
-  showTab(t);
-})();
-render();
+function applyLabState(st){
+  const m = st.split('-');
+  if(m[0]==='none'){ state.vent='none'; return; }
+  if(m.length>=3 && AIR[[m[0],m[1],m[2]].join('|')]){
+    state.vent='yes'; state.fan=m[0]; state.inlet=m[1]; state.duct=m[2];
+    state.dry = m.slice(3).includes('open') ? 'open' : 'closed';
+    state.angle = m.includes('up45') ? 'up45' : 'straight';
+    state.heater = m.includes('pillar') ? 'open' : m.includes('wall') ? 'wall' : 'closed';
+    state.exhaust = m.includes('upper') ? 'upper' : 'lower';
+    if(m.includes('induct')) state.duct='inletduct'; else if(m.includes('half')) state.duct='half';
+  }
+}
+function showTab(t, st){
+  tab = TABS.includes(t) ? t : 'construction';
+  document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected', b.dataset.tab===tab ? 'true':'false'));
+  document.querySelectorAll('.tab').forEach(s=>{ s.hidden = s.id!=='tab-'+tab; });
+  if(tab==='ventilation'){ if(st) applyLabState(st); render(); }
+  else if(tab==='construction'){ ruleId = (st && document.getElementById('rule-'+st)) ? st : ''; writeHash(); if(ruleId) document.getElementById('rule-'+ruleId).scrollIntoView({block:'start'}); }
+  else writeHash();
+}
+function readHash(){
+  const raw = location.hash.replace('#',''); const dot = raw.indexOf('.');
+  return { t: dot<0 ? raw : raw.slice(0,dot), st: dot<0 ? '' : raw.slice(dot+1) };
+}
+document.getElementById('tabs').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b){ ruleId=''; showTab(b.dataset.tab); } });
+window.addEventListener('hashchange',()=>{ const {t,st}=readHash(); if(t!==tab || st!==(tab==='ventilation'?labState:ruleId)) showTab(t,st); });
+document.getElementById('tab-construction').addEventListener('click',e=>{ const li=e.target.closest('li[id^="rule-"]'); if(!li) return; ruleId=li.id.slice(5); writeHash(); });
+(function(){ const {t,st}=readHash(); showTab(t||'construction', st); })();

@@ -9,6 +9,10 @@ The page follows saunaslava.com.br: EB Garamond for headings, Manrope for text, 
 3. Short sentences. No exclamation marks. No "the user".
 4. Titles are sentences with a full stop when they state a rule (Ceiling at 2.1 to 2.3 m.) and bare when they name a thing (Drying vent).
 
+## Addresses
+
+The hash names the tab and, after a dot, the view inside it: `#construction`, `#construction.ceiling` (a rule id), `#heater`, `#ventilation`, `#ventilation.on-above-riser-upper` (a lab state). No units in the address: units are the reader's preference. The hash is rewritten on every tab switch, rule click and lab change, so the address bar always reopens the same view.
+
 ## Code
 
 1. `index.html` is markup only. All CSS lives in `styles.css`, all JavaScript in `app.js`. No inline `style` attributes; the only style set from script is data (a bar's width).
