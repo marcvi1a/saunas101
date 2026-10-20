@@ -87,7 +87,7 @@ function renderCalc(fill){
   const vol = calc.w*calc.d*calc.h, eff = vol + 1.2*calc.g, kw = Math.ceil(eff - 1e-9); calc.kw = kw;
   const volTxt = m3 => imp ? Math.round(m3/(FT*FT*FT))+'\u202Fft³' : calcFmt(m3)+'\u202Fm³';
   if(!(vol>0)){ out.textContent = 'Enter the width, depth and height of the room.'; return; }
-  out.innerHTML = '<strong>'+volTxt(vol)+'</strong> of room' + (calc.g>0 ? ', counted as <strong>'+volTxt(eff)+'</strong> with the glass' : '') + ', so a heater of about <strong>'+kw+'\u202FkW</strong>. Round up to the next size on sale.';
+  out.innerHTML = '<span><strong>'+volTxt(vol)+'</strong> of room' + (calc.g>0 ? ', counted as <strong>'+volTxt(eff)+'</strong> with the glass' : '') + '.</span><span>An electric heater of about <strong>'+kw+'\u202FkW</strong>. Round up to the next size on sale.</span>';
 }
 for(const k in calcIds){ const el = document.getElementById(calcIds[k]); if(!el) continue;
   el.addEventListener('input', ()=>{ const n = parseFloat(el.value); const v = isFinite(n) && n>0 ? n : 0; const imp = units==='imperial';
