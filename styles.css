@@ -62,7 +62,8 @@ h1{font-size:30px;font-weight:400;letter-spacing:0;line-height:1.1}
 .facts li{min-width:0;scroll-margin-top:220px;cursor:default}
 .facts h4{margin:0 0 10px;font-family:var(--serif);font-weight:400;font-size:21px;line-height:1.15;color:var(--ink);text-wrap:balance}
 .facts p{margin:0;font-size:14px;line-height:1.55;color:rgba(17,17,17,.78);max-width:64ch}
-.top{margin-bottom:30px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.top{margin-bottom:30px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.top>div{min-width:0}
 .page--heater{display:grid;grid-template-columns:minmax(0,1fr) var(--col-tool);column-gap:48px;align-items:start}
 .page--heater .facts{grid-column:1;grid-row:1}
 .calc{grid-column:2;grid-row:1;margin-top:8px;position:sticky;top:calc(var(--masthead) + 32px);display:flex;flex-direction:column;align-items:stretch}
@@ -124,7 +125,7 @@ h1{font-size:30px;font-weight:400;letter-spacing:0;line-height:1.1}
 @media (max-width:1199px){.page--ventilation{display:flex;flex-direction:column;align-items:stretch}.page--ventilation > .facts{order:-2}.lab-right{order:-1;position:static;margin-top:24px}.lab-left .switches{margin-top:32px}.page--ventilation > .rank{margin-top:32px}}
 .notfound h2{margin:8px 0 10px;font-family:var(--serif);font-weight:400;font-size:21px;line-height:1.15}
 .notfound p{margin:0;font-size:14px;line-height:1.55;color:rgba(17,17,17,.78);max-width:64ch}
-.units{display:flex;gap:10px;background:none;border:0;padding:0;margin-top:14px;font-family:var(--sans);font-size:13px}
+.units{display:flex;flex:none;gap:6px;background:none;border:0;padding:0;margin-top:14px;font-family:var(--sans);font-size:13px}
 .units button{appearance:none;border:0;background:transparent;color:var(--muted);padding:2px 0;font:inherit;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;border-bottom:1px solid transparent}
 .units button[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--ink);cursor:default}
 .units button:not([aria-pressed="true"]):hover{color:var(--ink)}
