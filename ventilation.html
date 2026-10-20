@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&family=Manrope:wght@400;500;600;700&display=swap">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="stylesheet" href="/styles.css?v=73388f64">
+<link rel="stylesheet" href="/styles.css?v=228e41bc">
 </head>
 <body>
 <div class="wrap">
@@ -40,16 +40,7 @@
     <li id="fan"><h4>17. Electric heater needs a fan</h4><p>A wood stove pulls its air through the room and up the chimney. An electric heater moves nothing, so the room needs an inlet, an exhaust and usually a fan.</p></li>
   </ul>
   <div class="lab-left">
-  <div class="switches" id="switches">
-    <div class="sw"><div class="eyebrow" title="Air in, air out.">Ventilation</div><div class="seg" data-key="vent"><button type="button" data-v="yes">Yes</button><button type="button" data-v="none">None</button></div></div>
-    <div class="sw"><div class="eyebrow" title="Dries sauna after use.">Drying vent</div><div class="seg" data-key="dry"><button type="button" data-v="closed">Closed</button><button type="button" data-v="open">Open</button></div></div>
-    <div class="sw"><div class="eyebrow" title="Lets fresh air in from outside.">Inlet</div><div class="seg seg--grid" data-key="inlet"><button type="button" data-v="above" title="20 cm above the stones, 1 m off the floor">Above</button><button type="button" data-v="middle" title="At half the heater's height, facing it">Middle</button><button type="button" data-v="below" title="10 cm off the floor, beside the heater">Bottom</button><button type="button" data-v="bottom" title="Through the floor, directly under the heater">Under</button></div></div>
-    <div class="sw"><div class="eyebrow" title="Lets used air out.">Exhaust</div><div class="seg seg--stack" data-key="exhaust"><button type="button" data-v="lower">Lower bench</button><button type="button" data-v="upper">Upper bench</button></div></div>
-    <div class="sw"><div class="eyebrow" title="Heats the air and lifts it.">Heater</div><div class="seg" data-key="heater"><button type="button" data-v="open" title="Stone pillar: no casing, stones exposed on every side">Open</button><button type="button" data-v="closed" title="Floor-standing casing heater: a sheet-metal chimney with the stones on top">Closed</button><button type="button" data-v="wall" title="Short casing heater hung on the wall, 30 cm off the floor">Wall</button></div></div>
-    <div class="sw"><div class="eyebrow" title="Aims air into the heater's plume.">Inlet angle</div><div class="seg" data-key="angle"><button type="button" data-v="straight">Straight</button><button type="button" data-v="up45">45°</button></div></div>
-    <div class="sw"><div class="eyebrow" title="Pulls used air out and sets the rate.">Exhaust fan</div><div class="seg" data-key="fan"><button type="button" data-v="on">Fan</button><button type="button" data-v="off">No fan</button></div></div>
-    <div class="sw"><div class="eyebrow" title="Keeps the air flowing the right way without a fan.">Duct</div><div class="seg seg--grid" data-key="duct"><button type="button" data-v="straight">None</button><button type="button" data-v="riser" title="A bare pipe from the exhaust grille up to an outlet above the room">Long</button><button type="button" data-v="half" title="A bare pipe from the exhaust grille up to an outlet at 1.2 m">Short</button><button type="button" data-v="inletduct" title="A bare pipe from a mouth at floor level up to the inlet">Inlet</button></div></div>
-  </div>
+
     <div class="verdict" id="verdict"></div>
   <aside class="rank" aria-label="The 8 air layouts, ranked">
     <div class="eyebrow">Layouts scored 0 to 100 · M mechanical · G gravity</div>
@@ -101,15 +92,19 @@
   <footer class="modelnote-foot">Airflow is schematic, not CFD. Stack pressure for the fan-off states: about 2 Pa per metre of height between the openings at 90 °C inside and 25 °C outside, 1.7 at 35 °C. CO₂ figures come from one mixing model: 0.04 m³/h for 2 seated bathers, 420 ppm outside, the breathing zone mixed at its own exchange rate and read 30 minutes into the session; cross-checked against one published measurement. The door is taken as sealed; a gap under it is one more low inlet that the fan or the stack will use first.</footer>
   </div>
   <div class="lab-right">
-  <div class="sw sw--score scoreRow" id="scoreCard" data-g="good"><div class="eyebrow">Score</div><div class="scoreBig"><span id="scoreNum">100</span><small>/ 100</small></div><div class="scoreWord" id="scoreWord">Best choice</div></div>
-  <div class="room">
-    <svg id="svg" viewBox="-14 -14 448 340" role="img" aria-label="Animated cross-section of a sauna showing the air path for the chosen switches">
+  <div class="lab-card">
+  <div class="lab-top">
+    <div class="scoreline" id="scoreCard" data-g="good"><span class="eyebrow">Score</span><span class="scoreBig"><span id="scoreNum">100</span><small>/ 100</small></span><span class="scoreWord" id="scoreWord">Best choice</span>
+      <button class="btn btn--icon" id="toggle" type="button" aria-label="Pause" title="Pause" data-state="playing"><svg class="i-pause" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M5 3v10M11 3v10"/></svg><svg class="i-play" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M5 3l8 5-8 5z"/></svg></button>
+    </div>
+    <div class="draw">
+    <svg id="svg" viewBox="-14 -14 448 322" role="img" aria-label="Animated cross-section of a sauna showing the air path for the chosen switches">
       <defs><clipPath id="roomclip"><rect x="-4" y="-2" width="424" height="304"/></clipPath></defs>
       <g id="planks"></g>
       <g id="duct"></g>
       <g id="glow"></g>
       <g id="heaterg"></g>
-      <text x="73" y="318" text-anchor="middle" class="lbl">HEATER</text>
+      <text x="73" y="182" text-anchor="middle" class="lbl lblHalo">HEATER</text>
       <rect x="230" y="174" width="168" height="13.8" class="bench"/>
       <rect x="200" y="236" width="198" height="13.8" class="bench"/>
       <text x="392" y="170" text-anchor="end" class="lbl">UPPER BENCH</text>
@@ -120,21 +115,30 @@
       <g id="vents"></g>
       <g id="dyn" clip-path="url(#roomclip)"></g>
     </svg>
-    <div class="tip" id="tip" role="tooltip"></div>
-    <div class="controls">
       <div class="legend">
         <span><i class="dot dot--fresh"></i>fresh air</span>
         <span><i class="dot dot--hot"></i>heated air</span>
         <span id="legStale"><i class="dot dot--stale"></i>stagnant / CO₂</span>
       </div>
-      <button class="btn btn--icon" id="toggle" type="button" aria-label="Pause" title="Pause" data-state="playing"><svg class="i-pause" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M5 3v10M11 3v10"/></svg><svg class="i-play" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M5 3l8 5-8 5z"/></svg></button>
+      <div class="tip" id="tip" role="tooltip"></div>
     </div>
   </div>
+  <div class="switches" id="switches">
+    <div class="sw"><div class="eyebrow" title="Air in, air out.">Ventilation</div><div class="seg" data-key="vent"><button type="button" data-v="yes">Yes</button><button type="button" data-v="none">None</button></div></div>
+    <div class="sw"><div class="eyebrow" title="Dries sauna after use.">Drying vent</div><div class="seg" data-key="dry"><button type="button" data-v="closed">Closed</button><button type="button" data-v="open">Open</button></div></div>
+    <div class="sw"><div class="eyebrow" title="Lets fresh air in from outside.">Inlet</div><div class="seg seg--grid" data-key="inlet"><button type="button" data-v="above" title="20 cm above the stones, 1 m off the floor">Above</button><button type="button" data-v="middle" title="At half the heater's height, facing it">Middle</button><button type="button" data-v="below" title="10 cm off the floor, beside the heater">Bottom</button><button type="button" data-v="bottom" title="Through the floor, directly under the heater">Under</button></div></div>
+    <div class="sw"><div class="eyebrow" title="Lets used air out.">Exhaust</div><div class="seg seg--stack" data-key="exhaust"><button type="button" data-v="lower">Lower bench</button><button type="button" data-v="upper">Upper bench</button></div></div>
+    <div class="sw"><div class="eyebrow" title="Heats the air and lifts it.">Heater</div><div class="seg" data-key="heater"><button type="button" data-v="open" title="Stone pillar: no casing, stones exposed on every side">Open</button><button type="button" data-v="closed" title="Floor-standing casing heater: a sheet-metal chimney with the stones on top">Closed</button><button type="button" data-v="wall" title="Short casing heater hung on the wall, 30 cm off the floor">Wall</button></div></div>
+    <div class="sw"><div class="eyebrow" title="Aims air into the heater's plume.">Inlet angle</div><div class="seg" data-key="angle"><button type="button" data-v="straight">Straight</button><button type="button" data-v="up45">45°</button></div></div>
+    <div class="sw"><div class="eyebrow" title="Pulls used air out and sets the rate.">Exhaust fan</div><div class="seg" data-key="fan"><button type="button" data-v="on">Fan</button><button type="button" data-v="off">No fan</button></div></div>
+    <div class="sw"><div class="eyebrow" title="Keeps the air flowing the right way without a fan.">Duct</div><div class="seg seg--grid" data-key="duct"><button type="button" data-v="straight">None</button><button type="button" data-v="riser" title="A bare pipe from the exhaust grille up to an outlet above the room">Long</button><button type="button" data-v="half" title="A bare pipe from the exhaust grille up to an outlet at 1.2 m">Short</button><button type="button" data-v="inletduct" title="A bare pipe from a mouth at floor level up to the inlet">Inlet</button></div></div>
+  </div>  </div>
     <button class="share" type="button" data-share="lab" aria-label="Share this layout">
       <span class="share-label">Share</span>
       <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 12 12 4M6 4h6v6"/></svg>
       <span class="share-done">Link copied</span>
     </button>
+
   </div>
   </main>
   <footer class="made">
