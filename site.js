@@ -67,6 +67,10 @@ document.getElementById('units').addEventListener('click',e=>{ const b=e.target.
 /* heater size calculator: metres inside, shown and typed in the reader's units; the text converter skips its block */
 const FT = 0.3048;
 const calc = { w:2.1, d:2.1, h:2.1, g:0 };
+const CALC_HASH = /^#(\d+(?:\.\d+)?)x(\d+(?:\.\d+)?)x(\d+(?:\.\d+)?)(?:\+(\d+(?:\.\d+)?))?$/;
+const calcNum = x => String(Math.round(x*100)/100);
+const calcHash = () => '#' + calcNum(calc.w) + 'x' + calcNum(calc.d) + 'x' + calcNum(calc.h) + (calc.g > 0 ? '+' + calcNum(calc.g) : '');
+(function(){ const m = location.hash.match(CALC_HASH); if(!m) return; calc.w = +m[1]; calc.d = +m[2]; calc.h = +m[3]; calc.g = m[4] ? +m[4] : 0; })();
 const calcIds = { w:'calcW', d:'calcD', h:'calcH', g:'calcG' };
 const calcFmt = x => String(Math.round(x*10)/10);
 function renderCalc(fill){
@@ -83,8 +87,21 @@ function renderCalc(fill){
 }
 for(const k in calcIds){ const el = document.getElementById(calcIds[k]); if(!el) continue;
   el.addEventListener('input', ()=>{ const n = parseFloat(el.value); const v = isFinite(n) && n>0 ? n : 0; const imp = units==='imperial';
-    calc[k] = k==='g' ? (imp ? v*FT*FT : v) : (imp ? v*FT : v); renderCalc(false); }); }
+    calc[k] = k==='g' ? (imp ? v*FT*FT : v) : (imp ? v*FT : v); renderCalc(false); try{ history.replaceState(null,'', calcHash()); }catch(x){} }); }
 renderCalc(true);
+
+/* share the heater size: the system share sheet where there is one and no mouse, the clipboard everywhere else, as on saunaslava.com.br */
+(function(){
+  const b = document.getElementById('calcShare'); if(!b) return;
+  const copy = text => (navigator.clipboard && navigator.clipboard.writeText) ? navigator.clipboard.writeText(text) : Promise.reject(new Error('no clipboard'));
+  b.addEventListener('click', ()=>{
+    const url = location.origin + '/heater' + calcHash();
+    const text = 'Saunas 101: ' + document.getElementById('calcOut').textContent.split('. ')[0].trim() + '.';
+    const noMouse = window.matchMedia && window.matchMedia('(hover: none)').matches;
+    if(noMouse && navigator.share){ navigator.share({ title: document.title, text, url }).catch(()=>{}); return; }
+    copy(text + ' ' + url).then(()=>{ b.classList.add('is-copied'); clearTimeout(b._t); b._t = setTimeout(()=>b.classList.remove('is-copied'), 2000); }).catch(()=>{ window.prompt('Copy the link', url); });
+  });
+})();
 
 /* the masthead is sticky; its measured height feeds the calculator's sticky offset */
 function setMasthead(){ const m = document.querySelector('.masthead'); if(m) document.documentElement.style.setProperty('--masthead', Math.round(m.getBoundingClientRect().height)+'px'); }
