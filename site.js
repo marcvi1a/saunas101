@@ -84,7 +84,7 @@ function renderCalc(fill){
   if(fill) for(const k in calcIds) document.getElementById(calcIds[k]).value = calcFmt(toShow(k, calc[k]));
   document.querySelectorAll('#calc [data-u="len"]').forEach(s=>{ s.textContent = imp ? 'ft' : 'm'; });
   document.querySelectorAll('#calc [data-u="area"]').forEach(s=>{ s.textContent = imp ? 'ft²' : 'm²'; });
-  const vol = calc.w*calc.d*calc.h, eff = vol + 1.2*calc.g, kw = Math.ceil(eff - 1e-9);
+  const vol = calc.w*calc.d*calc.h, eff = vol + 1.2*calc.g, kw = Math.ceil(eff - 1e-9); calc.kw = kw;
   const volTxt = m3 => imp ? Math.round(m3/(FT*FT*FT))+'\u202Fft³' : calcFmt(m3)+'\u202Fm³';
   if(!(vol>0)){ out.textContent = 'Enter the width, depth and height of the room.'; return; }
   out.innerHTML = '<strong>'+volTxt(vol)+'</strong> of room' + (calc.g>0 ? ', counted as <strong>'+volTxt(eff)+'</strong> with the glass' : '') + ', so a heater of about <strong>'+kw+'\u202FkW</strong>. Round up to the next size on sale.';
@@ -99,12 +99,12 @@ renderCalc(true);
   const copy = text => (navigator.clipboard && navigator.clipboard.writeText) ? navigator.clipboard.writeText(text) : Promise.reject(new Error('no clipboard'));
   const canonical = () => { const l = document.querySelector('link[rel="canonical"]'); return l ? l.href : location.origin + location.pathname; };
   const payload = {
-    calc: () => ({ text: 'Saunas 101: ' + document.getElementById('calcOut').textContent.split('. ')[0].trim() + '.', url: location.origin + '/heater' + calcHash() }),
-    page: () => { const d = (document.querySelector('meta[name="description"]') || {}).content || ''; return { text: 'Saunas 101: ' + d.split(':')[0].trim() + '.', url: canonical() }; },
-    lab: () => { const h = document.querySelector('#verdict h2'), s = document.getElementById('scoreNum'); return { text: 'Saunas 101: ' + (h ? h.textContent.trim() : 'a sauna ventilation layout') + (s ? ', scored ' + s.textContent.trim() + ' of 100.' : '.'), url: canonical() + location.hash }; }
+    calc: () => ({ text: 'Saunas 101: Electric heater calculator ' + calc.kw + '\u202FkW.', url: location.origin + '/heater' + calcHash() }),
+    page: b => ({ text: 'Saunas 101: ' + (b.dataset.text || document.title) + '.', url: canonical() }),
+    lab: () => { const s = document.getElementById('scoreNum'); return { text: 'Saunas 101: Ventilation diagram with all variables explained, score ' + (s ? s.textContent.trim() : '') + '.', url: canonical() + location.hash }; }
   };
   document.querySelectorAll('.share[data-share]').forEach(b => b.addEventListener('click', ()=>{
-    const { text, url } = payload[b.dataset.share]();
+    const { text, url } = payload[b.dataset.share](b);
     const noMouse = window.matchMedia && window.matchMedia('(hover: none)').matches;
     if(noMouse && navigator.share){ navigator.share({ title: document.title, text, url }).catch(()=>{}); return; }
     copy(text + ' ' + url).then(()=>{ b.classList.add('is-copied'); clearTimeout(b._t); b._t = setTimeout(()=>b.classList.remove('is-copied'), 2000); }).catch(()=>{ window.prompt('Copy the link', url); });
