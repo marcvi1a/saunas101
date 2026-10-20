@@ -679,8 +679,6 @@ const RULES = [
   [/about 2 Pa per metre of height/g, 'about 0.6 Pa per foot of height'],
   [/, 1\.7 at 35 °C/g, ', 0.5 at 95 °F'],
   [/2 l\/s per m²/g, '0.4 cfm per ft²'],
-  [/per m³/g, 'per 35 ft³'],
-  [/per m²/g, 'per 11 ft²'],
   [new RegExp(RNG+' °C(?=\\s+(?:warmer|colder|below|above|hotter|cooler|lower|higher|difference|less|more))','g'), (m,a,b)=>(b!=null ? Math.round(numOf(a)*1.8)+' to '+Math.round(numOf(b)*1.8) : Math.round(numOf(a)*1.8))+' °F'],
   [new RegExp(RNG+' °C','g'), (m,a,b)=>(b!=null ? Math.round(numOf(a)*1.8+32)+' to '+Math.round(numOf(b)*1.8+32) : Math.round(numOf(a)*1.8+32))+' °F'],
   [new RegExp(RNG+' m³\\/h','g'), (m,a,b)=>{ const f=x=>x<1?Math.round(x*58.86)/100:Math.round(x*0.5886); return (b!=null ? f(numOf(a))+' to '+f(numOf(b)) : f(numOf(a)))+' cfm'; }],
@@ -688,7 +686,9 @@ const RULES = [
   [new RegExp(RNG+' l\\/s','g'), (m,a,b)=>(b!=null ? Math.round(numOf(a)*2.11888)+' to '+Math.round(numOf(b)*2.11888) : Math.round(numOf(a)*2.11888))+' cfm'],
   [new RegExp(RNG+' m\\/s','g'), (m,a,b)=>(b!=null ? Math.round(numOf(a)*2.23694)+' to '+Math.round(numOf(b)*2.23694) : Math.round(numOf(a)*2.23694))+' mph'],
   [new RegExp(RNG+' mm','g'), (m,a,b)=>(b!=null ? Math.round(numOf(a)/25.4)+' to '+Math.round(numOf(b)/25.4) : Math.round(numOf(a)/25.4))+' in'],
-  [new RegExp(RNG+' cm','g'), (m,a,b)=>(b!=null ? Math.round(numOf(a)/2.54)+' to '+Math.round(numOf(b)/2.54) : Math.round(numOf(a)/2.54))+' in']
+  [new RegExp(RNG+' cm','g'), (m,a,b)=>(b!=null ? Math.round(numOf(a)/2.54)+' to '+Math.round(numOf(b)/2.54) : Math.round(numOf(a)/2.54))+' in'],
+  [/m³/g, '35 ft³'],
+  [/m²/g, '11 ft²']
 ];
 const M_RULE = new RegExp(RNG+' m(?![A-Za-z³²\\/])','g');
 function toImperial(t, short){
