@@ -11,7 +11,7 @@ The page follows saunaslava.com.br: EB Garamond for headings, Manrope for text, 
 
 ## Heater calculator
 
-The Heater tab carries a small calculator, a white card to the right of the rules from 1200 px up and between rule 2 and rule 3 below that, styled as a tool (eyebrow title, plain labels) so it never reads as a rule: width, depth, height and the area of glass or bare wall give the room volume (plus 1.2 m³ per m² of bare wall) and the heater size, 1 kW per m³ rounded up. It keeps its figures in metres and renders them itself in the reader's units, so its block is marked `data-nounits` and the text converter skips it. Rules after the calculator sit in a second list with class `cont`, which keeps counting from the first.
+The Heater tab carries a small calculator, a white card to the right of the rules from 1200 px up and between rule 2 and rule 3 below that, styled as a tool (eyebrow title, plain labels) so it never reads as a rule, and sticky under the masthead on wide screens until the rules end (the masthead height is measured into `--masthead`): width, depth, height and the area of glass or bare wall give the room volume (plus 1.2 m³ per m² of bare wall) and the heater size, 1 kW per m³ rounded up. It keeps its figures in metres and renders them itself in the reader's units, so its block is marked `data-nounits` and the text converter skips it. Rules after the calculator sit in a second list with class `cont`, which keeps counting from the first.
 
 ## Addresses
 

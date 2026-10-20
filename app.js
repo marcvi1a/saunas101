@@ -983,3 +983,7 @@ for(const k in calcIds){ const el = document.getElementById(calcIds[k]); if(!el)
   el.addEventListener('input', ()=>{ const n = parseFloat(el.value); const v = isFinite(n) && n>0 ? n : 0; const imp = units==='imperial';
     calc[k] = k==='g' ? (imp ? v*FT*FT : v) : (imp ? v*FT : v); renderCalc(false); }); }
 renderCalc(true);
+
+/* the masthead is sticky; its measured height feeds the calculator's sticky offset */
+function setMasthead(){ const m = document.querySelector('.masthead'); if(m) document.documentElement.style.setProperty('--masthead', Math.round(m.getBoundingClientRect().height)+'px'); }
+setMasthead(); window.addEventListener('resize', setMasthead); if(document.fonts && document.fonts.ready) document.fonts.ready.then(setMasthead);
