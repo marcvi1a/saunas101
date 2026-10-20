@@ -37,6 +37,10 @@ The first 3 rules are drawn: three white cards at the right of the rules (sticky
 
 The löyly rule opens the page (it is the reason ventilation matters), then the switches read down the left column like rules: a serif title, one line on the job, the segmented control; the verdict follows them. The ranked list, the notes and the model note follow the verdict in the same column, one column wide. The score and the drawing sit in the tool column at the right, sticky under the masthead until the left column ends. Under 1200 px the order is rule, score and drawing, switches, verdict, ranked list, notes.
 
+## Masthead
+
+The title is a link to `/`, styled as plain text, so it can be opened in a new tab or used to get home from any page.
+
 ## Footer
 
 Every page ends with "Powered by" and the Lava wordmark, the site's own: `assets/lava-wordmark.png` as a mask over the WebGL flow in `assets/lava-flow.js` with the six pattern tiles, copied from the saunaslava.com.br theme (lava-hero.js, lava-e1…6.jpg at 1024 px). The wordmark is a link to https://saunaslava.com.br, dofollow, in a new tab, with the anchor text "Lava, saunas e aquecedores feitos no Brasil". The flow script loads only when the footer comes within 800 px of the viewport.
