@@ -23,7 +23,7 @@ const must = (ok, m) => { if (!ok) fail(m); };
 const read = f => fs.readFileSync(f, "utf8");
 const stamp = f => crypto.createHash("sha1").update(fs.readFileSync(f)).digest("hex").slice(0, 8);
 const lastmod = f => { try { return execSync("git log -1 --format=%cs -- " + f, { stdio: ["ignore", "pipe", "ignore"] }).toString().trim() || null; } catch (e) { return null; } };
-const UNIT_RE = /(\d)[ \u2009\u202F](?=(?:mm|cm|km|m³|m²|m|kW|W|°C|°F|l\/s|ppm|Pa|kg|ft³|ft²|ft|in|cfm|%)(?![A-Za-z0-9²³]))/g;
+const UNIT_RE = /(\d)[ \u2009\u202F](?=(?:mm|cm|km|m³|m²|m|kW|W|°C|°F|l\/s|ppm|Pa|kg|ft³|ft²|ft|in|cfm|h|min|%)(?![A-Za-z0-9²³]))/g;
 const tie = html => html.replace(/>([^<]*)</g, (m, t) => ">" + t.replace(UNIT_RE, "$1\u202F") + "<");
 const fill = (t, map) => t.replace(/\{\{(\w+)\}\}/g, (_, k) => { must(k in map, "unknown placeholder " + k); return map[k]; });
 

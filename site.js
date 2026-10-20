@@ -43,7 +43,7 @@ function toImperial(t, short){
   return s.replace(M_RULE,(m,a,b)=> b!=null ? L(numOf(a))+' to '+L(numOf(b)) : L(numOf(a)));
 }
 /* a figure never parts from its unit: a narrow no-break space (U+202F) between them, whatever wrote the text */
-const UNIT_RE = /(\d)[ \u2009\u202F](?=(?:mm|cm|km|m³|m²|m|kW|W|°C|°F|l\/s|ppm|Pa|kg|ft³|ft²|ft|in|cfm|%)(?![A-Za-z0-9²³]))/g;
+const UNIT_RE = /(\d)[ \u2009\u202F](?=(?:mm|cm|km|m³|m²|m|kW|W|°C|°F|l\/s|ppm|Pa|kg|ft³|ft²|ft|in|cfm|h|min|%)(?![A-Za-z0-9²³]))/g;
 const tie = t => t.replace(UNIT_RE, '$1\u202F');
 function applyUnits(){
   const w=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
