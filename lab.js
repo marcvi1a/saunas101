@@ -190,7 +190,7 @@ const PRESETS = [
 const PRESET_KEYS = ['fan','inlet','duct','exhaust','heater','angle','dry'];
 
 /* ---------- state ---------- */
-const state = { vent:'yes', fan:'on', inlet:'above', angle:'straight', heater:'open', exhaust:'lower', duct:'riser', dry:'closed', none:false };
+const state = { vent:'yes', fan:'on', inlet:'above', angle:'straight', heater:'open', exhaust:'lower', duct:'straight', dry:'closed', none:false };
 let paused=false;
 const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const darkUI = document.documentElement.dataset.theme==='dark' || (document.documentElement.dataset.theme!=='light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
