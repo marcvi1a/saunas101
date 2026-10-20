@@ -671,6 +671,13 @@ function fanEl(x,y,on){
 let units = 'metric';
 try{ if(new URLSearchParams(location.search).get('units')==='imperial') units='imperial'; else if(localStorage.getItem('units')==='imperial') units='imperial'; }catch(e){}
 const numOf = s => parseFloat(String(s).replace(',',''));
+function inFrac(inches){
+  if(inches >= 1.5) return Math.round(inches) + ' in';
+  let n = Math.round(inches * 16), d = 16;
+  while(n % 2 === 0 && n > 0){ n /= 2; d /= 2; }
+  const whole = Math.floor(n / d), rest = n - whole * d;
+  return (whole ? whole + (rest ? ' ' : '') : '') + (rest ? rest + '/' + d : '') + ' in';
+}
 function ftin(m){ const inches=Math.round(m*39.3701); if(inches<36) return inches+' in'; const ft=Math.floor(inches/12), i=inches%12; return i ? ft+' ft '+i+' in' : ft+' ft'; }
 function ftinShort(m){ const inches=Math.round(m*39.3701); if(inches<36) return inches+'″'; const ft=Math.floor(inches/12), i=inches%12; return ft+'′'+(i?i+'″':''); }
 const N = '(\\d+(?:[.,]\\d+)?)', RNG = N+'(?: to '+N+')?';
@@ -685,10 +692,10 @@ const RULES = [
   [new RegExp(RNG+' m³','g'), (m,a,b)=>(b!=null ? Math.round(numOf(a)*35.3147)+' to '+Math.round(numOf(b)*35.3147) : Math.round(numOf(a)*35.3147))+' ft³'],
   [new RegExp(RNG+' l\\/s','g'), (m,a,b)=>(b!=null ? Math.round(numOf(a)*2.11888)+' to '+Math.round(numOf(b)*2.11888) : Math.round(numOf(a)*2.11888))+' cfm'],
   [new RegExp(RNG+' m\\/s','g'), (m,a,b)=>(b!=null ? Math.round(numOf(a)*2.23694)+' to '+Math.round(numOf(b)*2.23694) : Math.round(numOf(a)*2.23694))+' mph'],
-  [new RegExp(RNG+' mm','g'), (m,a,b)=>(b!=null ? Math.round(numOf(a)/25.4)+' to '+Math.round(numOf(b)/25.4) : Math.round(numOf(a)/25.4))+' in'],
+  [new RegExp(RNG+' mm','g'), (m,a,b)=>{ const f=x=>inFrac(numOf(x)/25.4).replace(/ in$/,''); return (b!=null ? f(a)+' to '+f(b) : f(a))+' in'; }],
   [new RegExp(RNG+' cm','g'), (m,a,b)=>(b!=null ? Math.round(numOf(a)/2.54)+' to '+Math.round(numOf(b)/2.54) : Math.round(numOf(a)/2.54))+' in'],
-  [/m³/g, '35 ft³'],
-  [/m²/g, '11 ft²']
+  [/\bm³/g, '35 ft³'],
+  [/\bm²/g, '11 ft²']
 ];
 const M_RULE = new RegExp(RNG+' m(?![A-Za-z³²\\/])','g');
 function toImperial(t, short){
