@@ -88,8 +88,8 @@ h1{font-size:2.2rem;font-weight:400;letter-spacing:0;line-height:1.1}
 .page--construction{display:grid;grid-template-columns:minmax(0,1fr) var(--col-tool);column-gap:48px;align-items:start}
 .page--construction .facts{grid-column:1;grid-row:1}
 .pics{grid-column:2;grid-row:1;margin-top:8px;position:sticky;top:calc(var(--masthead) + 32px);display:flex;flex-direction:column;gap:12px}
-.pic{margin:0;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px}
-.pic svg{width:100%;height:auto;display:block}
+.pic{margin:0;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px;height:200px;box-sizing:border-box}
+.pic svg{width:100%;height:100%;display:block}
 .pic .wall{stroke-width:3}
 .wood{fill:var(--wood1)}
 .hblk{fill:var(--stone)}
