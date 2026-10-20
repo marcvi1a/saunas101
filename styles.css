@@ -123,7 +123,7 @@ h1{font-size:30px;font-weight:400;letter-spacing:0;line-height:1.1}
 .draw{position:relative}
 .draw svg{width:100%;height:auto;display:block;max-width:100%}
 .lab-left .rank{margin-top:40px}
-.lab-left .rank ol{grid-template-columns:1fr}
+.lab-left .rank ol{grid-template-columns:repeat(2,minmax(0,1fr))}
 @media (max-width:1199px){.lab-left .rank ol{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:560px){.lab-left .rank ol{grid-template-columns:1fr}}
 /* the switches: one row each under the drawing, the title column starting at the room's left wall (7.7 % of the card, like the legend), the control beside it */
@@ -157,7 +157,7 @@ h1{font-size:30px;font-weight:400;letter-spacing:0;line-height:1.1}
 .seg.seg--grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
 
 .seg.seg--stack{display:grid;grid-template-columns:1fr;gap:4px}
-.rank{margin-top:0;max-width:460px}
+.rank{margin-top:0}
 .rank ol{list-style:none;margin:10px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 12px}
 .rank li{display:block}
 @media (max-width:900px){.rank ol{grid-template-columns:repeat(2,minmax(0,1fr))}}
