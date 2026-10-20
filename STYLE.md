@@ -1,6 +1,6 @@
 # Saunas 101 · style
 
-The page follows saunaslava.com.br: EB Garamond for headings, Manrope for text, the cream background, a content column that starts where the site's header logo starts (1136 px wide, centred, 20 px gutters under 990 px).
+The page follows saunaslava.com.br: EB Garamond for headings, Manrope for text, the cream background, a content column that starts where the site's header logo starts (1100 px wide, centred: half the space beyond 1200 px plus 50 px, measured on the live site; 20 px gutters under 990 px).
 
 ## Writing
 
