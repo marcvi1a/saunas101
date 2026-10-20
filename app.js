@@ -964,7 +964,7 @@ document.querySelectorAll('.tab').forEach(p=>p.addEventListener('click',e=>{ if(
 
 /* heater size calculator: metres inside, shown and typed in the reader's units; the text converter skips its block */
 const FT = 0.3048;
-const calc = { w:2, d:2, h:2.1, g:0 };
+const calc = { w:2.1, d:2.1, h:2.1, g:0 };
 const calcIds = { w:'calcW', d:'calcD', h:'calcH', g:'calcG' };
 const calcFmt = x => String(Math.round(x*10)/10);
 function renderCalc(fill){
