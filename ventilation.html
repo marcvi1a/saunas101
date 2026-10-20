@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Ventilation · Saunas 101</title>
-<meta name="description" content="An interactive lab that scores 17 sauna ventilation layouts: inlet position and angle, exhaust height, fan, duct and heater type.">
+<meta name="description" content="What löyly is, and an interactive lab that scores 17 sauna ventilation layouts: inlet position and angle, exhaust height, fan, duct and heater type.">
 <link rel="canonical" href="https://saunas101.com/ventilation">
 <meta property="og:title" content="Ventilation · Saunas 101">
-<meta property="og:description" content="An interactive lab that scores 17 sauna ventilation layouts: inlet position and angle, exhaust height, fan, duct and heater type.">
+<meta property="og:description" content="What löyly is, and an interactive lab that scores 17 sauna ventilation layouts: inlet position and angle, exhaust height, fan, duct and heater type.">
 <meta property="og:url" content="https://saunas101.com/ventilation">
 <meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&family=Manrope:wght@400;500;600;700&display=swap">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="stylesheet" href="/styles.css?v=11583421">
+<link rel="stylesheet" href="/styles.css?v=7119d8d5">
 </head>
 <body>
 <div class="wrap">
@@ -34,6 +34,10 @@
   </nav>
   </div>
   <main class="page page--ventilation">
+  <ul class="facts">
+    <li id="loyly"><h4>15. Löyly is sauna</h4><p>Water thrown on the stones flashes into steam: löyly, the heat you feel. It rises to the ceiling, and only ventilation brings it down to the benches.</p></li>
+  </ul>
+  <div class="lab-left">
   <div class="switches" id="switches">
     <div class="sw"><div class="eyebrow">Ventilation</div><div class="job">Air in, air out.</div><div class="seg" data-key="vent"><button type="button" data-v="yes">Yes</button><button type="button" data-v="none">None</button></div></div>
     <div class="sw sw--air"><div class="eyebrow">Inlet</div><div class="job">Lets fresh air in from outside.</div><div class="seg seg--grid" data-key="inlet"><button type="button" data-v="above" title="20 cm above the stones, 1 m off the floor">Above</button><button type="button" data-v="middle" title="At half the heater's height, facing it">Middle</button><button type="button" data-v="below" title="10 cm off the floor, beside the heater">Bottom</button><button type="button" data-v="bottom" title="Through the floor, directly under the heater">Under</button></div></div>
@@ -44,49 +48,44 @@
     <div class="sw"><div class="eyebrow">Exhaust fan</div><div class="job">Pulls used air out and sets the rate.</div><div class="seg" data-key="fan"><button type="button" data-v="on">Fan</button><button type="button" data-v="off">No fan</button></div></div>
     <div class="sw"><div class="eyebrow">Duct</div><div class="job">Keeps the air flowing the right way without a fan.</div><div class="seg seg--grid" data-key="duct"><button type="button" data-v="straight">None</button><button type="button" data-v="inletduct" title="A bare pipe from a mouth at floor level up to the inlet">Inlet</button><button type="button" data-v="half" title="A bare pipe from the exhaust grille up to an outlet at 1.2 m">Half exhaust</button><button type="button" data-v="riser" title="A bare pipe from the exhaust grille up to an outlet at 2 m, above the room">Exhaust</button></div></div>
   </div>
-
-  <div class="sw sw--score scoreRow" id="scoreCard" data-g="good"><div class="eyebrow">Score</div><div class="scoreBig"><span id="scoreNum">100</span><small>/ 100</small></div><div class="scoreWord" id="scoreWord">Best choice</div></div>
-  <div class="lab">
-  <div class="lab-main">
-  <div class="stage">
-    <div class="room">
-      <svg id="svg" viewBox="-42 0 482 326" role="img" aria-label="Animated cross-section of a sauna showing the air path for the chosen switches">
-        <defs><clipPath id="roomclip"><rect x="-4" y="12" width="424" height="290"/></clipPath></defs>
-        <g id="planks"></g>
-        <g id="ruler"></g>
-        <g id="duct"></g>
-        <g id="glow"></g>
-        <g id="heaterg"></g>
-        <text x="73" y="318" text-anchor="middle" class="lbl">HEATER</text>
-        <rect x="230" y="174" width="168" height="13.8" class="bench"/>
-        <rect x="200" y="236" width="198" height="13.8" class="bench"/>
-        <text x="392" y="170" text-anchor="end" class="lbl">UPPER BENCH</text>
-        <text x="300" y="232" text-anchor="middle" class="lbl">LOWER BENCH</text>
-        <g class="person" transform="translate(300 173) scale(0.7211) translate(-650 -361)"><circle cx="650" cy="199.5" r="28.5"/><path d="M650 228 C 648.1 273.6, 651.9 321.1, 650 361 M650 258.4 C 619.3 276.2, 598.3 297.1, 587 327.8 M650 258.4 C 682.3 274.5, 703.3 294, 716.2 324.6 M650 361 C 632.9 364.8, 617.7 370.5, 606.3 378.1 C 602.5 389, 602.5 419, 604.4 448 M650 361 C 667.1 364.8, 684.2 370.5, 697.5 378.1 C 701.3 389, 701.3 419, 699.4 448"/></g>
-        <rect x="22" y="22" width="376" height="276" class="wall"/>
-        <g id="sensorg"></g>
-        <g id="vents"></g>
-        <g id="dyn" clip-path="url(#roomclip)"></g>
-      </svg>
-      <div class="tip" id="tip" role="tooltip"></div>
-      <div class="controls">
-        <div class="legend">
-          <span><i class="dot dot--fresh"></i>fresh air</span>
-          <span><i class="dot dot--hot"></i>heated air</span>
-          <span id="legStale"><i class="dot dot--stale"></i>stagnant / CO₂</span>
-        </div>
-        <button class="btn" id="toggle" type="button">Pause</button>
-      </div>
-    </div>
     <div class="verdict" id="verdict"></div>
+  </div>
+  <div class="lab-right">
+  <div class="sw sw--score scoreRow" id="scoreCard" data-g="good"><div class="eyebrow">Score</div><div class="scoreBig"><span id="scoreNum">100</span><small>/ 100</small></div><div class="scoreWord" id="scoreWord">Best choice</div></div>
+  <div class="room">
+    <svg id="svg" viewBox="-42 0 482 326" role="img" aria-label="Animated cross-section of a sauna showing the air path for the chosen switches">
+      <defs><clipPath id="roomclip"><rect x="-4" y="12" width="424" height="290"/></clipPath></defs>
+      <g id="planks"></g>
+      <g id="ruler"></g>
+      <g id="duct"></g>
+      <g id="glow"></g>
+      <g id="heaterg"></g>
+      <text x="73" y="318" text-anchor="middle" class="lbl">HEATER</text>
+      <rect x="230" y="174" width="168" height="13.8" class="bench"/>
+      <rect x="200" y="236" width="198" height="13.8" class="bench"/>
+      <text x="392" y="170" text-anchor="end" class="lbl">UPPER BENCH</text>
+      <text x="300" y="232" text-anchor="middle" class="lbl">LOWER BENCH</text>
+      <g class="person" transform="translate(300 173) scale(0.7211) translate(-650 -361)"><circle cx="650" cy="199.5" r="28.5"/><path d="M650 228 C 648.1 273.6, 651.9 321.1, 650 361 M650 258.4 C 619.3 276.2, 598.3 297.1, 587 327.8 M650 258.4 C 682.3 274.5, 703.3 294, 716.2 324.6 M650 361 C 632.9 364.8, 617.7 370.5, 606.3 378.1 C 602.5 389, 602.5 419, 604.4 448 M650 361 C 667.1 364.8, 684.2 370.5, 697.5 378.1 C 701.3 389, 701.3 419, 699.4 448"/></g>
+      <rect x="22" y="22" width="376" height="276" class="wall"/>
+      <g id="sensorg"></g>
+      <g id="vents"></g>
+      <g id="dyn" clip-path="url(#roomclip)"></g>
+    </svg>
+    <div class="tip" id="tip" role="tooltip"></div>
+    <div class="controls">
+      <div class="legend">
+        <span><i class="dot dot--fresh"></i>fresh air</span>
+        <span><i class="dot dot--hot"></i>heated air</span>
+        <span id="legStale"><i class="dot dot--stale"></i>stagnant / CO₂</span>
+      </div>
+      <button class="btn" id="toggle" type="button">Pause</button>
+    </div>
   </div>
   </div>
   <aside class="rank" aria-label="The 8 air layouts, ranked">
     <div class="eyebrow">Layouts scored 0 to 100 · M mechanical · G gravity</div>
     <ol id="rank"></ol>
   </aside>
-  </div>
-
   <section class="notes">
     <div class="card">
       <h2>How the score is built</h2>

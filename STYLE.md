@@ -25,6 +25,10 @@ The path names the page; the fragment names the view inside it. A rule's anchor 
 
 The Heater page carries a small calculator, a white card to the right of the rules from 1200 px up and above the rules below that (never between rules), styled as a tool (eyebrow title, plain labels) so it never reads as a rule, and sticky under the masthead on wide screens until the rules end (the masthead height is measured into `--masthead`): width, depth, height and the area of glass or bare wall give the room volume (plus 1.2 m³ per m² of bare wall) and the heater size, 1 kW per m³ rounded up. It keeps its figures in metres and renders them itself in the reader's units, so its block is marked `data-nounits` and the text converter skips it.
 
+## Ventilation page
+
+The löyly rule opens the page (it is the reason ventilation matters), then the switches read down the left column like rules: a serif title, one line on the job, the segmented control; the verdict follows them. The score and the drawing sit in a 495 px column at the right, sticky under the masthead until the left column ends. The ranked list and the notes run full width below. Under 1200 px the order is rule, score and drawing, switches, verdict, ranked list, notes.
+
 ## Footer
 
 Every page ends with "Powered by" and the Lava wordmark, the site's own: `assets/lava-wordmark.png` as a mask over the WebGL flow in `assets/lava-flow.js` with the six pattern tiles, copied from the saunaslava.com.br theme (lava-hero.js, lava-e1…6.jpg at 1024 px). The wordmark is a link to https://saunaslava.com.br, dofollow, in a new tab, with the anchor text "Lava, saunas e aquecedores feitos no Brasil". The flow script loads only when the footer comes within 800 px of the viewport.
