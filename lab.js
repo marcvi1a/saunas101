@@ -185,7 +185,7 @@ const PRESETS = [
   {name:'No ventilation',         vent:'none', heater:'open'},
   {name:'Gravity ventilation',    vent:'yes', fan:'off', inlet:'below', duct:'straight', exhaust:'upper', heater:'open', angle:'straight', dry:'closed'},
   {name:'Mechanical ventilation', vent:'yes', fan:'on',  inlet:'above', duct:'straight', exhaust:'lower', heater:'open', angle:'straight', dry:'closed'},
-  {name:'Best',                   vent:'yes', fan:'on',  inlet:'above', duct:'riser',    exhaust:'lower', heater:'open', angle:'straight', dry:'closed'}
+  {name:'Absolute best',          vent:'yes', fan:'on',  inlet:'above', duct:'riser',    exhaust:'lower', heater:'open', angle:'straight', dry:'closed'}
 ];
 const PRESET_KEYS = ['fan','inlet','duct','exhaust','heater','angle','dry'];
 
@@ -729,7 +729,7 @@ PRESETS.forEach((p,i)=>{
   const s = score(k, p.angle||'straight', p.heater, p.exhaust||'lower', false, false, false), g = scoreGrade(s);
   const li=document.createElement('li');
   li.innerHTML='<button type="button" class="rk '+g+'" data-i="'+i+'">'
-    +'<span class="rk-l">'+(i+1)+'.</span><span class="rk-t">'+p.name+'</span>'
+    +'<span class="rk-t">'+p.name+'</span>'
     +'<span class="rk-s">'+s+'</span><span class="rk-bar"><i style="width:'+s+'%"></i></span></button>';
   rankList.appendChild(li);
 });
