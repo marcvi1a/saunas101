@@ -9,6 +9,10 @@ The page follows saunaslava.com.br: EB Garamond for headings, Manrope for text, 
 3. Short sentences. No exclamation marks. No "the user". No brand names in the rules, and no mention of Lava anywhere: the page reads as an objective guide.
 4. Rule titles name the rule in words and carry no figures and no final full stop (Low ceiling, Warm feet); the figures go in the description, which runs 2 lines on desktop: between 140 and 160 characters, checked at build. Rules are numbered 1., 2., 3. in the title's own type.
 
+## Heater calculator
+
+The Heater tab carries a small calculator between the sizing rules and the stone rules: width, depth, height and the area of glass or bare wall give the room volume (plus 1.2 m³ per m² of bare wall) and the heater size, 1 kW per m³ rounded up. It keeps its figures in metres and renders them itself in the reader's units, so its block is marked `data-nounits` and the text converter skips it. Rules after the calculator sit in a second list with class `cont`, which keeps counting from the first.
+
 ## Addresses
 
 The hash names the tab and, after a dot, the view inside it: `#construction`, `#construction.ceiling` (a rule id), `#heater`, `#ventilation`, `#ventilation.on-above-riser-upper` (a lab state). No units in the address: units are the reader's preference. The hash is rewritten on every tab switch, rule click and lab change, so the address bar always reopens the same view. With no hash, or an unknown one, the page opens on Construction. A rule description may link to another tab with a plain `#tab` href; a click on that link is not a rule click.

@@ -706,7 +706,7 @@ function toImperial(t, short){
 function applyUnits(){
   const w=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
   let n; while((n=w.nextNode())){
-    const p=n.parentNode; if(!p || p.nodeName==='SCRIPT' || p.nodeName==='STYLE') continue;
+    const p=n.parentNode; if(!p || p.nodeName==='SCRIPT' || p.nodeName==='STYLE' || (p.closest && p.closest('[data-nounits]'))) continue;
     if(n._metric==null) n._metric=n.nodeValue;
     const short = !!(p.classList && p.classList.contains('rulerT'));
     const v = units==='imperial' ? toImperial(n._metric, short) : n._metric;
@@ -916,7 +916,7 @@ ranked.forEach(({r:[L,fan,inlet,duct,text,word],k,s},i)=>{
 }
 rankList.addEventListener('click',e=>{ const b=e.target.closest('.rk'); if(!b) return; if(b.dataset.none){ state.vent='none'; } else { state.vent='yes'; state.fan=b.dataset.fan; state.inlet=b.dataset.inlet; state.duct=b.dataset.duct; } render(); });
 if(reduce) paused=true;
-document.getElementById('units').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; units=b.dataset.u; try{ localStorage.setItem('units',units); }catch(e){} applyUnits(); });
+document.getElementById('units').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; units=b.dataset.u; try{ localStorage.setItem('units',units); }catch(e){} applyUnits(); renderCalc(true); });
 
 /* ---------- the address: #tab or #tab.state ---------- */
 const TABS = ['construction','heater','ventilation'];
@@ -961,3 +961,25 @@ document.querySelectorAll('.tab').forEach(p=>p.addEventListener('click',e=>{ if(
   const io = new IntersectionObserver(es => { if(es.some(e=>e.isIntersecting)){ io.disconnect(); load(); } }, { rootMargin:'800px' });
   io.observe(wm);
 })();
+
+/* heater size calculator: metres inside, shown and typed in the reader's units; the text converter skips its block */
+const FT = 0.3048;
+const calc = { w:2, d:2, h:2.1, g:0 };
+const calcIds = { w:'calcW', d:'calcD', h:'calcH', g:'calcG' };
+const calcFmt = x => String(Math.round(x*10)/10);
+function renderCalc(fill){
+  const out = document.getElementById('calcOut'); if(!out) return;
+  const imp = units==='imperial';
+  const toShow = (k, m) => k==='g' ? (imp ? m/(FT*FT) : m) : (imp ? m/FT : m);
+  if(fill) for(const k in calcIds) document.getElementById(calcIds[k]).value = calcFmt(toShow(k, calc[k]));
+  document.querySelectorAll('#calc [data-u="len"]').forEach(s=>{ s.textContent = imp ? 'ft' : 'm'; });
+  document.querySelectorAll('#calc [data-u="area"]').forEach(s=>{ s.textContent = imp ? 'ft²' : 'm²'; });
+  const vol = calc.w*calc.d*calc.h, eff = vol + 1.2*calc.g, kw = Math.ceil(eff - 1e-9);
+  const volTxt = m3 => imp ? Math.round(m3/(FT*FT*FT))+' ft³' : calcFmt(m3)+' m³';
+  if(!(vol>0)){ out.textContent = 'Enter the width, depth and height of the room.'; return; }
+  out.innerHTML = '<strong>'+volTxt(vol)+'</strong> of room' + (calc.g>0 ? ', counted as <strong>'+volTxt(eff)+'</strong> with the glass' : '') + ', so a heater of about <strong>'+kw+' kW</strong>. Round up to the next size on sale.';
+}
+for(const k in calcIds){ const el = document.getElementById(calcIds[k]); if(!el) continue;
+  el.addEventListener('input', ()=>{ const n = parseFloat(el.value); const v = isFinite(n) && n>0 ? n : 0; const imp = units==='imperial';
+    calc[k] = k==='g' ? (imp ? v*FT*FT : v) : (imp ? v*FT : v); renderCalc(false); }); }
+renderCalc(true);
