@@ -913,7 +913,7 @@ document.getElementById('units').addEventListener('click',e=>{ const b=e.target.
 const TABS = ['construction','heater','ventilation'];
 let tab = 'construction', labState = '', ruleId = '';
 function writeHash(){
-  const st = tab==='ventilation' ? labState : tab==='construction' ? ruleId : '';
+  const st = tab==='ventilation' ? labState : ruleId;
   try{ history.replaceState(null,'', '#'+tab+(st?'.'+st:'')); }catch(e){}
 }
 function applyLabState(st){
@@ -933,8 +933,7 @@ function showTab(t, st){
   document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected', b.dataset.tab===tab ? 'true':'false'));
   document.querySelectorAll('.tab').forEach(s=>{ s.hidden = s.id!=='tab-'+tab; });
   if(tab==='ventilation'){ if(st) applyLabState(st); render(); }
-  else if(tab==='construction'){ ruleId = (st && document.getElementById('rule-'+st)) ? st : ''; writeHash(); if(ruleId) document.getElementById('rule-'+ruleId).scrollIntoView({block:'start'}); }
-  else writeHash();
+  else { ruleId = (st && document.querySelector('#tab-'+tab+' #rule-'+st)) ? st : ''; writeHash(); if(ruleId) document.getElementById('rule-'+ruleId).scrollIntoView({block:'start'}); }
 }
 function readHash(){
   const raw = location.hash.replace('#',''); const dot = raw.indexOf('.');
@@ -942,7 +941,7 @@ function readHash(){
 }
 document.getElementById('tabs').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b){ ruleId=''; showTab(b.dataset.tab); } });
 window.addEventListener('hashchange',()=>{ const {t,st}=readHash(); if(t!==tab || st!==(tab==='ventilation'?labState:ruleId)) showTab(t,st); });
-document.getElementById('tab-construction').addEventListener('click',e=>{ const li=e.target.closest('li[id^="rule-"]'); if(!li) return; ruleId=li.id.slice(5); writeHash(); });
+document.querySelectorAll('.tab').forEach(p=>p.addEventListener('click',e=>{ const li=e.target.closest('li[id^="rule-"]'); if(!li) return; ruleId=li.id.slice(5); writeHash(); }));
 (function(){ const {t,st}=readHash(); showTab(t||'ventilation', st); })();
 
 /* ---------- the footer wordmark: the site's flow, loaded when the footer comes near ---------- */
