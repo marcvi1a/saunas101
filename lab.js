@@ -32,101 +32,101 @@ const MODEL = {
 const NEED = 6;                      // 6 changes of 12 m³ = 20 l/s, what 2 bathers need for 1,000 ppm
 const GEN2 = 3333;                   // ppm per hour added by 2 seated bathers in 12 m³ (0.04 m³/h of CO₂)
 const TILT = {
-  'on|above|riser':    {f:1,    note:'The jet now aims at the ceiling. At the fan\'s 2.5 m/s it gets there, spreads under it and comes down over the top bench, where the fan collects it as before: the exchange where you breathe does not change. What changes is the sensor. The jet is now pointed at the place where the thermostat lives; keep the sensor 1 m from the louver, or aim the louver into the plume instead.'},
-  'on|above|straight': {f:1,    note:'The jet now aims at the ceiling. At the fan\'s 2.5 m/s it gets there, spreads under it and comes down over the top bench, where the fan collects it as before: the exchange where you breathe does not change. What changes is the sensor. The jet is now pointed at the place where the thermostat lives; keep the sensor 1 m from the louver, or aim the louver into the plume instead.'},
-  'on|below|riser':    {f:1,    note:'Tilted up, the floor inlet throws its air at the side of the heater. At the fan\'s speed the stream still falls within 50 cm and the fan drags it along the floor to the grille; the short circuit stays. The heater catches a little more of it, not enough to change the number.'},
-  'on|below|straight': {f:1,    note:'Tilted up, the floor inlet throws its air at the side of the heater. At the fan\'s speed the stream still falls within 50 cm and the fan drags it along the floor to the grille; the short circuit stays. The heater catches a little more of it, not enough to change the number.'},
-  'off|above|riser':   {f:1.07, note:'Buoyancy only counts the heights where the holes meet the outside air. Tilting the hole up puts its outside mouth 14 cm lower, so the chimney from inlet to duct outlet is 14 cm taller: about 7 % more flow. Inside, the air moves at about 1 m/s, climbs some 30 cm off the tilt and falls into the plume as before.'},
-  'off|above|straight':{f:0.9, note:'Warm air does go up, and it still comes out of this hole, because it is pushed: at 1 m the room sits about 0.7 Pa above the outside, and that pressure drives air down a short slope without noticing it. What the tilt does is lower the outside mouth by 14 cm, which takes 14 cm off the 74 cm that drive the reversal: about 10 % slower, still backwards. To stop it you would have to bring the inlet\'s outside mouth down to the exhaust\'s height, and then nothing moves at all. Gravity needs the outlet above the inlet; no angle on the inlet changes that.'},
-  'off|below|riser':   {f:1.04, note:'The outside mouth drops 14 cm, which adds 14 cm to an already tall chimney: about 4 % more flow. The cold air still arrives at the floor by the heater.'},
-  'off|below|straight':{f:1.35, note:'Here the tilt matters: the 2 openings were 16 cm apart in height and the tilt makes it 30 cm, about 35 % more flow from the same weak loop. The catch is that a hole at 10 cm tilted up through the wall meets the outside at ground level; it only works where the sauna floor stands above the ground outside.'},
-  'on|middle|riser':   {f:1.3,  note:'Aimed 45° up from 45 cm, the jet lands on the upper part of the heater, near the stones, instead of its middle: a casing catches more of it in the plume, a pillar takes it in higher up. Some 30 % more fresh air where you breathe.'},
-  'on|middle|straight':{f:1.3,  note:'Aimed 45° up from 45 cm, the jet lands on the upper part of the heater, near the stones, instead of its middle: a casing catches more of it in the plume, a pillar takes it in higher up. Some 30 % more fresh air where you breathe.'},
-  'off|middle|riser':  {f:1.04, note:'The outside mouth drops 14 cm, which adds 14 cm to a 1.65 m chimney: about 4 % more flow.'},
-  'off|middle|straight':{f:0.5, note:'The outside mouth drops 14 cm, which takes 14 cm off the 19 cm that drive this reversal. It runs backwards at half the speed, which is to say it barely runs at all. Tilt it a little more and nothing moves in either direction.'},
-  'on|bottom|riser':   {f:1,    note:'A hole in the floor has no up to tilt towards; the angle switch does nothing here.'},
-  'on|bottom|straight':{f:1,    note:'A hole in the floor has no up to tilt towards; the angle switch does nothing here.'},
-  'off|bottom|riser':  {f:1,    note:'A hole in the floor has no up to tilt towards; the angle switch does nothing here.'},
-  'off|bottom|straight':{f:1,   note:'A hole in the floor has no up to tilt towards; the angle switch does nothing here.'},
-  'none':              {f:1,    note:''}
+  'on|above|riser':    {f:1},
+  'on|above|straight': {f:1},
+  'on|below|riser':    {f:1},
+  'on|below|straight': {f:1},
+  'off|above|riser':   {f:1.07},
+  'off|above|straight':{f:0.9},
+  'off|below|riser':   {f:1.04},
+  'off|below|straight':{f:1.35},
+  'on|middle|riser':   {f:1.3},
+  'on|middle|straight':{f:1.3},
+  'off|middle|riser':  {f:1.04},
+  'off|middle|straight':{f:0.5},
+  'on|bottom|riser':   {f:1},
+  'on|bottom|straight':{f:1},
+  'off|bottom|riser':  {f:1},
+  'off|bottom|straight':{f:1},
+  'none':              {f:1}
 };
 const HEATER = {
-  'on|above|riser':    {f:1,   note:'A pillar has no chimney inside it: the air it heats seeps in through the stones on every side and leaves slower over a wider top. The fresh air dropping out of the inlet is still caught and lifted, over a wider area, and the fan does the rest. Same number.'},
-  'on|above|straight': {f:1,   note:'A pillar has no chimney inside it: the air it heats seeps in through the stones on every side and leaves slower over a wider top. The fresh air dropping out of the inlet is still caught and lifted, over a wider area, and the fan does the rest. Same number.'},
-  'on|below|riser':    {f:0.8, note:'The closed casing worked as a chimney and lifted a share of the floor air past its elements. The pillar has no casing, so it lifts less and the fan drags more of the fresh air straight across the floor: about a fifth less fresh air where you breathe.'},
-  'on|below|straight': {f:0.8, note:'The closed casing worked as a chimney and lifted a share of the floor air past its elements. The pillar has no casing, so it lifts less and the fan drags more of the fresh air straight across the floor: about a fifth less fresh air where you breathe.'},
-  'off|above|riser':   {f:1,   note:'No change: the chimney that drives this loop is in the duct, not in the heater.'},
-  'off|above|straight':{f:1,   note:'No change: the reversal is set by the 2 holes. The heater only heats.'},
-  'off|below|riser':   {f:0.9, note:'The casing heater pulls floor air into its base and that pull is part of what makes the low inlet work. The pillar pulls less, so the loop runs about 10 % slower and more of the cold air stays on the floor.'},
-  'off|below|straight':{f:0.9, note:'The casing heater pulls floor air into its base and that pull is part of what makes the low inlet work. The pillar pulls less, so the loop runs about 10 % slower and more of the cold air stays on the floor.'},
-  'on|middle|riser':   {f:1.875, feet:0.75, note:'This is the layout the pillar was made for. The jet goes in between the stones, is heated on the spot and rises through the pillar into the plume; the fan then brings it down past the benches. Nearly twice the fresh air where you breathe compared with a casing, and warm feet, because little of it ever reaches the floor. The stones on the inlet side run cooler.'},
-  'on|middle|straight':{f:1.875, feet:0.75, note:'This is the layout the pillar was made for. The jet goes in between the stones, is heated on the spot and rises through the pillar into the plume; the fan then brings it down past the benches. Nearly twice the fresh air where you breathe compared with a casing, and warm feet, because little of it ever reaches the floor. The stones on the inlet side run cooler.'},
-  'off|middle|riser':  {f:1.3,  feet:0.8,  note:'The jet enters the stones directly instead of falling to the floor and waiting for the casing to draw it in: about 30 % more of the fresh air is heated before it spreads, and the floor stays warmer.'},
-  'off|middle|straight':{f:1,   note:'No change: the reversal is set by the 2 holes. The heater only heats.'},
-  'on|bottom|riser':   {f:0.85, feet:0.85, note:'The pillar stands on short legs over the hole, so the fresh air goes straight into its stone bed, and the hot stones with the air tunnel pull it up as a casing would, through a leakier chimney: about 15 % of the air spills out at the base and the fan drags that part to the grille along the floor.'},
-  'on|bottom|straight':{f:0.85, feet:0.85, note:'The pillar stands on short legs over the hole, so the fresh air goes straight into its stone bed, and the hot stones with the air tunnel pull it up as a casing would, through a leakier chimney: about 15 % of the air spills out at the base and the fan drags that part to the grille along the floor.'},
-  'off|bottom|riser':  {f:0.85, feet:0.85, note:'The pillar is a leakier chimney than a casing: about 15 % of the air that comes up under it spills out at the base instead of rising through the stones.'},
-  'off|bottom|straight':{f:0.85, feet:0.85, note:'The pillar is a leakier chimney than a casing: about 15 % of the air that comes up under it spills out at the base instead of rising through the stones.'},
-  'none':              {f:1,   note:''}
+  'on|above|riser':    {f:1},
+  'on|above|straight': {f:1},
+  'on|below|riser':    {f:0.8},
+  'on|below|straight': {f:0.8},
+  'off|above|riser':   {f:1},
+  'off|above|straight':{f:1},
+  'off|below|riser':   {f:0.9},
+  'off|below|straight':{f:0.9},
+  'on|middle|riser':   {f:1.875, feet:0.75},
+  'on|middle|straight':{f:1.875, feet:0.75},
+  'off|middle|riser':  {f:1.3,  feet:0.8},
+  'off|middle|straight':{f:1},
+  'on|bottom|riser':   {f:0.85, feet:0.85},
+  'on|bottom|straight':{f:0.85, feet:0.85},
+  'off|bottom|riser':  {f:0.85, feet:0.85},
+  'off|bottom|straight':{f:0.85, feet:0.85},
+  'none':              {f:1}
 };
 /* the exhaust under the upper bench, 75 cm up instead of 26: the fan or the stack draws from higher, the floor zone drops out */
 const EXH = {
-  'on|above|riser':    {f:1,   feet:0.75, note:'The fan now draws from 75 cm up, under the upper bench. The fresh air still comes down past the bather, but the lowest 75 cm, the lower bench and the floor, drop out of the loop and go cool and stale. VTT 1992: the exhaust near the floor gave the most even temperature from floor to ceiling.'},
-  'on|above|straight': {f:1,   feet:0.75, note:'The fan now draws from 75 cm up, under the upper bench. The fresh air still comes down past the bather, but the lowest 75 cm, the lower bench and the floor, drop out of the loop and go cool and stale. VTT 1992: the exhaust near the floor gave the most even temperature from floor to ceiling.'},
-  'on|below|riser':    {f:1.6, feet:0.5,  note:'With the grille at 75 cm the fan can no longer drag the cold floor air straight out: it has to be heated enough to rise 65 cm first. The short circuit is half broken and more of the fresh air reaches the benches. The floor stays cold.'},
-  'on|below|straight': {f:1.6, feet:0.5,  note:'With the grille at 75 cm the fan can no longer drag the cold floor air straight out: it has to be heated enough to rise 65 cm first. The short circuit is half broken and more of the fresh air reaches the benches. The floor stays cold.'},
-  'off|above|riser':   {f:1,   feet:0.75, note:'The chimney is the same, inlet to duct outlet; the duct just draws from higher up. The floor zone drops out of the loop.'},
-  'off|above|straight':{f:0.6, feet:0.3,  note:'The exhaust at 75 cm is only 25 cm under the inlet, so the reversal has a third of the drive: about 0.3 changes an hour, still backwards, with the cold air now arriving at seat height instead of the ankles.'},
-  'off|below|riser':   {f:1,   feet:0.6,  note:'Same chimney, drawn from higher up. The floor below the grille stays colder.'},
-  'off|below|straight':{f:2,   feet:0.55, note:'A chimney of 65 cm instead of 16: about twice the flow of Harvia\'s low-low drawing. This is HUUM\'s rule, exhaust up to 60 cm off the floor, taken to its limit.'},
+  'on|above|riser':    {f:1,   feet:0.75},
+  'on|above|straight': {f:1,   feet:0.75},
+  'on|below|riser':    {f:1.6, feet:0.5},
+  'on|below|straight': {f:1.6, feet:0.5},
+  'off|above|riser':   {f:1,   feet:0.75},
+  'off|above|straight':{f:0.6, feet:0.3},
+  'off|below|riser':   {f:1,   feet:0.6},
+  'off|below|straight':{f:2,   feet:0.55},
   'on|middle|riser':   {f:1,   feet:0.5},
   'on|middle|straight':{f:1,   feet:0.5},
   'off|middle|riser':  {f:1,   feet:0.65},
-  'off|middle|straight':{f:2.5, feet:0.55, note:'The exhaust at 75 cm is now above the 45 cm inlet: the loop turns the right way round on a 30 cm chimney. Weak, about one change an hour, but no longer backwards.'},
+  'off|middle|straight':{f:2.5, feet:0.55},
   'on|bottom|riser':   {f:1,   feet:0.8},
   'on|bottom|straight':{f:1,   feet:0.8},
   'off|bottom|riser':  {f:1,   feet:0.8},
-  'off|bottom|straight':{f:1.6, feet:0.85, note:'A chimney of 75 cm instead of 26, through the heater: about 1.6 times the flow.'},
-  'in0|on|riser':      {f:2.5, feet:0.5,  note:'The grille is now 65 cm above the door gap, so the leaking air has to rise before the fan can take it: a little of it reaches the benches on the way.'},
-  'in0|on|straight':   {f:2.5, feet:0.5,  note:'The grille is now 65 cm above the door gap, so the leaking air has to rise before the fan can take it: a little of it reaches the benches on the way.'},
+  'off|bottom|straight':{f:1.6, feet:0.85},
+  'in0|on|riser':      {f:2.5, feet:0.5},
+  'in0|on|straight':   {f:2.5, feet:0.5},
   'in0|off|riser':     {f:1.2, feet:0.6},
   'in0|off|straight':  {f:2,   feet:0.6}
 };
 const WALL = {
-  'on|below|riser':    {f:0.75, feet:0.25, note:'A wall heater\'s intake is its underside, 30 cm up. The cold air arriving at 10 cm pools below that and does not climb on its own, so the casing lifts less of it than a floor-standing one and the fan drags more of it across the floor: about a quarter less fresh air where you breathe.'},
-  'on|below|straight': {f:0.75, feet:0.25, note:'A wall heater\'s intake is its underside, 30 cm up. The cold air arriving at 10 cm pools below that and does not climb on its own, so the casing lifts less of it than a floor-standing one and the fan drags more of it across the floor: about a quarter less fresh air where you breathe.'},
-  'off|below|riser':   {f:0.85, note:'The heater pulls from 30 cm up, above the cold pool the inlet makes at the floor: the loop runs about 15 % slower.'},
-  'off|below|straight':{f:0.85, note:'The heater pulls from 30 cm up, above the cold pool the inlet makes at the floor: the loop runs about 15 % slower.'},
-  'on|bottom|riser':   {f:0.75, feet:0.8,  note:'Tylö draws its under-the-heater inlet for wall heaters, but as a hole in the wall right under the casing, where the heater\'s draught takes the air at once. A hole in the floor 30 cm below is a different thing: fresh air at 30 °C is heavy and does not climb to the intake by itself. It spreads across the floor, the casing catches the share its own draught pulls up, and the fan drags the rest to the grille: about a quarter less than a floor-standing casing, which sits over the hole and leaves the air nowhere else to go.'},
-  'on|bottom|straight':{f:0.75, feet:0.8,  note:'Tylö draws its under-the-heater inlet for wall heaters, but as a hole in the wall right under the casing, where the heater\'s draught takes the air at once. A hole in the floor 30 cm below is a different thing: fresh air at 30 °C is heavy and does not climb to the intake by itself. It spreads across the floor, the casing catches the share its own draught pulls up, and the fan drags the rest to the grille: about a quarter less than a floor-standing casing, which sits over the hole and leaves the air nowhere else to go.'},
-  'off|bottom|riser':  {f:0.75, feet:0.8,  note:'The chimney through the heater starts 30 cm up, and the fresh air below it is heavy: only what the casing\'s draught pulls up gets heated, the rest spreads on the floor. Tylö avoids this by putting the inlet in the wall right under the casing.'},
-  'off|bottom|straight':{f:0.75, feet:0.8,  note:'The chimney through the heater starts 30 cm up, and the fresh air below it is heavy: only what the casing\'s draught pulls up gets heated, the rest spreads on the floor.'},
+  'on|below|riser':    {f:0.75, feet:0.25},
+  'on|below|straight': {f:0.75, feet:0.25},
+  'off|below|riser':   {f:0.85},
+  'off|below|straight':{f:0.85},
+  'on|bottom|riser':   {f:0.75, feet:0.8},
+  'on|bottom|straight':{f:0.75, feet:0.8},
+  'off|bottom|riser':  {f:0.75, feet:0.8},
+  'off|bottom|straight':{f:0.75, feet:0.8},
 };
 const HTABLE = {open:HEATER, wall:WALL};
 function hmod(k, heater){ const t=HTABLE[heater]; return (t && t[k]) ? t[k] : null; }
 /* the inlet duct: a chimney is a column of warm air, and an inlet duct carries cold air. Run inside the room its air warms about halfway,
    worth half the duct's height; its mouth cannot go below the floor. Keyed on the no-exhaust-duct states. */
 const IDUCT = {
-  'on|above|straight':  {f:1, note:'While the fan runs any pipe is only a longer way in. Switch the fan off to see what it does without one: nothing.'},
-  'on|middle|straight': {f:1, note:'While the fan runs any pipe is only a longer way in. Switch the fan off to see what it does without one: nothing.'},
-  'on|below|straight':  {f:1, note:'While the fan runs any pipe is only a longer way in. Switch the fan off to see what it does without one: nothing.'},
-  'off|above|straight': {f:0.4, feet:0.8, stall:true, note:'The air stalls. With the pipe cold the push runs backwards, as without a pipe: hot air leaves through the hole and goes down the pipe. But that fills the pipe with warm air, and a warm pipe is a piece of the room: now the warm column runs from the mouth at the floor up to the grille at 26 cm and pushes the other way, in at the mouth, out at the grille. The moment it does, cold air climbs the pipe, the pipe cools, and the push flips back. The 2 cancel where a warm plug sits in the top of the pipe and nothing moves: a trickle of warm air creeps down to replace what the pipe wall loses, and that is all. The reversal is gone, and so is everything else: the room is as good as sealed, with no draught at the ankles. The exhaust pipe has no such cancellation, because the air it carries is pushed up and out, and flowing keeps it warm. The old rule, "outlet above inlet", counts the openings where the air changes temperature, not the pipe mouths. Gravity ventilation is the weight difference between the warm column inside and the cold column outside, over the height where the inside is warm. An inlet pipe is full of outside air at outside temperature: it is a piece of the outside that reaches to the wall, so the inlet still counts at the hole, 1 m up. Drop its mouth 10 m down a shaft and nothing changes either. The exhaust pipe is the opposite, a piece of the room full of warm air that reaches above the roof, so the outlet counts at its top. Here the hole at 1 m is still above the grille at 26 cm, the warm column between them still pushes out through its upper opening, and that opening is the inlet. What an inlet pipe is for is practical: a mouth sheltered from wind and rain, away from the exhaust\'s mouth, or a route to a wall you can open.'},
-  'off|middle|straight':{f:0.5, feet:0.8, stall:true, note:'The air stalls. Cold, the pipe lets the weak reversal run; the hot air that leaves fills it, and a warm pipe reaches from the floor up to the grille and pushes the other way; cold air climbs, cools it, and the push flips back. A warm plug settles in the top of the pipe and nothing moves beyond a trickle. The room is as good as sealed, without the draught.'},
-  'off|below|straight': {f:1, note:'Nothing changes: the loop runs the right way, so the pipe carries outside air at outside temperature the whole time, and a cold pipe is a piece of the outside. The inlet still counts at the hole, 10 cm up. Only a pipe full of warm air moves an opening, and this one never warms.'}
+  'on|above|straight':  {f:1},
+  'on|middle|straight': {f:1},
+  'on|below|straight':  {f:1},
+  'off|above|straight': {f:0.4, feet:0.8, stall:true},
+  'off|middle|straight':{f:0.5, feet:0.8, stall:true},
+  'off|below|straight': {f:1}
 };
 const COMBO = {};
 function comboOf(k, exhaust, induct){ return (induct && exhaust==='upper' && COMBO[k]) ? COMBO[k] : null; }
 const BARE = 0.93;   // a bare exhaust pipe outdoors: its air cools a few degrees on the way up, about 7 % less flow than an insulated one
 /* the half pipe: outlet at 1.2 m instead of 2 m. Chimney = pipe top − inlet height; flow ∝ √height */
 const HALF = {
-  'off|above|riser':  {f:0.45, note:'The pipe top at 1.2 m is only 20 cm above the inlet at 1 m: a 20 cm chimney instead of 1 m. Flow goes with the square root of the height, so under half the flow, about one change an hour. Still the right way round, and it still needs priming.'},
-  'off|middle|riser': {f:0.70, note:'Chimney from the 45 cm inlet to the 1.2 m outlet: 75 cm instead of 1.55 m. About 70 % of the flow.'},
-  'off|below|riser':  {f:0.76, note:'Chimney from the 10 cm inlet to the 1.2 m outlet: 1.1 m instead of 1.9 m. About 3/4 of the flow.'},
-  'off|bottom|riser': {f:0.77, note:'Chimney from the floor to 1.2 m instead of 2 m. About 3/4 of the flow.'},
-  'on|above|riser':   {f:1, note:'While the fan runs the pipe\'s height is irrelevant. It matters the day the fan stops: switch it off.'},
-  'on|middle|riser':  {f:1, note:'While the fan runs the pipe\'s height is irrelevant. It matters the day the fan stops: switch it off.'},
-  'on|below|riser':   {f:1, note:'While the fan runs the pipe\'s height is irrelevant. It matters the day the fan stops: switch it off.'},
-  'on|bottom|riser':  {f:1, note:'While the fan runs the pipe\'s height is irrelevant. It matters the day the fan stops: switch it off.'}
+  'off|above|riser':  {f:0.45},
+  'off|middle|riser': {f:0.70},
+  'off|below|riser':  {f:0.76},
+  'off|bottom|riser': {f:0.77},
+  'on|above|riser':   {f:1},
+  'on|middle|riser':  {f:1},
+  'on|below|riser':   {f:1},
+  'on|bottom|riser':  {f:1}
 };
 function headOf(k, angle, heater, exhaust, induct, half){ const c=comboOf(k,exhaust,induct); if(c) return c.head; const m=hmod(k,heater); const bare = (k.startsWith('off|') && k.endsWith('|riser')) ? BARE : 1; return bare * MODEL[k].head * ((angle==='up45' && TILT[k]) ? TILT[k].f : 1) * (m ? m.f : 1) * ((exhaust==='upper' && EXH[k]) ? EXH[k].f : 1) * ((induct && IDUCT[k]) ? IDUCT[k].f : 1) * ((half && HALF[k]) ? HALF[k].f : 1); }
 function feetOf(k, heater, exhaust, induct){
@@ -226,52 +226,32 @@ function toUpper(d){
 /* ---------- air states: fan × inlet × duct ---------- */
 const AIR = {
   'in0|on|riser': {
-    grade:'bad', badge:'Exhaust only',
+    grade:'bad',
     title:'Fan on, no inlet, exhaust ducted up',
-    summary:'No inlet, so the fan takes its air from wherever the room leaks, and the easiest leak is the gap under the door, 30 cm from the grille. The air crosses that strip of floor and is gone. The room sits under suction, the heater\'s plume goes round and round above, and almost nothing it breathes is replaced. VTT 2002 found exactly this in Helsinki flats: with an exhaust-only fan the door gap took over as the inlet and the designed one stopped working.',
-    good:['The fan still removes some moisture','Nothing can reverse: the room is under suction everywhere'],
-    bad:['Almost no fresh air where you breathe: the leak and the grille are 30 cm apart','A cold stream along the floor from the door','Where the air actually comes in depends on the building, not on you'],
-    says:'<b>VTT 2002</b>: in exhaust-only saunas the door gap was the easier way in and the high inlet ran backwards. <b>Harvia</b> and <b>Helo</b> both require a supply opening.',
     paths:[{d:'M398 290 C 380 294, 340 296, 300 294 C 320 280, 360 268, 398 262', color:'fresh', dur:4, n:8}],
     stagnant:'M105 24 h291 v220 h-291z', leakIn:true
   },
   'in0|on|straight': {
-    grade:'bad', badge:'Exhaust only',
+    grade:'bad',
     title:'Fan on, no inlet, exhaust straight through the wall',
-    summary:'No inlet, so the fan takes its air from wherever the room leaks, and the easiest leak is the gap under the door, 30 cm from the grille. The air crosses that strip of floor and is gone. The room sits under suction, the heater\'s plume goes round and round above, and almost nothing it breathes is replaced. VTT 2002 found exactly this in Helsinki flats: with an exhaust-only fan the door gap took over as the inlet and the designed one stopped working.',
-    good:['The fan still removes some moisture','Nothing can reverse: the room is under suction everywhere'],
-    bad:['Almost no fresh air where you breathe: the leak and the grille are 30 cm apart','A cold stream along the floor from the door','Where the air actually comes in depends on the building, not on you'],
-    says:'<b>VTT 2002</b>: in exhaust-only saunas the door gap was the easier way in and the high inlet ran backwards. <b>Harvia</b> and <b>Helo</b> both require a supply opening.',
     paths:[{d:'M398 290 C 380 294, 340 296, 300 294 C 320 280, 360 268, 398 262', color:'fresh', dur:4, n:8}],
     stagnant:'M105 24 h291 v220 h-291z', leakIn:true
   },
   'in0|off|riser': {
-    grade:'bad', badge:'A chimney with nothing to feed it',
+    grade:'bad',
     title:'Fan stopped, no inlet, exhaust ducted up',
-    summary:'The duct still draws, but the only air it can draw arrives through the gap under the door, right beside the grille. A tiny loop runs along 30 cm of floor and the rest of the room stays as it is.',
-    good:['Nothing reverses'],
-    bad:['A fraction of a change an hour','The room is as stale as a sealed box, with a draught at the door'],
-    says:'<b>Helo</b> and <b>Harvia</b> draw an inlet in every layout; a duct cannot pull air that has no way in.',
     paths:[{d:'M398 290 C 380 294, 340 296, 300 294 C 320 280, 360 268, 398 262', color:'fresh', dur:8, n:3, size:2.6}],
     stagnant:'M105 24 h291 v220 h-291z', leakIn:true
   },
   'in0|off|straight': {
-    grade:'bad', badge:'Nearly sealed',
+    grade:'bad',
     title:'Fan stopped, no inlet, exhaust straight through the wall',
-    summary:'A hole at 26 cm and a gap at the floor on the same wall, 20 cm apart: there is almost no chimney and almost no flow. The room behaves like a sealed box that whistles a little.',
-    good:['Keeps its heat'],
-    bad:['No fresh air to speak of','CO₂ climbs as in a sealed room'],
-    says:'<b>HUUM</b>: the outlet must sit at least 20 cm above the inlet for gravity to move anything; here the 2 are on one wall and nearly level.',
     paths:[{d:'M398 290 C 380 294, 340 296, 300 294 C 320 280, 360 268, 398 262', color:'fresh', dur:12, n:2, size:2.4}],
     stagnant:'M105 24 h291 v220 h-291z', leakIn:true
   },
   'out0|above': {
-    grade:'bad', badge:'Inlet only',
+    grade:'bad',
     title:'Inlet above the heater, no exhaust',
-    summary:'With no exhaust the air can only leave through the leaks, and the biggest leaks are around the door: a gap at the top and a gap at the bottom. Buoyancy sorts them: hot air seeps out at the top of the door and, since the inlet is 1 m up, out through the inlet too; cold air creeps in under the door. A faint reversal through cracks.',
-    good:['Keeps its heat: the leaks are small'],
-    bad:['A fraction of a change an hour, through cracks you did not design','The inlet works as an exhaust part of the time','Cold draught under the door'],
-    says:'<b>Tylö</b>: an exhaust is required with the inlet; without it the inlet above the heater becomes the outlet.',
     paths:[
       {d:'M398 290 C 380 294, 330 292, 270 290 C 210 290, 150 290, 112 282 C 100 278, 98 262, 98 240 C 98 215, 96 200, 96 186 C 92 190, 68 166, 22 160', color:'gradient', dur:14, n:4, size:2.8},
       {d:'M80 190 C 74 150, 95 70, 160 48 C 240 32, 330 45, 398 60', color:'hot', dur:12, n:3, size:2.6}
@@ -279,42 +259,26 @@ const AIR = {
     stagnant:'M105 24 h291 v200 h-291z', revIn:true, leakOut:true, leakIn:true
   },
   'out0|middle': {
-    grade:'bad', badge:'Inlet only',
+    grade:'bad',
     title:'Inlet at the heater\'s middle, no exhaust',
-    summary:'With no exhaust the hot air leaves through the leaks at the top of the door and the cracks, and the inlet at 45 cm feeds the room from below them: a gravity loop with a 1.3 m chimney and a crack for an outlet. It breathes, slowly, the right way round.',
-    good:['Right way round: the leaks are above the inlet','Keeps its heat'],
-    bad:['Under one change an hour: a door seal is a poor outlet','Depends on leaks you did not design'],
-    says:'<b>Helo</b>: the outlet goes at least 1 m above the inlet. Here it is a crack 1.3 m above it.',
     paths:[{d:'M22 236 C 40 240, 50 256, 58 278 C 64 292, 70 296, 74 296 C 76 290, 74 240, 74 200 C 74 150, 95 70, 160 48 C 240 32, 330 45, 398 60', color:'gradient', dur:14, n:4, size:2.8}],
     stagnant:'M200 60 h190 v150 h-190z', leakOut:true
   },
   'out0|below': {
-    grade:'bad', badge:'Inlet only',
+    grade:'bad',
     title:'Inlet at the floor by the heater, no exhaust',
-    summary:'With no exhaust the hot air leaves through the leaks at the top of the door and the cracks, and the low inlet feeds the room from the floor: Harvia\'s gravity drawing with a crack for an outlet. A 1.65 m chimney drives it, the crack throttles it.',
-    good:['Right way round: the leaks are far above the inlet','Keeps its heat'],
-    bad:['Under one change an hour: a door seal is a poor outlet','Cold air at the floor by the heater','Depends on leaks you did not design'],
-    says:'<b>Harvia</b> draws this inlet with a low exhaust on the far wall, not with none.',
     paths:[{d:'M22 283 C 60 282, 74 262, 80 215 C 92 150, 95 70, 160 48 C 240 32, 330 45, 398 60', color:'gradient', dur:14, n:4, size:2.8}],
     stagnant:'M200 60 h190 v150 h-190z', leakOut:true
   },
   'out0|bottom': {
-    grade:'bad', badge:'Inlet only',
+    grade:'bad',
     title:'Inlet in the floor under the heater, no exhaust',
-    summary:'The heater draws fresh air up through itself and sends it to the ceiling; with no exhaust it leaves through the leaks at the top of the door. The tallest chimney on the page, 1.75 m, throttled by a crack.',
-    good:['Right way round, through the heater: warm feet','Keeps its heat'],
-    bad:['About one change an hour at best: a door seal is a poor outlet','Depends on leaks you did not design'],
-    says:'<b>Tylö</b> pairs this inlet with a high exhaust on the far wall; the leaks here stand in for it badly.',
     paths:[{d:'M73 312 L 73 200 C 74 150, 95 70, 160 48 C 240 32, 330 45, 398 60', color:'gradient', dur:13, n:5, size:2.8}],
     stagnant:'M200 60 h190 v150 h-190z', leakOut:true
   },
   'on|middle|riser': {
-    grade:'ok', badge:'Depends on the heater',
+    grade:'ok',
     title:"Fan on, inlet at the heater's middle, exhaust ducted up",
-    summary:"The inlet faces the side of the heater at half its height, and what happens next depends on what it faces. A closed casing is a wall: the jet splits on it, most of the cold air slides down to the floor and the fan drags it to the grille, the rest climbs the hot casing into the plume. An open pillar is a sieve: the jet goes in between the stones, is heated on the spot and rises through the pillar, and the fan then pulls it down past the benches as with the high inlet. No manual draws this position; it is the one layout on this page where the heater switch changes everything.",
-    good:["With an open pillar the fresh air is heated before it reaches anyone: warm feet, good exchange","The inlet sits low on the wall, easy to build and out of the sensor's way"],
-    bad:["With a closed casing most of the air falls to the floor: a cold layer and a short circuit to the grille","The stones nearest the inlet run cooler, so the löyly comes off the pillar unevenly","No manufacturer draws it and nobody has measured it"],
-    says:"<b>No source draws a side inlet.</b> Harvia and Helo put the fan-driven inlet above the heater; Tylö puts the gravity inlet under it. The page reasons from the heater's shape: a casing deflects, a pillar admits.",
     paths:[
       {d:'M22 236 C 40 238, 50 244, 56 262 C 70 290, 180 292, 280 288 C 340 284, 376 266, 398 262', color:'fresh', dur:5.5, n:8, duct:true},
       {d:'M22 236 C 44 238, 54 226, 62 200 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 262', color:'gradient', kt:'0;0.08;0.2;1', dur:7, n:5, duct:true}
@@ -326,12 +290,8 @@ const AIR = {
     stagnant:'M200 60 h190 v140 h-190z'
   },
   'on|middle|straight': {
-    grade:'ok', badge:'Depends on the heater',
+    grade:'ok',
     title:"Fan on, inlet at the heater's middle, exhaust straight through the wall",
-    summary:"The inlet faces the side of the heater at half its height, and what happens next depends on what it faces. A closed casing is a wall: the jet splits on it, most of the cold air slides down to the floor and the fan drags it to the grille, the rest climbs the hot casing into the plume. An open pillar is a sieve: the jet goes in between the stones, is heated on the spot and rises through the pillar, and the fan then pulls it down past the benches as with the high inlet. The duct makes no difference while the fan runs.",
-    good:["With an open pillar the fresh air is heated before it reaches anyone: warm feet, good exchange","The inlet sits low on the wall, easy to build and out of the sensor's way"],
-    bad:["With a closed casing most of the air falls to the floor: a cold layer and a short circuit to the grille","The stones nearest the inlet run cooler, so the löyly comes off the pillar unevenly","When the fan stops the inlet is the higher opening and the room runs backwards"],
-    says:"<b>No source draws a side inlet.</b> Harvia and Helo put the fan-driven inlet above the heater; Tylö puts the gravity inlet under it. The page reasons from the heater's shape: a casing deflects, a pillar admits.",
     paths:[
       {d:'M22 236 C 40 238, 50 244, 56 262 C 70 290, 180 292, 280 288 C 340 284, 376 266, 398 262', color:'fresh', dur:5.5, n:8},
       {d:'M22 236 C 44 238, 54 226, 62 200 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 262', color:'gradient', kt:'0;0.08;0.2;1', dur:7, n:5}
@@ -343,12 +303,8 @@ const AIR = {
     stagnant:'M200 60 h190 v140 h-190z'
   },
   'off|middle|riser': {
-    grade:'ok', badge:'Half-height gravity',
+    grade:'ok',
     title:"Fan stopped, inlet at the heater's middle, exhaust ducted up",
-    summary:"The chimney in the duct draws, and the inlet sits 45 cm up the wall facing the heater. The cold air falls the short way to the floor; with a closed casing the heater's own draught takes much of it in at the base and sends it up, with a pillar the jet enters the stones directly. Either way more of the fresh air is heated before it spreads than with the inlet at the floor, and the chimney from inlet to duct outlet is 1.65 m, taller than with the high inlet.",
-    good:["Taller chimney than the high inlet: more buoyancy flow","Most of the fresh air passes the heater before it reaches the benches","Nothing reverses: the duct outlet is far above the inlet"],
-    bad:["Still a gravity sauna: 2 to 3 changes an hour at best","Cold air falls to the floor on its way to the heater","Unmeasured: no manual or study covers this position"],
-    says:"<b>Helo</b> and <b>HUUM</b> draw the gravity inlet low beside the heater; this is that inlet lifted to half height, with the same low outlet ducted up.",
     paths:[
       {d:'M22 236 C 40 240, 50 256, 58 278 C 64 292, 70 296, 74 296 C 76 290, 74 240, 74 200 C 74 150, 100 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 262', color:'gradient', kt:'0;0.2;0.32;1', dur:10, n:6, duct:true},
       {d:'M22 236 C 40 242, 52 262, 60 280 C 80 292, 180 292, 280 288 C 340 284, 376 266, 398 262', color:'fresh', dur:9, n:3, size:2.6, duct:true}
@@ -359,24 +315,16 @@ const AIR = {
     ]
   },
   'off|middle|straight': {
-    grade:'bad', badge:'A weak reversal',
+    grade:'bad',
     title:"Fan stopped, inlet at the heater's middle, exhaust straight through the wall",
-    summary:"Both openings are low, and the inlet is the higher one: 45 cm against 26 cm. Buoyancy runs them backwards, as with the high inlet, only with a quarter of the drive: warm air leaks out of the inlet, cold air seeps in at the grille and creeps along the floor. The flow is small and so is the exchange; the room is close to a sealed box with a cold draught on the ankles.",
-    good:["Little heat is lost: the drive is only about 0.4 Pa","Open the drying vent and the loop turns the right way round"],
-    bad:["Runs backwards: about half a change an hour, along the floor","CO₂ climbs almost as fast as in a sealed room","The inlet above the outlet is the rule broken here; 19 cm is enough to break it"],
-    says:"<b>Tylö</b>: an exhaust to outdoors below the inlet reverses the flow. The height difference decides, not the inlet's angle or the heater.",
     paths:[
       {d:'M398 262 C 380 272, 330 290, 270 290 C 210 291, 150 291, 112 286 C 100 282, 96 270, 96 258 C 94 248, 80 240, 22 236', color:'gradient', kt:'0;0.5;0.68;1', dur:12, n:6, size:2.8}
     ],
     stagnant:'M105 24 h291 v200 h-291z', revIn:true
   },
   'on|bottom|riser': {
-    grade:'ok', badge:"Tylö's inlet, with a fan",
+    grade:'ok',
     title:"Fan on, inlet in the floor under the heater, exhaust ducted up",
-    summary:"The fresh air comes up through the floor into the heater's base. A closed casing is a chimney and takes it all: the air is heated past the elements, leaves over the stones and joins the plume at the ceiling, where the fan pulls it down past the benches to the grille. The room gets the high inlet's mixing with the inlet hidden under the heater. A pillar has no chimney: the air arrives at the base, some rises through the stones, the rest spills out along the floor and the fan drags that part to the grille cold.",
-    good:["With a closed casing every litre of fresh air is heated before it spreads: warm feet, full exchange","No hole in a visible wall; the inlet is under the heater","The thermostat sits high on the wall, nowhere near the incoming air"],
-    bad:["Needs a floor open to outside air, or a duct from the hole to an outside wall","Löyly water and dirt drain into it: a collar and a screen are not optional","With a pillar a share of the air spills along the floor cold"],
-    says:"<b>Tylö</b>: “place the inlet vent straight through the wall directly under the heater”, for its wall-hung heaters, 125 cm² for a family sauna. On a floor-standing heater the same position is a hole in the floor.",
     paths:[
       {d:'M73 312 L 73 200 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 262', color:'gradient', kt:'0;0.12;0.25;1', dur:6.5, n:9, duct:true},
       {d:'M73 300 C 84 296, 100 292, 130 292 C 200 292, 300 290, 398 262', color:'fresh', dur:6, n:2, size:2.4, duct:true}
@@ -387,12 +335,8 @@ const AIR = {
     ]
   },
   'on|bottom|straight': {
-    grade:'ok', badge:"Tylö's inlet, with a fan",
+    grade:'ok',
     title:"Fan on, inlet in the floor under the heater, exhaust straight through the wall",
-    summary:"The fresh air comes up through the floor into the heater's base. A closed casing is a chimney and takes it all: the air is heated past the elements, leaves over the stones and joins the plume at the ceiling, where the fan pulls it down past the benches to the grille. A pillar has no chimney: some of the air rises through the stones, the rest spills out along the floor to the grille. The duct makes no difference while the fan runs; without the fan this layout keeps breathing the right way, because the inlet is the lowest opening in the room.",
-    good:["With a closed casing every litre of fresh air is heated before it spreads: warm feet, full exchange","No hole in a visible wall","Cannot reverse when the fan stops"],
-    bad:["Needs a floor open to outside air, or a duct from the hole to an outside wall","Löyly water and dirt drain into it: a collar and a screen are not optional","With a pillar a share of the air spills along the floor cold"],
-    says:"<b>Tylö</b>: “place the inlet vent straight through the wall directly under the heater”, for its wall-hung heaters, 125 cm² for a family sauna. On a floor-standing heater the same position is a hole in the floor.",
     paths:[
       {d:'M73 312 L 73 200 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 262', color:'gradient', kt:'0;0.12;0.25;1', dur:6.5, n:9},
       {d:'M73 300 C 84 296, 100 292, 130 292 C 200 292, 300 290, 398 262', color:'fresh', dur:6, n:2, size:2.4}
@@ -403,12 +347,8 @@ const AIR = {
     ]
   },
   'off|bottom|riser': {
-    grade:'ok', badge:'The heater as the chimney',
+    grade:'ok',
     title:"Fan stopped, inlet in the floor under the heater, exhaust ducted up",
-    summary:"Tylö's gravity inlet with Helo's ducted outlet. The heater draws the fresh air up through itself, heats it and sends it to the ceiling; it comes down the far wall past the benches and leaves at the grille, and the duct outlet 2 m above the inlet gives the tallest chimney on this page. With a closed casing nearly all the air takes that route. With a pillar some spills along the floor first.",
-    good:["Tallest chimney of the gravity layouts: about 3 changes an hour","The fresh air is heated before it reaches anyone: the warmest feet of any gravity layout","Cannot reverse: the inlet is the lowest point in the room"],
-    bad:["Needs a floor open to the outside, or a duct to one","Depends on the heater being hot: nothing moves during heat-up","A gap under the door is a second inlet at the same height"],
-    says:"<b>Tylö</b> draws the inlet under the heater and the exhaust high for gravity saunas. <b>Helo</b> ducts the low exhaust up. This layout takes both.",
     paths:[
       {d:'M73 312 L 73 200 C 74 150, 100 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 262', color:'gradient', kt:'0;0.12;0.28;1', dur:9, n:7, duct:true},
       {d:'M73 312 L 73 200 C 74 150, 120 60, 200 50 C 270 45, 330 90, 340 135 C 345 170, 360 215, 398 262', color:'gradient', kt:'0;0.12;0.28;1', dur:9.8, n:5, duct:true}
@@ -419,12 +359,8 @@ const AIR = {
     ]
   },
   'off|bottom|straight': {
-    grade:'ok', badge:"Tylö's inlet, a low outlet",
+    grade:'ok',
     title:"Fan stopped, inlet in the floor under the heater, exhaust straight through the wall",
-    summary:"The inlet is at the floor and the outlet at 26 cm: a chimney of 26 cm, a little more than Harvia's drawing with the inlet beside the heater, and the heater pre-heats the air, which the beside-the-heater inlet does not. It breathes weakly and the right way round, because the inlet is the lowest opening in the room and can never turn into an exhaust.",
-    good:["Cannot reverse","Feet warmer than with the inlet beside the heater: the air arrives through the heater"],
-    bad:["About one change an hour","Needs a floor open to outside air","Dies as the room cools"],
-    says:"<b>Tylö</b> wants the outlet high and diagonal with this inlet; with a low outlet the same inlet gives a fraction of the flow.",
     paths:[
       {d:'M73 312 L 73 200 C 74 150, 100 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 262', color:'gradient', kt:'0;0.12;0.28;1', dur:16, n:5},
       {d:'M73 312 L 73 200 C 74 150, 120 60, 200 50 C 270 45, 330 90, 340 135 C 345 170, 360 215, 398 262', color:'gradient', kt:'0;0.12;0.28;1', dur:17, n:4}
@@ -435,13 +371,9 @@ const AIR = {
     ]
   },
   'none': {
-    grade:'bad', badge:'The sealed box',
+    grade:'bad',
     title:'No ventilation: no inlet, no exhaust',
-    summary:'The common Brazilian sauna: a closed room with a heater. The heater still moves air, a plume up the wall, across the ceiling, down the far side and back along the floor, but it is the same air going round. Nothing replaces what the bathers breathe out except the gaps around the door, a few tenths of a change an hour. CO₂ climbs about 55 ppm a minute with 2 bathers, 4 times that with 8, and the löyly\'s moisture has no way out either.',
-    good:['Warm everywhere, no draught, no fan, nothing to build','Heats fast and holds heat: nothing is thrown away'],
-    bad:['No fresh air: with 2 bathers CO₂ passes 2,000 ppm in half an hour, with 8 it passes 5,000, the 8-hour occupational limit (Brazil\'s NR-15 sets 3,900)','Stale, heavy air; the sauna people say "suffocates"','Steam has nowhere to go: the wood stays wet after the session unless the door is left open','Opening the door is the only ventilation, and it dumps the heat'],
     ach:'0.3 / h, door gaps', achG:'bad', head:'about 0.2 / h', headG:'bad', feet:'warm', feetG:'good',
-    says:'<b>Harvia</b>, <b>Helo</b> and <b>Tylö</b> manuals all require an inlet and an exhaust. <b>Saunologia</b>: 8 to 10 l/s per bather keeps a sauna under 1,000 ppm; with the ventilation off the level climbs within minutes. <b>Finnish code D2</b> (repealed) gave every occupied room at least 6 l/s.',
     paths:[
       {d:'M80 212 C 70 150, 90 70, 150 48 C 240 30, 340 34, 382 60 C 396 120, 396 220, 380 270 C 330 292, 200 294, 110 290 C 80 288, 72 250, 80 212 Z', color:'hot', dur:12, n:10, size:3},
       {d:'M250 70 C 300 60, 340 90, 320 120 C 300 150, 230 140, 220 110 C 212 90, 230 76, 250 70 Z', color:'stale', dur:14, n:5, size:2.6, noguide:true},
@@ -450,39 +382,27 @@ const AIR = {
     stagnant:'M105 24 h291 v160 h-291z'
   },
   'on|above|riser': {
-    grade:'best', badge:'The reference layout',
+    grade:'best',
     title:'Fan on, inlet above the heater, exhaust ducted up',
-    summary:'Fresh air drops out of the high inlet straight into the heater\'s plume and is heated and mixed at once. The fan pulls that mixed air down through the benches and out under the lower bench, past the bather\'s face on the way. The rising duct changes nothing while the fan runs; it is there for the day the fan stops.',
-    good:['Air is exchanged where people breathe','Feet 20 to 35 °C warmer than with a low inlet (VTT 1992)','The hottest air under the ceiling is kept, not thrown away','Rate set by the fan: 6 changes an hour, or 8 to 10 l/s per bather'],
-    bad:['Needs a duct run and the fan interlocked with the heater','The inlet must keep its distance from the sensor','A gap under the door can steal the inlet\'s job: VTT measured hot air leaving a high inlet with the fan running when the door leaked'],
     ach:'6 / h', achG:'good', head:'6 / h', headG:'good', feet:'warm', feetG:'good', co2:980, co28:2250, co2note:'steady state',
-    says:'<b>VTT 1992</b> and <b>2002</b>, <b>Harvia</b>, <b>Helo</b>, <b>HUUM</b>, <b>Saunologia</b> all give this layout for an electric heater with a fan. VTT 2002 and Saunologia add: with an exhaust fan only, seal the door or add a supply fan.',
     paths:[
       {d:'M22 160 C 46 163, 60 172, 70 182 C 78 150, 88 110, 120 70 C 170 40, 260 40, 320 70 C 360 95, 350 150, 330 180 C 315 205, 320 240, 398 262', color:'gradient', dur:6, n:10, duct:true},
       {d:'M22 160 C 50 165, 66 176, 74 186 C 90 130, 110 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 262', color:'gradient', dur:6.8, n:8, duct:true}
     ]
   },
   'on|above|straight': {
-    grade:'best', badge:'Works, until the fan stops',
+    grade:'best',
     title:'Fan on, inlet above the heater, exhaust straight through the wall',
-    summary:'Identical to the reference layout while the fan runs: the inlet air is caught by the plume, mixed, and pulled down through the benches to the low grille. The difference is hidden. Both openings go straight outside, so the moment the fan dies, buoyancy has a low hole and a high hole to work with.',
-    good:['Same air path and the same warm feet as the ducted version','Simplest exhaust to build: one hole, one fan'],
-    bad:['No protection when the fan stops: flip the fan switch to see the reversal','Wind on the exhaust wall pushes straight into the room; 3 m/s is about 5 Pa, more than the stack effect','Tylö warns against any exhaust that leads straight outdoors for this reason'],
     ach:'6 / h', achG:'good', head:'6 / h', headG:'good', feet:'warm', feetG:'good', co2:980, co28:2250, co2note:'steady state',
-    says:'<b>VTT 1992</b> ran its lab this way, exhaust fan straight out, and it worked because the fan was always on. <b>Tylö</b>: "The air exhaust vent must not lead outdoors. This could cause the ventilation direction to be reversed."',
     paths:[
       {d:'M22 160 C 46 163, 60 172, 70 182 C 78 150, 88 110, 120 70 C 170 40, 260 40, 320 70 C 360 95, 350 150, 330 180 C 315 205, 320 240, 398 262', color:'gradient', dur:6, n:10},
       {d:'M22 160 C 50 165, 66 176, 74 186 C 90 130, 110 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 262', color:'gradient', dur:6.8, n:8}
     ]
   },
   'on|below|riser': {
-    grade:'bad', badge:'Short circuit along the floor',
+    grade:'bad',
     title:'Fan on, inlet below the heater',
-    summary:'The fan pulls, but the fresh air never climbs. Cold air comes in at floor level, pools, and the fan drags it straight across the floor to the low grille, under the benches and under everyone. The heater\'s plume rises to the ceiling and circles there with nothing to carry it down. The room changes its air 6 times an hour on paper and about a third of that at head height, the share the heater manages to lift.',
-    good:['The fan still removes some heat and moisture','Nothing reverses: the flow direction is stable'],
-    bad:['A cold layer on the floor; VTT measured the foot bench 20 to 35 °C colder than with a high inlet','Head zone starved: in the VTT tracer tests the low-in, low-out layout let humidity at head height climb to 2 or 3 times the high-inlet value','Cold air fed under an electric heater disturbs its thermostat (VTT 1992) and can overheat a heater with a built-in sensor (Saunologia)'],
     ach:'6 / h', achG:'warn', head:'about 2 / h, a third of the fan', headG:'bad', feet:'cold layer', feetG:'bad', co2:2300, co28:5500, co2note:'at head height, steady',
-    says:'<b>VTT 1992</b>: a low inlet "lands on the floor", and inlet low with exhaust low is the short-circuit case. <b>Harvia</b> and <b>Narvi</b> give the low inlet only for gravity ventilation, never with a fan. <b>Finnmark</b> and <b>Thermory</b> still draw it low with a fan; the VTT smoke tests contradict them.',
     paths:[
       {d:'M22 283 C 80 288, 180 292, 280 288 C 340 284, 376 266, 398 262', color:'fresh', dur:5, n:9, duct:true},
       {d:'M22 280 C 60 284, 110 290, 200 290 C 300 290, 360 272, 398 260', color:'fresh', dur:5.6, n:7, duct:true},
@@ -491,13 +411,9 @@ const AIR = {
     stagnant:'M200 60 h190 v140 h-190z'
   },
   'on|below|straight': {
-    grade:'bad', badge:'Short circuit along the floor',
+    grade:'bad',
     title:'Fan on, inlet below the heater',
-    summary:'The fan pulls, but the fresh air never climbs. Cold air comes in at floor level, pools, and the fan drags it straight across the floor to the low grille, under the benches and under everyone. The heater\'s plume lifts about a third of the fresh air; the rest crosses the floor to the grille. The duct makes no difference while the fan runs.',
-    good:['The fan still removes some heat and moisture','Nothing reverses while the fan runs'],
-    bad:['A cold layer on the floor; VTT measured the foot bench 20 to 35 °C colder than with a high inlet','Head zone starved: the low-in, low-out layout let humidity at head height climb to 2 or 3 times the high-inlet value','Cold air fed under an electric heater disturbs its thermostat (VTT 1992)'],
     ach:'6 / h', achG:'warn', head:'about 2 / h, a third of the fan', headG:'bad', feet:'cold layer', feetG:'bad', co2:2300, co28:5500, co2note:'at head height, steady',
-    says:'<b>VTT 1992</b>: a low inlet "lands on the floor", and inlet low with exhaust low is the short-circuit case. <b>Harvia</b> and <b>Narvi</b> give the low inlet only for gravity ventilation, never with a fan.',
     paths:[
       {d:'M22 283 C 80 288, 180 292, 280 288 C 340 284, 376 266, 398 262', color:'fresh', dur:5, n:9},
       {d:'M22 280 C 60 284, 110 290, 200 290 C 300 290, 360 272, 398 260', color:'fresh', dur:5.6, n:7},
@@ -506,26 +422,18 @@ const AIR = {
     stagnant:'M200 60 h190 v140 h-190z'
   },
   'off|above|riser': {
-    grade:'ok', badge:'The fail-safe',
+    grade:'ok',
     title:'Fan stopped, inlet above the heater, exhaust ducted up',
-    summary:'The fan is gone and the room keeps breathing the right way round, only slower. The duct\'s outlet is higher than the inlet, so the column of warm air in the duct works as a small chimney: it keeps drawing from the low grille, and the high inlet keeps admitting air that falls into the plume. Nothing reverses. The sauna degrades from a fan system to a gravity system, never to a backwards one.',
-    good:['Same direction as with the fan: in above the heater, out under the bench','Feet stay warm; no cold draught at floor level','2 or 3 changes an hour from buoyancy alone, enough for 2 bathers','The failure is a slower sauna, not a ruined one'],
-    bad:['Weaker than the fan: with 6 or 8 bathers CO₂ climbs past 2,000 ppm','Depends on the duct outlet being well above the inlet: the higher, the stronger','Must be primed: with the pipe cold at start-up the loop can start backwards and stay there, cold air coming down the pipe. A minute of fan, or the drying vent open for a minute, starts it the right way; the low inlet of F needs no priming','A gap under the door competes with the inlet; seal the door'],
     ach:'2 to 3 / h', achG:'warn', head:'2 to 3 / h', headG:'warn', feet:'warm', feetG:'good', co2:1750, co28:4100, co2note:'steady state at 2.5 / h',
-    says:'<b>Helo</b> ducts the low exhaust up to the ceiling and, without a fan, places the outlet at least 1 m above the inlet. <b>Sawo</b> allows the under-platform exhaust to be piped to a ceiling vent. <b>VTT 1992</b> calls low-in, high-out the most reliable gravity arrangement; the riser makes a low grille behave as a high outlet.',
     paths:[
       {d:'M22 160 C 46 163, 60 172, 70 182 C 78 150, 88 110, 120 70 C 170 40, 260 40, 320 70 C 360 95, 350 150, 330 180 C 315 205, 320 240, 398 262', color:'gradient', dur:10, n:6, duct:true},
       {d:'M22 160 C 50 165, 66 176, 74 186 C 90 130, 110 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 262', color:'gradient', dur:11, n:5, duct:true}
     ]
   },
   'off|above|straight': {
-    grade:'bad', badge:'The reversal',
+    grade:'bad',
     title:'Fan stopped, inlet above the heater, exhaust straight through the wall',
-    summary:'Nothing pulls at the low grille any more, so buoyancy takes over and runs both openings backwards. Hot room air pushes out through the high inlet above the heater; cool outside air seeps in through the low grille and creeps along the floor. The room turns into a tight low-in, high-out loop that hugs the floor and the heater wall: a cold draught on the ankles, a thickening hot layer under the ceiling, almost no exchange at head height. One of the 2 layouts on this page that run backwards.',
-    good:['Heat loss through the vents drops by about 2/3; the heater cycles less','Restart the fan and the proper loop is back within a minute'],
-    bad:['The vents run backwards: about 1.5 Pa of stack pressure between the openings, 5 to 7 l/s through 2 100 mm holes, 0.4 to 0.6 kW lost','Cold draught at the feet, hot air thrown away above the heater','Exchange at head height under one change an hour; with 2 bathers CO₂ climbs about 50 ppm a minute','Brazil halves the Finnish pressure, it does not remove it'],
     ach:'1 to 2 / h, backwards', achG:'bad', head:'under 1 / h', headG:'bad', feet:'cold draught', feetG:'bad', co2:1900, co28:4800, co2note:'after 20 minutes, still climbing',
-    says:'<b>VTT 2002</b> measured 80 to 100 °C air flowing out of the high inlet in a Helsinki sauna with this layout, with the exhaust fan running, because the door gap was the easier way in. <b>Saunologia</b>: a high gravity inlet "turns into an exhaust pipe". <b>Tylö</b>: an exhaust to outdoors "could cause the ventilation direction to be reversed".',
     paths:[
       {d:'M398 262 C 380 264, 330 288, 270 289 C 210 290, 150 290, 112 282 C 100 278, 98 262, 98 240 C 98 215, 96 200, 96 186 C 92 190, 68 166, 22 160', color:'gradient', kt:'0;0.5;0.68;1', dur:9, n:9, size:3},
       {d:'M398 258 C 370 262, 300 282, 230 284 C 170 286, 130 280, 108 270 C 100 262, 102 236, 104 214 C 104 220, 90 180, 22 162', color:'gradient', kt:'0;0.5;0.68;1', dur:10, n:6, size:2.8, noguide:true}
@@ -533,13 +441,9 @@ const AIR = {
     stagnant:'M105 24 h291 v160 h-291z', revIn:true
   },
   'off|below|riser': {
-    grade:'ok', badge:'The Finnish gravity sauna',
+    grade:'ok',
     title:'Fan stopped, inlet below the heater, exhaust ducted up',
-    summary:'This is the classic sauna without a fan, done properly. Cold air enters low beside the heater, is heated, rises to the ceiling, drifts across, comes down the far wall and leaves through the low grille into the rising duct. It works on buoyancy alone and keeps working as long as the heater is hot. Its price is the floor: the cold inlet air pools before the plume lifts it, and the feet pay.',
-    good:['No fan, no wiring, works every time the heater is on','The loop passes the benches on its way down the far wall','Keeps more heat than a ceiling exhaust'],
-    bad:['Cold draught at floor level near the heater; VTT measured the foot bench 20 to 35 °C colder than with a high inlet','Flow is weak and variable, 2 to 3 changes an hour at best','Cold air under an electric heater can disturb its thermostat'],
     ach:'2 to 3 / h', achG:'warn', head:'1 to 2 / h', headG:'warn', feet:'cold at the heater', feetG:'bad', co2:1750, co28:4100, co2note:'steady state at 2.5 / h',
-    says:'<b>Harvia</b> and <b>Narvi</b>, gravity: supply below or next to the heater, exhaust near the floor as far from the heater as possible. <b>Helo</b>: without forced ventilation the inlet goes low and the exhaust at least 1 m higher. <b>Saunologia</b> does not recommend gravity ventilation for electric saunas.',
     paths:[
       {d:'M22 283 C 60 282, 74 262, 80 215 C 92 150, 95 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 262', color:'gradient', dur:9, n:7, duct:true},
       {d:'M22 283 C 60 283, 76 262, 82 215 C 95 140, 120 60, 200 50 C 270 45, 330 90, 340 135 C 345 170, 360 215, 398 262', color:'gradient', dur:9.8, n:6, duct:true}
@@ -547,13 +451,9 @@ const AIR = {
     stagnant:'M240 100 h60 v50 h-60z'
   },
   'off|below|straight': {
-    grade:'ok', badge:'Harvia\'s gravity drawing, weak',
+    grade:'ok',
     title:'Fan stopped, inlet at the floor by the heater, exhaust straight through the wall',
-    summary:'The classic sauna without a fan, as Harvia draws it: air in low beside the heater, heated, up to the ceiling, across, down the far wall and out through the low grille. It breathes only because the outlet is higher than the inlet: here 26 cm against 10 cm, about 0.3 Pa of stack pressure, under HUUM\'s minimum of 20 cm. Put the 2 openings at the same height and nothing moves. Lift the outlet to 1 m above the inlet, Helo\'s rule, or duct it up, and the same room breathes 2 to 3 times as fast.',
-    good:['No fan, no wiring, works whenever the heater is hot','The loop passes the benches on its way down the far wall','Keeps more heat than a ceiling exhaust'],
-    bad:['Weak: about one change an hour; a 16 cm height difference is a small chimney','Cold air at the floor near the heater; VTT measured the foot bench 20 to 35 °C colder than with a high inlet','Depends on the heater being hot; it does nothing during heat-up and dies as the room cools','A gap under the door at the same height short-circuits it'],
     ach:'about 1 / h', achG:'bad', head:'about 1 / h', headG:'bad', feet:'cold at the floor', feetG:'bad', co2:1900, co28:4800, co2note:'after 20 minutes, still climbing',
-    says:'<b>Harvia</b>, gravity: supply below or next to the heater, exhaust near the floor as far from the heater as possible. <b>HUUM</b>, gravity: exhaust at least 20 cm higher than the supply, not above 60 cm. <b>Helo</b>: without forced ventilation the outlet goes at least 1 m above the inlet. <b>Saunologia</b> does not recommend gravity ventilation for electric saunas.',
     paths:[
       {d:'M22 283 C 60 282, 74 262, 80 215 C 92 150, 95 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 262', color:'gradient', dur:16, n:5},
       {d:'M22 283 C 60 283, 76 262, 82 215 C 95 140, 120 60, 200 50 C 270 45, 330 90, 340 135 C 345 170, 360 215, 398 262', color:'gradient', dur:17, n:4}
@@ -568,18 +468,18 @@ const DRY = {
   'on|middle|straight':{note:'The open vent exhales the hottest air at the ceiling, or sucks cool air onto the top bench if the fan is strong; the floor keeps whatever the heater does not lift.'},
   'on|bottom|riser':   {note:'The open vent exhales the hottest air at the ceiling, or sucks cool air onto the top bench if the fan is strong. The heater keeps feeding the plume from below.'},
   'on|bottom|straight':{note:'The open vent exhales the hottest air at the ceiling, or sucks cool air onto the top bench if the fan is strong. The heater keeps feeding the plume from below.'},
-  'off|middle|riser':  {grade:'ok', badge:'Low in, high out: the reliable gravity loop', note:'With the ceiling vent open the room runs the classic low-in, high-out loop, VTT\'s most reliable gravity arrangement. It pays in heat: the ceiling vent throws away 90 to 95 °C air, about double the heat of a low exhaust.'},
-  'off|middle|straight':{grade:'ok', badge:'The ceiling vent turns it round', note:'The open vent at 1.9 m is now the outlet. Both low openings admit, the weak reversal becomes the classic low-in, high-out loop, and the room breathes 2 to 3 times an hour, at the price of its hottest air.'},
-  'off|bottom|riser':  {grade:'ok', badge:'Low in, high out: the reliable gravity loop', note:'With the ceiling vent open the room runs the classic low-in, high-out loop from the lowest inlet there is. It pays in heat: the ceiling vent throws away 90 to 95 °C air, about double the heat of a low exhaust.'},
-  'off|bottom|straight':{grade:'ok', badge:'Low in, high out: the reliable gravity loop', note:'With the ceiling vent open the room runs the classic low-in, high-out loop from the lowest inlet there is; the low grille does little now. It pays in heat: the ceiling vent throws away 90 to 95 °C air.'},
-  'on|above|riser':   {grade:'ok', badge:'The hottest air leaves at the ceiling', headN:4, head:'about 4 / h', headG:'warn', note:'Which way the vent breathes is a contest between the fan\x27s suction and the stack pressure at the ceiling. A strong fan on a small inlet holds the room about 2 Pa below outside and the vent sucks cool air in, straight onto the top bench. A weaker fan, a bigger inlet or a leaky door drops the suction under 1 Pa, the stack wins, and the vent exhales the hottest air in the room with the löyly, before the fan can bring it down past the benches; drawn here. A 2-person room at 6 changes an hour sits right on that line. Harvia and Narvi: the drying vent stays closed while bathing and is opened afterwards.'},
-  'on|above|straight':{grade:'ok', badge:'The hottest air leaves at the ceiling', headN:4, head:'about 4 / h', headG:'warn', note:'Which way the vent breathes is a contest between the fan\x27s suction and the stack pressure at the ceiling. A strong fan on a small inlet holds the room about 2 Pa below outside and the vent sucks cool air in, straight onto the top bench. A weaker fan, a bigger inlet or a leaky door drops the suction under 1 Pa, the stack wins, and the vent exhales the hottest air in the room with the löyly, before the fan can bring it down past the benches; drawn here. A 2-person room at 6 changes an hour sits right on that line. Harvia and Narvi: the drying vent stays closed while bathing and is opened afterwards.'},
+  'off|middle|riser':  {grade:'ok'},
+  'off|middle|straight':{grade:'ok'},
+  'off|bottom|riser':  {grade:'ok'},
+  'off|bottom|straight':{grade:'ok'},
+  'on|above|riser':   {grade:'ok', headN:4, head:'about 4 / h', headG:'warn'},
+  'on|above|straight':{grade:'ok', headN:4, head:'about 4 / h', headG:'warn'},
   'on|below|riser':   {note:'The open vent exhales the hottest air at the ceiling, or sucks cool air onto the top bench if the fan is strong; the floor short circuit continues underneath either way.'},
   'on|below|straight':{note:'The open vent exhales the hottest air at the ceiling, or sucks cool air onto the top bench if the fan is strong; the floor short circuit continues underneath either way.'},
-  'off|above|riser':  {grade:'bad', badge:'The ceiling vent beats the chimney', ach:'2 to 3 / h', achG:'warn', headN:1.5, head:'1 to 2 / h', headG:'warn', feet:'cool draught', feetG:'bad', co2:1750, co28:4100, note:'The open vent at 1.9 m is now the easiest way out, above the inlet and inside the room: hot air leaves there, the high inlet admits, and the low grille turns into a cold inlet despite the duct. The hottest air is thrown away all session.'},
-  'off|above|straight':{ach:'2 to 3 / h, backwards', note:'Hot air now leaves through the open vent as well as the inlet; the reversal is stronger and the room loses its hottest air, at 90 °C, all session.'},
-  'off|below|riser':  {grade:'ok', badge:'Low in, high out: the reliable gravity loop', ach:'2 to 4 / h', achG:'warn', headN:2.5, head:'2 to 3 / h', headG:'warn', feet:'coldest of all', feetG:'bad', co2:1500, co28:3500, note:'With the ceiling vent open the room runs the classic low-in, high-out loop, VTT\'s most reliable gravity arrangement and the strongest without a fan. It pays twice: the ceiling vent throws away 90 to 95 °C air, about double the heat of a low exhaust, and VTT found the feet coldest of any layout.'},
-  'off|below|straight':{grade:'ok', badge:'Low in, high out: the reliable gravity loop', ach:'2 to 4 / h', achG:'warn', headN:2.5, head:'2 to 3 / h', headG:'warn', feet:'coldest of all', feetG:'bad', co2:1500, co28:3500, note:'With the ceiling vent open the room runs the classic low-in, high-out loop, VTT\'s most reliable gravity arrangement; the low grille does little now. It pays twice: the ceiling vent throws away 90 to 95 °C air, about double the heat of a low exhaust, and the feet are the coldest of any layout.'}
+  'off|above|riser':  {grade:'bad', ach:'2 to 3 / h', achG:'warn', headN:1.5, head:'1 to 2 / h', headG:'warn', feet:'cool draught', feetG:'bad', co2:1750, co28:4100},
+  'off|above|straight':{ach:'2 to 3 / h, backwards'},
+  'off|below|riser':  {grade:'ok', ach:'2 to 4 / h', achG:'warn', headN:2.5, head:'2 to 3 / h', headG:'warn', feet:'coldest of all', feetG:'bad', co2:1500, co28:3500},
+  'off|below|straight':{grade:'ok', ach:'2 to 4 / h', achG:'warn', headN:2.5, head:'2 to 3 / h', headG:'warn', feet:'coldest of all', feetG:'bad', co2:1500, co28:3500}
 };
 const DRY_PATHS = {
   offMiddle: [{d:'M22 236 C 40 240, 50 256, 58 278 C 64 292, 70 296, 74 296 C 76 290, 74 240, 74 200 C 74 150, 95 70, 160 48 C 240 32, 330 36, 398 36', color:'gradient', kt:'0;0.2;0.32;1', dur:8, n:7, size:3, noguide:true}],
@@ -803,24 +703,6 @@ function render(){
   const hideTip=()=>{ const t=document.getElementById('tip'); if(t) t.classList.remove('on'); };
   sgrp.addEventListener('mouseenter',showTip); sgrp.addEventListener('mouseleave',hideTip);
   sgrp.addEventListener('click',()=>{ const t=document.getElementById('tip'); if(t&&t.classList.contains('on')) hideTip(); else showTip(); });
-
-  // verdict
-  const label={best:'Best choice',ok:'Acceptable',bad:'Avoid'}[o.grade];
-  document.getElementById('verdict').innerHTML=`
-    <h2>${o.title}</h2>
-    <p>${o.summary}</p>
-    ${dryOpen && o.note ? `<p><b>With the drying vent open:</b> ${o.note}</p>` : ''}
-    ${(!none && state.angle==='up45' && TILT[key] && TILT[key].note) ? `<p><b>With the inlet tilted 45° up:</b> ${TILT[key].note}</p>` : ''}
-    ${(!none && state.heater==='open' && HEATER[key] && HEATER[key].note) ? `<p><b>With an open heater:</b> ${HEATER[key].note}</p>` : ''}
-    ${(!none && state.heater==='wall' && WALL[key] && WALL[key].note) ? `<p><b>With a wall heater:</b> ${WALL[key].note}</p>` : ''}
-    ${(!none && state.exhaust==='upper' && EXH[key] && EXH[key].note && !comboOf(key,'upper',induct) && !stall) ? `<p><b>With the exhaust under the upper bench:</b> ${EXH[key].note}</p>` : ''}
-    ${(induct && (comboOf(key,state.exhaust,true) || IDUCT[key])) ? `<p><b>With an inlet duct:</b> ${(comboOf(key,state.exhaust,true) || IDUCT[key]).note}</p>` : ''}
-    ${(half && HALF[key]) ? `<p><b>With the exhaust pipe to 1.2 m:</b> ${HALF[key].note}</p>` : ''}
-    <div class="pros-cons">
-      <div class="col good"><h3>Good</h3><ul>${o.good.map(x=>`<li>${x}</li>`).join('')}</ul></div>
-      <div class="col bad"><h3>Bad</h3><ul>${o.bad.map(x=>`<li>${x}</li>`).join('')}</ul></div>
-    </div>
-    <div class="says">${o.says}</div>`;
 
   document.querySelectorAll('.seg').forEach(seg=>{
     const k=seg.dataset.key; const air = k!=='vent' && k!=='heater';   // with no ventilation only the heater keeps a selection
