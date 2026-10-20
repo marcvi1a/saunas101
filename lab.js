@@ -116,8 +116,8 @@ const IDUCT = {
 };
 const COMBO = {};
 function comboOf(k, exhaust, induct){ return (induct && exhaust==='upper' && COMBO[k]) ? COMBO[k] : null; }
-const BARE = 0.93;   // a bare exhaust pipe outdoors: its air cools a few degrees on the way up, about 7 % less flow than an insulated one
-/* the half pipe: outlet at 1.2 m instead of 2 m. Chimney = pipe top − inlet height; flow ∝ √height */
+const BARE = 0.93;   // a bare exhaust duct outdoors: its air cools a few degrees on the way up, about 7 % less flow than an insulated one
+/* the half duct: outlet at 1.2 m instead of 2 m. Chimney = duct top − inlet height; flow ∝ √height */
 const HALF = {
   'off|above|riser':  {f:0.45},
   'off|middle|riser': {f:0.70},
@@ -641,11 +641,11 @@ function render(){
   } else if(induct){
     const yIn=({above:160, middle:236, below:283})[state.inlet];
     dg.appendChild(el('path',{d:'M13 '+(yIn-7)+' H4 V284 H-2 M18 '+(yIn+7)+' V298 H-2',class:'duct'}));
-    const t=el('text',{x:15,y:278,class:'lbl',transform:'rotate(-90 15 278)'}); t.textContent='INLET PIPE'; dg.appendChild(t);
+    const t=el('text',{x:15,y:278,class:'lbl',transform:'rotate(-90 15 278)'}); t.textContent='INLET DUCT'; dg.appendChild(t);
   } else if(withDuct){
     const top = half ? HALF_TOP : -10;
     dg.appendChild(el('path',{d:'M400 '+top+' V'+(outPos().y+12)+' H416 V'+top,class:'duct'}));
-    const t=el('text',{x:418,y:top+10,class:'lbl',transform:'rotate(90 418 '+(top+10)+')'}); t.textContent='EXHAUST PIPE'; dg.appendChild(t);
+    const t=el('text',{x:418,y:top+10,class:'lbl',transform:'rotate(90 418 '+(top+10)+')'}); t.textContent='EXHAUST DUCT'; dg.appendChild(t);
   }
 
   // vents
@@ -656,7 +656,7 @@ function render(){
   const inPos = ({above:IN_ABOVE, middle:IN_MIDDLE, below:IN_BELOW, bottom:IN_BOTTOM})[state.inlet];
   let inLabel, outLabel, inCls='vent', outCls='vent';
   if(o.idle){ inLabel={t:'IN · NO FLOW',c:''}; outLabel={t:'OUT · NO FLOW',c:''}; inCls=outCls='ventIdle'; }
-  else if(o.stall){ inLabel={t:'IN · STALLED, A WARM PLUG|SITS IN THE PIPE',c:'lblBad'}; outLabel={t:'OUT · A TRICKLE',c:'lblBad'}; }
+  else if(o.stall){ inLabel={t:'IN · STALLED, A WARM PLUG|SITS IN THE DUCT',c:'lblBad'}; outLabel={t:'OUT · A TRICKLE',c:'lblBad'}; }
   else if(o.revIn){ inLabel={t:'IN · NOW LEAKS HOT AIR OUT',c:'lblBad'}; outLabel={t:'OUT · NOW LETS COLD AIR IN',c:'lblBad'}; }
   else { inLabel={t: ({above:'IN · 20 cm ABOVE THE STONES', middle: state.heater==='open' ? 'IN · 45 cm, INTO THE STONES' : 'IN · 45 cm, AT THE CASING', below:'IN · 10 cm, BY THE HEATER', bottom:'IN · FLOOR, UNDER THE HEATER'})[state.inlet], c:'lblIn'}; outLabel={t: state.fan==='on' ? 'OUT · FAN' : 'OUT · BUOYANCY', c:'lblOut'}; }
   if(!none){
