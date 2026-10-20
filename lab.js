@@ -641,11 +641,11 @@ function render(){
   } else if(induct){
     const yIn=({above:160, middle:236, below:283})[state.inlet];
     dg.appendChild(el('path',{d:'M13 '+(yIn-7)+' H4 V284 H-2 M18 '+(yIn+7)+' V298 H-2',class:'duct'}));
-    const t=el('text',{x:15,y:278,class:'lbl',transform:'rotate(-90 15 278)'}); t.textContent='INLET PIPE · OUTSIDE'; dg.appendChild(t);
+    const t=el('text',{x:15,y:278,class:'lbl',transform:'rotate(-90 15 278)'}); t.textContent='INLET PIPE'; dg.appendChild(t);
   } else if(withDuct){
     const top = half ? HALF_TOP : -10;
     dg.appendChild(el('path',{d:'M400 '+top+' V'+(outPos().y+12)+' H416 V'+top,class:'duct'}));
-    const t=el('text',{x:418,y:top+10,class:'lbl',transform:'rotate(90 418 '+(top+10)+')'}); t.textContent= half ? 'EXHAUST PIPE · OUTSIDE · OUTLET AT 1.2 m' : 'EXHAUST PIPE · OUTSIDE · OUTLET ABOVE THE INLET'; dg.appendChild(t);
+    const t=el('text',{x:418,y:top+10,class:'lbl',transform:'rotate(90 418 '+(top+10)+')'}); t.textContent='EXHAUST PIPE'; dg.appendChild(t);
   }
 
   // vents
