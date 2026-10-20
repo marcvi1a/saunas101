@@ -27,7 +27,7 @@ Every page is two columns from 1200 px up: the text column at the left (`minmax(
 
 ## Heater calculator
 
-The Heater page carries a small calculator, a white card to the right of the rules from 1200 px up and above the rules below that (never between rules), styled as a tool (eyebrow title, plain labels) so it never reads as a rule, and sticky under the masthead on wide screens until the rules end (the masthead height is measured into `--masthead`): width, depth, height and the area of glass or bare wall give the room volume (plus 1.2 m³ per m² of bare wall) and the heater size, 1 kW per m³ rounded to the nearest kilowatt, on two lines: the volume, then "An electric heater of about N kW." It keeps its figures in metres and renders them itself in the reader's units, so its block is marked `data-nounits` and the text converter skips it.
+The Heater page carries a small calculator, a white card to the right of the rules from 1200 px up and above the rules below that (never between rules), styled as a tool (eyebrow title, plain labels) so it never reads as a rule, and sticky under the masthead on wide screens until the rules end (the masthead height is measured into `--masthead`): width, depth, height and the area of glass or bare wall give the room volume (plus 1.2 m³ per m² of bare wall) and the heater size, 1 kW per m³ rounded to the nearest kilowatt, on two lines: the volume, then "It needs an electric heater of about N kW." It keeps its figures in metres and renders them itself in the reader's units, so its block is marked `data-nounits` and the text converter skips it.
 
 ## Construction pictures
 
