@@ -1,0 +1,8 @@
+{
+  "name": "saunas101",
+  "private": true,
+  "description": "Saunas 101, a static guide to building a proper Finnish sauna",
+  "scripts": {
+    "build": "node build.js"
+  }
+}

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Heater · Saunas 101</title>
+<meta name="description" content="How to size an electric sauna heater, with a calculator, and the rules on stones, clearances, the sensor and the wiring.">
+<link rel="canonical" href="https://saunas101.com/heater">
+<meta property="og:title" content="Heater · Saunas 101">
+<meta property="og:description" content="How to size an electric sauna heater, with a calculator, and the rules on stones, clearances, the sensor and the wiring.">
+<meta property="og:url" content="https://saunas101.com/heater">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&family=Manrope:wght@400;500;600;700&display=swap">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="stylesheet" href="/styles.css?v=0a016085">
+</head>
+<body>
+<div class="wrap">
+  <div class="masthead">
+  <header class="top">
+    <div>
+      <h1>Saunas 101</h1>
+      <p class="sub">How a proper Finnish sauna works, so you can build your own.</p>
+    </div>
+    <div class="units" id="units" role="group" aria-label="Units"><button type="button" data-u="metric" aria-pressed="true">Metric</button><span class="sep">·</span><button type="button" data-u="imperial" aria-pressed="false">Imperial</button></div>
+  </header>
+  <nav class="tabs" aria-label="Sections">
+    <a href="/">Construction</a>
+    <a href="/heater" aria-current="page">Heater</a>
+    <a href="/ventilation">Ventilation</a>
+  </nav>
+  </div>
+  <main class="page page--heater">
+  <ul class="facts">
+    <li id="heater-size"><h4>Heater sized to the room</h4><p>An electric heater needs about 1 kW for every m³ of room, measured inside the panelling. Undersized, it runs flat out and never makes löyly, the steam.</p></li>
+    <li id="glass"><h4>Glass counts as extra room</h4><p>A glass, brick or stone wall leaks the heat that wood panelling keeps in. For each m² of it, add 1.2 m³ to the room volume before you pick the heater size.</p></li>
+  </ul>
+  <div class="calc" id="calc" data-nounits>
+    <h4 class="calc-h">Size your heater</h4>
+    <div class="calc-row">
+      <label class="calc-f"><span class="calc-l">Width</span><span class="calc-in"><input id="calcW" type="number" inputmode="decimal" min="0" step="0.1"><span class="calc-u" data-u="len"></span></span></label>
+      <label class="calc-f"><span class="calc-l">Depth</span><span class="calc-in"><input id="calcD" type="number" inputmode="decimal" min="0" step="0.1"><span class="calc-u" data-u="len"></span></span></label>
+      <label class="calc-f"><span class="calc-l">Height</span><span class="calc-in"><input id="calcH" type="number" inputmode="decimal" min="0" step="0.1"><span class="calc-u" data-u="len"></span></span></label>
+      <label class="calc-f"><span class="calc-l">Glass or bare wall</span><span class="calc-in"><input id="calcG" type="number" inputmode="decimal" min="0" step="0.1"><span class="calc-u" data-u="area"></span></span></label>
+    </div>
+    <p class="calc-out" id="calcOut"></p>
+  </div>
+  <ul class="facts cont">
+    <li id="stones"><h4>Lots of stones, loosely stacked</h4><p>Stones store the heat that turns water into steam, so a deep bed gives soft, lasting löyly. Stack 5 to 10 cm stones loosely so air passes, over every element.</p></li>
+    <li id="clearance"><h4>Keep the clearances</h4><p>Every heater states its distances to walls, benches and ceiling. Wood any closer dries, chars over the years and can ignite. A rail keeps skin off the steel.</p></li>
+    <li id="sensor"><h4>Sensor above the heater</h4><p>The sensor sits over the stones, just under the ceiling, where the manual puts it. By the door or the inlet it reads cold air and never stops the heater.</p></li>
+    <li id="wiring"><h4>Its own circuit, heat-rated cable</h4><p>The heater gets its own circuit and earth-leakage protection. In the hot room only heat-rated cable, and the junction box low on the wall where it is coolest.</p></li>
+  </ul>
+  </main>
+  <footer class="made">
+    <div class="eyebrow">Powered by</div>
+    <a class="wm-link" href="https://saunaslava.com.br" target="_blank" rel="noopener">
+      <div class="lava-wm" data-lava-flow data-patterns='["/assets/lava-e2.jpg","/assets/lava-e1.jpg","/assets/lava-e3.jpg","/assets/lava-e6.jpg","/assets/lava-e4.jpg","/assets/lava-e5.jpg"]' role="img" aria-label="Lava"><canvas class="flow" aria-hidden="true"></canvas></div>
+      <span class="sr">Lava, saunas e aquecedores feitos no Brasil</span>
+    </a>
+  </footer>
+</div>
+
+<script src="/site.js?v=8ec96df0" defer></script>
+</body>
+</html>

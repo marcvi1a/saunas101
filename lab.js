@@ -1,4 +1,4 @@
-/* Saunas 101 · the ventilation lab: states, model, drawing, switches, tabs, units. */
+/* Saunas 101 · the ventilation lab: states, model, drawing, switches, ranked list. Needs site.js first (units). */
 /* ---------- the model behind the score and the CO₂ ----------
    head: fresh air reaching the breathing zone, changes per hour (12 m³, 2 bathers need 6)
    feet: 1 warm · 0.5 cold at the heater or the floor · 0.25 a cold layer · 0.1 a draught */
@@ -667,54 +667,6 @@ function fanEl(x,y,on){
   f.appendChild(b); return f;
 }
 
-/* ---------- units ---------- */
-let units = 'metric';
-try{ if(new URLSearchParams(location.search).get('units')==='imperial') units='imperial'; else if(localStorage.getItem('units')==='imperial') units='imperial'; }catch(e){}
-const numOf = s => parseFloat(String(s).replace(',',''));
-function inFrac(inches){
-  if(inches >= 1.5) return Math.round(inches) + ' in';
-  let n = Math.round(inches * 16), d = 16;
-  while(n % 2 === 0 && n > 0){ n /= 2; d /= 2; }
-  const whole = Math.floor(n / d), rest = n - whole * d;
-  return (whole ? whole + (rest ? ' ' : '') : '') + (rest ? rest + '/' + d : '') + ' in';
-}
-function ftin(m){ const inches=Math.round(m*39.3701); if(inches<36) return inches+' in'; const ft=Math.floor(inches/12), i=inches%12; return i ? ft+' ft '+i+' in' : ft+' ft'; }
-function ftinShort(m){ const inches=Math.round(m*39.3701); if(inches<36) return inches+'″'; const ft=Math.floor(inches/12), i=inches%12; return ft+'′'+(i?i+'″':''); }
-const N = '(\\d+(?:[.,]\\d+)?)', RNG = N+'(?: to '+N+')?';
-function rule(unit, f, tail){ return [new RegExp(RNG+' '+unit+(tail||''),'g'), (m,a,b,rest)=>(b!=null ? f(numOf(a))+' to '+f(numOf(b)) : f(numOf(a)))+(typeof rest==='string'?rest:'')]; }
-const RULES = [
-  [/about 2 Pa per metre of height/g, 'about 0.6 Pa per foot of height'],
-  [/, 1\.7 at 35 °C/g, ', 0.5 at 95 °F'],
-  [/2 l\/s per m²/g, '0.4 cfm per ft²'],
-  [new RegExp(RNG+' °C(?=\\s+(?:warmer|colder|below|above|hotter|cooler|lower|higher|difference|less|more))','g'), (m,a,b)=>(b!=null ? Math.round(numOf(a)*1.8)+' to '+Math.round(numOf(b)*1.8) : Math.round(numOf(a)*1.8))+' °F'],
-  [new RegExp(RNG+' °C','g'), (m,a,b)=>(b!=null ? Math.round(numOf(a)*1.8+32)+' to '+Math.round(numOf(b)*1.8+32) : Math.round(numOf(a)*1.8+32))+' °F'],
-  [new RegExp(RNG+' m³\\/h','g'), (m,a,b)=>{ const f=x=>x<1?Math.round(x*58.86)/100:Math.round(x*0.5886); return (b!=null ? f(numOf(a))+' to '+f(numOf(b)) : f(numOf(a)))+' cfm'; }],
-  [new RegExp(RNG+' m³','g'), (m,a,b)=>(b!=null ? Math.round(numOf(a)*35.3147)+' to '+Math.round(numOf(b)*35.3147) : Math.round(numOf(a)*35.3147))+' ft³'],
-  [new RegExp(RNG+' l\\/s','g'), (m,a,b)=>(b!=null ? Math.round(numOf(a)*2.11888)+' to '+Math.round(numOf(b)*2.11888) : Math.round(numOf(a)*2.11888))+' cfm'],
-  [new RegExp(RNG+' m\\/s','g'), (m,a,b)=>(b!=null ? Math.round(numOf(a)*2.23694)+' to '+Math.round(numOf(b)*2.23694) : Math.round(numOf(a)*2.23694))+' mph'],
-  [new RegExp(RNG+' mm','g'), (m,a,b)=>{ const f=x=>inFrac(numOf(x)/25.4).replace(/ in$/,''); return (b!=null ? f(a)+' to '+f(b) : f(a))+' in'; }],
-  [new RegExp(RNG+' cm','g'), (m,a,b)=>(b!=null ? Math.round(numOf(a)/2.54)+' to '+Math.round(numOf(b)/2.54) : Math.round(numOf(a)/2.54))+' in'],
-  [/\bm³/g, '35 ft³'],
-  [/\bm²/g, '11 ft²']
-];
-const M_RULE = new RegExp(RNG+' m(?![A-Za-z³²\\/])','g');
-function toImperial(t, short){
-  let s=t; RULES.forEach(([re,f])=>{ s=s.replace(re,f); });
-  const L = short ? ftinShort : ftin;
-  return s.replace(M_RULE,(m,a,b)=> b!=null ? L(numOf(a))+' to '+L(numOf(b)) : L(numOf(a)));
-}
-function applyUnits(){
-  const w=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-  let n; while((n=w.nextNode())){
-    const p=n.parentNode; if(!p || p.nodeName==='SCRIPT' || p.nodeName==='STYLE' || (p.closest && p.closest('[data-nounits]'))) continue;
-    if(n._metric==null) n._metric=n.nodeValue;
-    const short = !!(p.classList && p.classList.contains('rulerT'));
-    const v = units==='imperial' ? toImperial(n._metric, short) : n._metric;
-    if(v!==n.nodeValue) n.nodeValue=v;
-  }
-  document.querySelectorAll('#units button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.u===units ? 'true':'false'));
-}
-
 const TILT_PATHS = [
   ['M22 160 C 46 163, 60 172, 70 182', 'M22 160 C 40 142, 56 134, 66 154 C 72 170, 72 180, 70 182'],
   ['M22 160 C 50 165, 66 176, 74 186', 'M22 160 C 42 140, 60 132, 70 154 C 76 172, 76 182, 74 186'],
@@ -886,7 +838,7 @@ function render(){
   document.querySelectorAll('.rk').forEach(b=>b.setAttribute('aria-pressed', (b.dataset.none ? none : (!none && b.dataset.fan===state.fan && b.dataset.inlet===state.inlet && b.dataset.duct===state.duct)) ? 'true':'false'));
   applyPause();
   labState = none ? 'none' : key.replace(/\|/g,'-')+(state.dry==='open'?'-open':'')+(state.angle==='up45'?'-up45':'')+(state.heater==='open'?'-pillar':state.heater==='wall'?'-wall':'')+(state.exhaust==='upper'?'-upper':'')+(induct?'-induct':'')+(half?'-half':'');
-  if(tab==='ventilation') writeHash();
+  writeHash();
   applyUnits();
 }
 function applyPause(){
@@ -916,15 +868,11 @@ ranked.forEach(({r:[L,fan,inlet,duct,text,word],k,s},i)=>{
 }
 rankList.addEventListener('click',e=>{ const b=e.target.closest('.rk'); if(!b) return; if(b.dataset.none){ state.vent='none'; } else { state.vent='yes'; state.fan=b.dataset.fan; state.inlet=b.dataset.inlet; state.duct=b.dataset.duct; } render(); });
 if(reduce) paused=true;
-document.getElementById('units').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; units=b.dataset.u; try{ localStorage.setItem('units',units); }catch(e){} applyUnits(); renderCalc(true); });
 
-/* ---------- the address: #tab or #tab.state ---------- */
-const TABS = ['construction','heater','ventilation'];
-let tab = 'construction', labState = '', ruleId = '';
-function writeHash(){
-  const st = tab==='ventilation' ? labState : ruleId;
-  try{ history.replaceState(null,'', '#'+tab+(st?'.'+st:'')); }catch(e){}
-}
+
+/* ---------- the address: #state names the layout on show ---------- */
+let labState = '';
+function writeHash(){ try{ history.replaceState(null,'', '#'+labState); }catch(e){} }
 function applyLabState(st){
   const m = st.split('-');
   if(m[0]==='none'){ state.vent='none'; return; }
@@ -937,53 +885,5 @@ function applyLabState(st){
     if(m.includes('induct')) state.duct='inletduct'; else if(m.includes('half')) state.duct='half';
   }
 }
-function showTab(t, st){
-  tab = TABS.includes(t) ? t : 'construction';
-  document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected', b.dataset.tab===tab ? 'true':'false'));
-  document.querySelectorAll('.tab').forEach(s=>{ s.hidden = s.id!=='tab-'+tab; });
-  if(tab==='ventilation'){ if(st) applyLabState(st); render(); }
-  else { ruleId = (st && document.querySelector('#tab-'+tab+' #rule-'+st)) ? st : ''; writeHash(); if(ruleId) document.getElementById('rule-'+ruleId).scrollIntoView({block:'start'}); }
-}
-function readHash(){
-  const raw = location.hash.replace('#',''); const dot = raw.indexOf('.');
-  return { t: dot<0 ? raw : raw.slice(0,dot), st: dot<0 ? '' : raw.slice(dot+1) };
-}
-document.getElementById('tabs').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b){ ruleId=''; showTab(b.dataset.tab); } });
-window.addEventListener('hashchange',()=>{ const {t,st}=readHash(); if(t!==tab || st!==(tab==='ventilation'?labState:ruleId)) showTab(t,st); });
-document.querySelectorAll('.tab').forEach(p=>p.addEventListener('click',e=>{ if(e.target.closest('a')) return; const li=e.target.closest('li[id^="rule-"]'); if(!li) return; ruleId=li.id.slice(5); writeHash(); }));
-(function(){ const {t,st}=readHash(); showTab(t||'construction', st); })();
-
-/* ---------- the footer wordmark: the site's flow, loaded when the footer comes near ---------- */
-(function(){
-  const wm = document.querySelector('[data-lava-flow]'); if(!wm) return;
-  const load = () => { const s=document.createElement('script'); s.src='assets/lava-flow.js'; document.body.appendChild(s); };
-  if(!('IntersectionObserver' in window)){ load(); return; }
-  const io = new IntersectionObserver(es => { if(es.some(e=>e.isIntersecting)){ io.disconnect(); load(); } }, { rootMargin:'800px' });
-  io.observe(wm);
-})();
-
-/* heater size calculator: metres inside, shown and typed in the reader's units; the text converter skips its block */
-const FT = 0.3048;
-const calc = { w:2.1, d:2.1, h:2.1, g:0 };
-const calcIds = { w:'calcW', d:'calcD', h:'calcH', g:'calcG' };
-const calcFmt = x => String(Math.round(x*10)/10);
-function renderCalc(fill){
-  const out = document.getElementById('calcOut'); if(!out) return;
-  const imp = units==='imperial';
-  const toShow = (k, m) => k==='g' ? (imp ? m/(FT*FT) : m) : (imp ? m/FT : m);
-  if(fill) for(const k in calcIds) document.getElementById(calcIds[k]).value = calcFmt(toShow(k, calc[k]));
-  document.querySelectorAll('#calc [data-u="len"]').forEach(s=>{ s.textContent = imp ? 'ft' : 'm'; });
-  document.querySelectorAll('#calc [data-u="area"]').forEach(s=>{ s.textContent = imp ? 'ft²' : 'm²'; });
-  const vol = calc.w*calc.d*calc.h, eff = vol + 1.2*calc.g, kw = Math.ceil(eff - 1e-9);
-  const volTxt = m3 => imp ? Math.round(m3/(FT*FT*FT))+' ft³' : calcFmt(m3)+' m³';
-  if(!(vol>0)){ out.textContent = 'Enter the width, depth and height of the room.'; return; }
-  out.innerHTML = '<strong>'+volTxt(vol)+'</strong> of room' + (calc.g>0 ? ', counted as <strong>'+volTxt(eff)+'</strong> with the glass' : '') + ', so a heater of about <strong>'+kw+' kW</strong>. Round up to the next size on sale.';
-}
-for(const k in calcIds){ const el = document.getElementById(calcIds[k]); if(!el) continue;
-  el.addEventListener('input', ()=>{ const n = parseFloat(el.value); const v = isFinite(n) && n>0 ? n : 0; const imp = units==='imperial';
-    calc[k] = k==='g' ? (imp ? v*FT*FT : v) : (imp ? v*FT : v); renderCalc(false); }); }
-renderCalc(true);
-
-/* the masthead is sticky; its measured height feeds the calculator's sticky offset */
-function setMasthead(){ const m = document.querySelector('.masthead'); if(m) document.documentElement.style.setProperty('--masthead', Math.round(m.getBoundingClientRect().height)+'px'); }
-setMasthead(); window.addEventListener('resize', setMasthead); if(document.fonts && document.fonts.ready) document.fonts.ready.then(setMasthead);
+window.addEventListener('hashchange',()=>{ const st = location.hash.slice(1); if(st!==labState){ applyLabState(st); render(); } });
+(function(){ const st = location.hash.slice(1); if(st) applyLabState(st); render(); })();

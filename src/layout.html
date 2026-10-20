@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>{{title}}</title>
+{{head}}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&family=Manrope:wght@400;500;600;700&display=swap">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="stylesheet" href="/styles.css?v={{css}}">
+</head>
+<body>
+<div class="wrap">
+  <div class="masthead">
+  <header class="top">
+    <div>
+      <h1>Saunas 101</h1>
+      <p class="sub">How a proper Finnish sauna works, so you can build your own.</p>
+    </div>
+    <div class="units" id="units" role="group" aria-label="Units"><button type="button" data-u="metric" aria-pressed="true">Metric</button><span class="sep">·</span><button type="button" data-u="imperial" aria-pressed="false">Imperial</button></div>
+  </header>
+  <nav class="tabs" aria-label="Sections">
+    {{tabs}}
+  </nav>
+  </div>
+  <main class="page page--{{page}}">
+{{content}}
+  </main>
+{{footer}}
+</div>
+
+{{scripts}}
+</body>
+</html>
