@@ -944,3 +944,12 @@ document.getElementById('tabs').addEventListener('click',e=>{ const b=e.target.c
 window.addEventListener('hashchange',()=>{ const {t,st}=readHash(); if(t!==tab || st!==(tab==='ventilation'?labState:ruleId)) showTab(t,st); });
 document.getElementById('tab-construction').addEventListener('click',e=>{ const li=e.target.closest('li[id^="rule-"]'); if(!li) return; ruleId=li.id.slice(5); writeHash(); });
 (function(){ const {t,st}=readHash(); showTab(t||'ventilation', st); })();
+
+/* ---------- the footer wordmark: the site's flow, loaded when the footer comes near ---------- */
+(function(){
+  const wm = document.querySelector('[data-lava-flow]'); if(!wm) return;
+  const load = () => { const s=document.createElement('script'); s.src='assets/lava-flow.js'; document.body.appendChild(s); };
+  if(!('IntersectionObserver' in window)){ load(); return; }
+  const io = new IntersectionObserver(es => { if(es.some(e=>e.isIntersecting)){ io.disconnect(); load(); } }, { rootMargin:'800px' });
+  io.observe(wm);
+})();

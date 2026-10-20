@@ -13,6 +13,10 @@ The page follows saunaslava.com.br: EB Garamond for headings, Manrope for text, 
 
 The hash names the tab and, after a dot, the view inside it: `#construction`, `#construction.ceiling` (a rule id), `#heater`, `#ventilation`, `#ventilation.on-above-riser-upper` (a lab state). No units in the address: units are the reader's preference. The hash is rewritten on every tab switch, rule click and lab change, so the address bar always reopens the same view. With no hash, or an unknown one, the page opens on Ventilation.
 
+## Footer
+
+Every tab ends with "Powered by" and the Lava wordmark, the site's own: `assets/lava-wordmark.png` as a mask over the WebGL flow in `assets/lava-flow.js` with the six pattern tiles, copied from the saunaslava.com.br theme (lava-hero.js, lava-e1…6.jpg at 1024 px). The wordmark is a link to https://saunaslava.com.br, dofollow, in a new tab, with the anchor text "Lava, saunas e aquecedores feitos no Brasil". The flow script loads only when the footer comes within 800 px of the viewport.
+
 ## Code
 
 1. `index.html` is markup only. All CSS lives in `styles.css`, all JavaScript in `app.js`. No inline `style` attributes; the only style set from script is data (a bar's width).
