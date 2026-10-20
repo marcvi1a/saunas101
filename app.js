@@ -444,7 +444,7 @@ const AIR = {
     stagnant:'M105 24 h291 v160 h-291z'
   },
   'on|above|riser': {
-    grade:'best', badge:'The Lava layout',
+    grade:'best', badge:'The reference layout',
     title:'Fan on, inlet above the heater, exhaust ducted up',
     summary:'Fresh air drops out of the high inlet straight into the heater\'s plume and is heated and mixed at once. The fan pulls that mixed air down through the benches and out under the lower bench, past the bather\'s face on the way. The rising duct changes nothing while the fan runs; it is there for the day the fan stops.',
     good:['Air is exchanged where people breathe','Feet 20 to 35 °C warmer than with a low inlet (VTT 1992)','The hottest air under the ceiling is kept, not thrown away','Rate set by the fan: 6 changes an hour, or 8 to 10 l/s per bather'],
@@ -459,7 +459,7 @@ const AIR = {
   'on|above|straight': {
     grade:'best', badge:'Works, until the fan stops',
     title:'Fan on, inlet above the heater, exhaust straight through the wall',
-    summary:'Identical to the Lava layout while the fan runs: the inlet air is caught by the plume, mixed, and pulled down through the benches to the low grille. The difference is hidden. Both openings go straight outside, so the moment the fan dies, buoyancy has a low hole and a high hole to work with.',
+    summary:'Identical to the reference layout while the fan runs: the inlet air is caught by the plume, mixed, and pulled down through the benches to the low grille. The difference is hidden. Both openings go straight outside, so the moment the fan dies, buoyancy has a low hole and a high hole to work with.',
     good:['Same air path and the same warm feet as the ducted version','Simplest exhaust to build: one hole, one fan'],
     bad:['No protection when the fan stops: flip the fan switch to see the reversal','Wind on the exhaust wall pushes straight into the room; 3 m/s is about 5 Pa, more than the stack effect','Tylö warns against any exhaust that leads straight outdoors for this reason'],
     ach:'6 / h', achG:'good', head:'6 / h', headG:'good', feet:'warm', feetG:'good', co2:980, co28:2250, co2note:'steady state',
