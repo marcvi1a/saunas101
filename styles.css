@@ -230,10 +230,6 @@ section.notes{margin-top:40px;display:grid;grid-template-columns:1fr 1fr;gap:20p
 .card p,.card li{max-width:62ch}
 .card ol,.card ul{padding-left:20px;margin:8px 0 0}
 .card li{margin-bottom:6px}
-.src{display:flex;flex-direction:column;gap:6px;margin-top:10px;font-size:13px}
-.src a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px;overflow-wrap:anywhere}
-.src a:hover{text-decoration-color:var(--cedar)}
-.src span{color:var(--muted)}
 .modelnote-foot{margin-top:36px;color:var(--muted);font-size:13px;max-width:70ch}
 
 /* SVG parts */
