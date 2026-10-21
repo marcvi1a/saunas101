@@ -581,6 +581,16 @@ function tilt(d){ if(ANGLE_EFF!=='up45') return d; for(const [a,b] of TILT_PATHS
 let hotKey = null;
 function cardOf(key){ const seg=document.querySelector('[data-key="'+key+'"]'); return seg && seg.closest ? seg.closest('.sw') : null; }
 function cycle(key){ const seg=document.querySelector('.seg[data-key="'+key+'"]'); if(!seg) return; const bs=[...seg.querySelectorAll('button')]; const i=bs.findIndex(b=>b.dataset.v===state[key]); const nb=bs[(i+1)%bs.length]; if(key!=='vent' && key!=='heater') state.vent='yes'; state[key]=nb.dataset.v; }
+/* after every draw, each live element gets a transparent rect over its box, 6 units of padding, at least 24 square, so hovering the area counts, not only the lines */
+function fitHits(){
+  document.querySelectorAll('#svg .hit').forEach(g=>{
+    g.querySelectorAll(':scope > rect.hitbox').forEach(r=>r.remove());
+    let b; try{ b=g.getBBox(); }catch(e){ return; }
+    if(!b || (b.width===0 && b.height===0)) return;
+    const pad=6, w=Math.max(b.width+2*pad, 24), h=Math.max(b.height+2*pad, 24);
+    g.appendChild(el('rect',{class:'hitbox', x:b.x+b.width/2-w/2, y:b.y+b.height/2-h/2, width:w, height:h, fill:'none', 'pointer-events':'all'}));
+  });
+}
 function linkToSwitch(g, key, flip){
   g.classList.add('hit'); g.dataset.sw=key;
   g.addEventListener('mouseenter',()=>{ hotKey=key; const c=cardOf(key); if(c) c.classList.add('sw--hot'); });
@@ -703,6 +713,7 @@ function render(){
   document.querySelectorAll('.sw:not(.sw--score)').forEach(c=>{ const seg=c.querySelector('.seg'); c.classList.toggle('sw--off', none && !(seg && (seg.dataset.key==='vent' || seg.dataset.key==='heater'))); });
   document.querySelectorAll('.sw--hot').forEach(c=>c.classList.remove('sw--hot'));
   if(hotKey){ const c=cardOf(hotKey); if(c) c.classList.add('sw--hot'); }
+  fitHits();
   const sNow = score(key, angleEff, state.heater, state.exhaust, induct, half, dryOpen), card=document.getElementById('scoreCard');
   if(card){ const g=scoreGrade(sNow); card.dataset.g = g; document.getElementById('scoreNum').textContent = sNow; document.getElementById('scoreWord').textContent = {good:'Best choice',warn:'Acceptable',bad:'Avoid'}[g]; }
   const dimSeg=(k,off)=>{ const seg=document.querySelector('[data-key="'+k+'"]'); if(!seg) return; if(seg.closest('.sw')) seg.closest('.sw').classList.toggle('sw--off', none || off); seg.querySelectorAll('button').forEach(b=>{ b.disabled = off; }); };
