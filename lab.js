@@ -580,7 +580,7 @@ function tilt(d){ if(ANGLE_EFF!=='up45') return d; for(const [a,b] of TILT_PATHS
 /* a drawn element that stands for a switch: hover lights the switch card, click flips it */
 let hotKey = null;
 function cardOf(key){ const seg=document.querySelector('[data-key="'+key+'"]'); return seg && seg.closest ? seg.closest('.sw') : null; }
-function cycle(key){ const seg=document.querySelector('.seg[data-key="'+key+'"]'); if(!seg) return; const bs=[...seg.querySelectorAll('button')]; const i=bs.findIndex(b=>b.dataset.v===state[key]); const nb=bs[(i+1)%bs.length]; if(key!=='vent' && key!=='heater') state.vent='yes'; state[key]=nb.dataset.v; }
+function cycle(key){ const seg=document.querySelector('.seg[data-key="'+key+'"]'); if(!seg) return; const bs=[...seg.querySelectorAll('button')]; const i=bs.findIndex(b=>b.dataset.v===state[key]); let nb=null; for(let s=1;s<=bs.length;s++){ const c=bs[(i+s)%bs.length]; if(!c.disabled){ nb=c; break; } } if(!nb) return; if(key!=='vent' && key!=='heater') state.vent='yes'; state[key]=nb.dataset.v; }
 /* after every draw, each live element gets a transparent rect over its box, 6 units of padding, at least 24 square, so hovering the area counts, not only the lines */
 function fitHits(){
   document.querySelectorAll('#svg .hit').forEach(g=>{

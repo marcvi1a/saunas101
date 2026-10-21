@@ -188,6 +188,7 @@ h1{font-size:30px;font-weight:400;letter-spacing:0;line-height:1.1}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .seg button:focus-visible{outline:2px solid var(--fresh);outline-offset:2px}
 .seg button:disabled{cursor:default}
+.sw:not(.sw--off) .seg button:disabled{opacity:.45}
 
 .tip{position:absolute;z-index:5;background:var(--ink);color:var(--paper);font-family:var(--sans);font-size:12px;line-height:1.35;padding:8px 10px;border-radius:6px;max-width:240px;pointer-events:none;opacity:0;transition:opacity .15s}
 .tip.on{opacity:1}
