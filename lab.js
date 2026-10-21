@@ -591,9 +591,9 @@ function fitHits(){
     if(!b) return;
     if(!b || (b.width===0 && b.height===0)) return;
     const pad=6, w=Math.max(b.width+2*pad, 24), h=Math.max(b.height+2*pad, 24);
-    // the frame stays 2 units inside the drawing's edge, so a hole through the floor or the top wall gets a closed frame, not one that runs off the picture
+    // the frame stays 2 units inside the drawing's top and sides; the bottom is open so the floor inlet's frame is whole (the svg overflows visibly)
     const own=g.hasAttribute('transform');   // a group drawn in its own coordinates (the fan) keeps its full frame
-    const x0=own?b.x+b.width/2-w/2:Math.max(b.x+b.width/2-w/2, -12), y0=own?b.y+b.height/2-h/2:Math.max(b.y+b.height/2-h/2, -10), x1=own?b.x+b.width/2+w/2:Math.min(b.x+b.width/2+w/2, 432), y1=own?b.y+b.height/2+h/2:Math.min(b.y+b.height/2+h/2, 306);
+    const x0=own?b.x+b.width/2-w/2:Math.max(b.x+b.width/2-w/2, -12), y0=own?b.y+b.height/2-h/2:Math.max(b.y+b.height/2-h/2, -10), x1=own?b.x+b.width/2+w/2:Math.min(b.x+b.width/2+w/2, 432), y1=b.y+b.height/2+h/2;   // the bottom is free: the floor inlet's frame may run below the picture, over the legend
     g.appendChild(el('rect',{class:'hitbox', x:x0, y:y0, width:x1-x0, height:y1-y0, rx:3, fill:'none', 'pointer-events':'all'}));
   });
 }

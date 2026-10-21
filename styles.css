@@ -121,7 +121,7 @@ h1{font-size:30px;font-weight:400;letter-spacing:0;line-height:1.1}
 .scoreline[data-g="warn"] .scoreBig,.scoreline[data-g="warn"] .scoreWord{color:var(--warn)}
 .scoreline[data-g="bad"] .scoreBig,.scoreline[data-g="bad"] .scoreWord{color:var(--bad)}
 .draw{position:relative}
-.draw svg{width:100%;height:auto;display:block;max-width:100%}
+.draw svg{width:100%;height:auto;display:block;max-width:100%;overflow:visible}
 .lab-left .rank{margin-top:40px}
 .lab-left .rank ol{grid-template-columns:repeat(2,minmax(0,1fr))}
 @media (max-width:1199px){.lab-left .rank ol{grid-template-columns:repeat(2,minmax(0,1fr))}}
