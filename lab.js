@@ -208,6 +208,15 @@ const DUCT_UP_HALF=' C 404 262, 408 230, 408 200 C 408 170, 408 150, 408 128';
 const DUCT_UP_HI_HALF=' C 404 200, 408 180, 408 165 C 408 150, 408 140, 408 128';
 const HALF_TOP = 132;   // 1.2 m
 const OUT_HI={x:398,y:202}, LEAK_IN={x:398,y:290}, LEAK_OUT={x:398,y:60};
+/* the stack, for the no-fan layouts: outside air at 25 °C; inside, the column between the two openings warms from 40 °C at the floor to 92.5 °C under the ceiling,
+   so the driving pressure is (ρ_out − ρ_in)·g·Δh with ρ_in from the column's mean temperature; two Ø125 openings in series, Cd 0.6, so Q = Cd·A·√(ΔP/ρ).
+   Only ratios are used: the factor for the grille under the upper bench against the lower one, and for the short duct against the full riser. Heights are the drawing's own. */
+const hOf = y => (300 - y) / (300 / 2.1);
+const H_IN = {above:hOf(IN_ABOVE.y), middle:hOf(IN_MIDDLE.y), below:hOf(IN_BELOW.y), bottom:0}, H_OUT = {lower:hOf(OUT.y), upper:hOf(OUT_HI.y), riser:hOf(-10), half:hOf(HALF_TOP)};
+function stackP(h1, h2){ const lo=Math.min(h1,h2), hi=Math.max(h1,h2); if(hi<=lo) return 0; const t = 40 + 25*Math.min((lo+hi)/2, 2.1); const dRho = 1.184*(1 - 298/(t+273)); return dRho*9.81*(hi-lo); }
+const stackRatio = (hIn, outA, outB) => Math.sqrt(stackP(hIn, H_OUT[outA]) / stackP(hIn, H_OUT[outB]));
+['below','bottom'].forEach(i => { EXH['off|'+i+'|straight'].f = stackRatio(H_IN[i], 'upper', 'lower'); });   // both grilles sit above these inlets, so the ratio is the whole story
+Object.keys(HALF).filter(k => k.startsWith('off|')).forEach(k => { HALF[k].f = stackRatio(H_IN[k.split('|')[1]], 'half', 'riser'); });
 function outPos(){ return state.exhaust==='upper' ? OUT_HI : OUT; }
 /* the grille's top edge sits 5 cm under the bench above it: centre 264 under the lower bench, 202 under the upper; every path that met the grille at 264 meets it at 202 */
 function toUpper(d){
