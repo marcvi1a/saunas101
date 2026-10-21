@@ -580,8 +580,9 @@ function tilt(d){ if(ANGLE_EFF!=='up45') return d; for(const [a,b] of TILT_PATHS
 /* a drawn element that stands for a switch: hover lights the switch card, click flips it */
 let hotKey = null;
 function cardOf(key){ const seg=document.querySelector('[data-key="'+key+'"]'); return seg && seg.closest ? seg.closest('.sw') : null; }
+function cycle(key){ const seg=document.querySelector('.seg[data-key="'+key+'"]'); if(!seg) return; const bs=[...seg.querySelectorAll('button')]; const i=bs.findIndex(b=>b.dataset.v===state[key]); const nb=bs[(i+1)%bs.length]; if(key!=='vent' && key!=='heater') state.vent='yes'; state[key]=nb.dataset.v; }
 function linkToSwitch(g, key, flip){
-  g.classList.add('hit');
+  g.classList.add('hit'); g.dataset.sw=key;
   g.addEventListener('mouseenter',()=>{ hotKey=key; const c=cardOf(key); if(c) c.classList.add('sw--hot'); });
   g.addEventListener('mouseleave',()=>{ hotKey=null; const c=cardOf(key); if(c) c.classList.remove('sw--hot'); });
   g.addEventListener('click',()=>{ flip(); render(); });
@@ -669,19 +670,17 @@ function render(){
   if(o.leakOut) vents.appendChild(ventEl(LEAK_OUT.x,LEAK_OUT.y,{t:'LEAKS OUT|DOOR TOP, CRACKS',c:'lblOut'},'vent',false));
   if(state.inlet!=='none'){
   if(state.inlet!=='above' && inLabel.t.indexOf('|')<0) inLabel = Object.assign({}, inLabel, {t: inLabel.t.replace(', ','|').replace(' · NOW','|NOW')});
-  if(state.inlet==='bottom') vents.appendChild(ventEl(inPos.x,inPos.y,Object.assign({},lblAt,inLabel),inCls,true,false,-90));
-  else vents.appendChild(ventEl(inPos.x,inPos.y,Object.assign({},lblAt,inLabel),inCls,true, angleEff==='up45'));
+  { const inG = state.inlet==='bottom' ? ventEl(inPos.x,inPos.y,Object.assign({},lblAt,inLabel),inCls,true,false,-90) : ventEl(inPos.x,inPos.y,Object.assign({},lblAt,inLabel),inCls,true, angleEff==='up45'); linkToSwitch(inG,'inlet',()=>cycle('inlet')); vents.appendChild(inG); }
   }
   if(state.exhaust!=='none'){
   const op=outPos();
-  vents.appendChild(ventEl(op.x,op.y,outLabel,outCls,false));
-  if(state.fan==='on') vents.appendChild(fanEl(op.x,op.y,true));
+  { const outG=ventEl(op.x,op.y,outLabel,outCls,false); linkToSwitch(outG,'exhaust',()=>cycle('exhaust')); vents.appendChild(outG); }
+  if(state.fan==='on'){ const fG=fanEl(op.x,op.y,true); linkToSwitch(fG,'fan',()=>cycle('fan')); vents.appendChild(fG); }
   }
   }
   if(!none){
     const dry=ventEl(398,22, dryOpen ? {t: 'DRYING VENT|HOT AIR OUT', c:'lblBad'} : {t:'DRYING VENT',c:''}, dryOpen?'vent':'ventIdle', false);
-    linkToSwitch(dry, 'dry', ()=>{ state.dry = state.dry==='open' ? 'closed' : 'open'; });
-    vents.appendChild(dry);
+    linkToSwitch(dry,'dry',()=>cycle('dry')); vents.appendChild(dry);
   }
 
   // the sensor has one correct place: high on the wall above the heater, clear of every inlet
@@ -725,6 +724,11 @@ document.querySelectorAll('.seg').forEach(seg=>{
   seg.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; if(seg.dataset.key!=='vent' && seg.dataset.key!=='heater') state.vent='yes'; state[seg.dataset.key]=b.dataset.v; render(); });
 });
 document.getElementById('toggle').addEventListener('click',()=>{paused=!paused; applyPause();});
+linkToSwitch(document.getElementById('duct'),'duct',()=>cycle('duct'));
+linkToSwitch(document.getElementById('heaterg'),'heater',()=>cycle('heater'));
+document.querySelectorAll('.lab-card .sw').forEach(sw=>{ const seg=sw.querySelector('.seg'); if(!seg) return; const key=seg.dataset.key;
+  sw.addEventListener('mouseenter',()=>document.querySelectorAll('#svg .hit[data-sw="'+key+'"]').forEach(g=>g.classList.add('lit')));
+  sw.addEventListener('mouseleave',()=>document.querySelectorAll('#svg .lit').forEach(g=>g.classList.remove('lit'))); });
 const rankList=document.getElementById('rank');
 function buildRank(){
 rankList.innerHTML='';
