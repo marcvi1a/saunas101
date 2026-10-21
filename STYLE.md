@@ -31,7 +31,7 @@ The Heater page carries a small calculator, a white card to the right of the rul
 
 ## Construction pictures
 
-The first 3 rules are drawn: three white cards at the right of the rules (sticky like the calculator, after the rules under 1200 px), each an inline SVG in the lab's own style: wood interior, black outline, the lab's benches and heater block, the lab's white seated figure (`#bather`, defined once in the first picture and reused with `use`), a red ✗ over each wrong room and a green ✓ over the right one, a mono label under each room. Rooms are to scale within a picture (40 px per metre in the first two, 30 in the third); the hot layer is the top 60 cm of the room. Sizes and figures are built from `src/construction.html`'s markup only; no image files.
+The first 3 rules are drawn: three white cards at the right of the rules (sticky like the calculator, after the rules under 1200 px), each an inline SVG in the lab's own style: wood interior, black outline, the lab's benches and heater block, the lab's white seated figure (`#bather`, defined once in the first picture and reused with `use`), a red ✗ over each wrong room and a green ✓ over the right one, a mono label under each room. Rooms are to scale within a picture (40 px per metre in the first, 48 in the second, 30 in the third); the hot layer is the top 60 cm of the room. Benches keep their distance from the heater in every room: the lower bench at least 25 cm, the upper at least 40 cm (the too-big room has more), and the one-level bench is exactly as long as the lower bench of the multiple-levels room. Sizes and figures are built from `src/construction.html`'s markup only; no image files.
 
 ## Ventilation page
 
