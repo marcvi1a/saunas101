@@ -592,7 +592,8 @@ function fitHits(){
     if(!b || (b.width===0 && b.height===0)) return;
     const pad=6, w=Math.max(b.width+2*pad, 24), h=Math.max(b.height+2*pad, 24);
     // the frame stays 2 units inside the drawing's edge, so a hole through the floor or the top wall gets a closed frame, not one that runs off the picture
-    const x0=Math.max(b.x+b.width/2-w/2, -12), y0=Math.max(b.y+b.height/2-h/2, -10), x1=Math.min(b.x+b.width/2+w/2, 432), y1=Math.min(b.y+b.height/2+h/2, 306);
+    const own=g.hasAttribute('transform');   // a group drawn in its own coordinates (the fan) keeps its full frame
+    const x0=own?b.x+b.width/2-w/2:Math.max(b.x+b.width/2-w/2, -12), y0=own?b.y+b.height/2-h/2:Math.max(b.y+b.height/2-h/2, -10), x1=own?b.x+b.width/2+w/2:Math.min(b.x+b.width/2+w/2, 432), y1=own?b.y+b.height/2+h/2:Math.min(b.y+b.height/2+h/2, 306);
     g.appendChild(el('rect',{class:'hitbox', x:x0, y:y0, width:x1-x0, height:y1-y0, rx:3, fill:'none', 'pointer-events':'all'}));
   });
 }
