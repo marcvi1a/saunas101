@@ -201,19 +201,19 @@ const darkUI = document.documentElement.dataset.theme==='dark' || (document.docu
 const FRESH_HEX = darkUI ? '#63B3D6' : '#378DE2', HOT_HEX = darkUI ? '#F09A52' : '#E8603A';
 
 /* ---------- geometry ---------- */
-const IN_ABOVE={x:22,y:160}, IN_MIDDLE={x:22,y:236}, IN_BELOW={x:22,y:283}, IN_BOTTOM={x:73,y:298}, OUT={x:398,y:262}, SENSOR={x:73,y:22};
-const DUCT_UP=' C 404 260, 408 200, 408 150 C 408 100, 408 50, 408 -6';
-const DUCT_UP_HI=' C 404 194, 408 150, 408 110 C 408 60, 408 30, 408 -6';
-const DUCT_UP_HALF=' C 404 260, 408 230, 408 200 C 408 170, 408 150, 408 128';
-const DUCT_UP_HI_HALF=' C 404 194, 408 180, 408 165 C 408 150, 408 140, 408 128';
+const IN_ABOVE={x:22,y:160}, IN_MIDDLE={x:22,y:236}, IN_BELOW={x:22,y:283}, IN_BOTTOM={x:73,y:298}, OUT={x:398,y:264}, SENSOR={x:73,y:22};
+const DUCT_UP=' C 404 262, 408 200, 408 150 C 408 100, 408 50, 408 -6';
+const DUCT_UP_HI=' C 404 200, 408 150, 408 110 C 408 60, 408 30, 408 -6';
+const DUCT_UP_HALF=' C 404 262, 408 230, 408 200 C 408 170, 408 150, 408 128';
+const DUCT_UP_HI_HALF=' C 404 200, 408 180, 408 165 C 408 150, 408 140, 408 128';
 const HALF_TOP = 132;   // 1.2 m
-const OUT_HI={x:398,y:196}, LEAK_IN={x:398,y:290}, LEAK_OUT={x:398,y:60};
+const OUT_HI={x:398,y:202}, LEAK_IN={x:398,y:290}, LEAK_OUT={x:398,y:60};
 function outPos(){ return state.exhaust==='upper' ? OUT_HI : OUT; }
-/* with the exhaust under the upper bench every path that met the grille at 262 meets it at 196 */
+/* the grille's top edge sits 5 cm under the bench above it: centre 264 under the lower bench, 202 under the upper; every path that met the grille at 264 meets it at 202 */
 function toUpper(d){
   if(state.exhaust!=='upper') return d;
-  return d.replace(/, (\d+) (\d+), 398 26[02]/g, (m,x,y)=>', '+x+' '+Math.min(+y,212)+', 398 196')
-          .replace(/^M398 26\d C (\d+) (\d+),/, 'M398 196 C $1 215,');
+  return d.replace(/, (\d+) (\d+), 398 26[024]/g, (m,x,y)=>', '+x+' '+Math.min(+y,218)+', 398 202')
+          .replace(/^M398 26\d C (\d+) (\d+),/, 'M398 202 C $1 221,');
 }
 
 /* ---------- air states: fan × inlet × duct ---------- */
@@ -221,25 +221,25 @@ const AIR = {
   'in0|on|riser': {
     grade:'bad',
     title:'Fan on, no inlet, exhaust ducted up',
-    paths:[{d:'M398 290 C 380 294, 340 296, 300 294 C 320 280, 360 268, 398 262', color:'fresh', dur:4, n:8}],
+    paths:[{d:'M398 290 C 380 294, 340 296, 300 294 C 320 280, 360 268, 398 264', color:'fresh', dur:4, n:8}],
     stagnant:'M105 24 h291 v220 h-291z', leakIn:true
   },
   'in0|on|straight': {
     grade:'bad',
     title:'Fan on, no inlet, exhaust straight through the wall',
-    paths:[{d:'M398 290 C 380 294, 340 296, 300 294 C 320 280, 360 268, 398 262', color:'fresh', dur:4, n:8}],
+    paths:[{d:'M398 290 C 380 294, 340 296, 300 294 C 320 280, 360 268, 398 264', color:'fresh', dur:4, n:8}],
     stagnant:'M105 24 h291 v220 h-291z', leakIn:true
   },
   'in0|off|riser': {
     grade:'bad',
     title:'Fan stopped, no inlet, exhaust ducted up',
-    paths:[{d:'M398 290 C 380 294, 340 296, 300 294 C 320 280, 360 268, 398 262', color:'fresh', dur:8, n:3, size:2.6}],
+    paths:[{d:'M398 290 C 380 294, 340 296, 300 294 C 320 280, 360 268, 398 264', color:'fresh', dur:8, n:3, size:2.6}],
     stagnant:'M105 24 h291 v220 h-291z', leakIn:true
   },
   'in0|off|straight': {
     grade:'bad',
     title:'Fan stopped, no inlet, exhaust straight through the wall',
-    paths:[{d:'M398 290 C 380 294, 340 296, 300 294 C 320 280, 360 268, 398 262', color:'fresh', dur:12, n:2, size:2.4}],
+    paths:[{d:'M398 290 C 380 294, 340 296, 300 294 C 320 280, 360 268, 398 264', color:'fresh', dur:12, n:2, size:2.4}],
     stagnant:'M105 24 h291 v220 h-291z', leakIn:true
   },
   'out0|above': {
@@ -273,12 +273,12 @@ const AIR = {
     grade:'ok',
     title:"Fan on, inlet at the heater's middle, exhaust ducted up",
     paths:[
-      {d:'M22 236 C 40 238, 50 244, 56 262 C 70 290, 180 292, 280 288 C 340 284, 376 266, 398 262', color:'fresh', dur:5.5, n:8, duct:true},
-      {d:'M22 236 C 44 238, 54 226, 62 200 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 262', color:'gradient', kt:'0;0.08;0.2;1', dur:7, n:5, duct:true}
+      {d:'M22 236 C 40 238, 50 244, 56 262 C 70 290, 180 292, 280 288 C 340 284, 376 266, 398 264', color:'fresh', dur:5.5, n:8, duct:true},
+      {d:'M22 236 C 44 238, 54 226, 62 200 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 264', color:'gradient', kt:'0;0.08;0.2;1', dur:7, n:5, duct:true}
     ],
     pathsOpen:[
-      {d:'M22 236 C 40 238, 52 236, 64 232 C 74 220, 76 200, 74 186 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 262', color:'gradient', kt:'0;0.08;0.2;1', dur:6.5, n:9, duct:true},
-      {d:'M22 236 C 40 240, 48 256, 56 268 C 70 290, 180 292, 280 288 C 340 284, 376 266, 398 262', color:'fresh', dur:6, n:3, size:2.6, duct:true}
+      {d:'M22 236 C 40 238, 52 236, 64 232 C 74 220, 76 200, 74 186 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 264', color:'gradient', kt:'0;0.08;0.2;1', dur:6.5, n:9, duct:true},
+      {d:'M22 236 C 40 240, 48 256, 56 268 C 70 290, 180 292, 280 288 C 340 284, 376 266, 398 264', color:'fresh', dur:6, n:3, size:2.6, duct:true}
     ],
     stagnant:'M200 60 h190 v140 h-190z'
   },
@@ -286,12 +286,12 @@ const AIR = {
     grade:'ok',
     title:"Fan on, inlet at the heater's middle, exhaust straight through the wall",
     paths:[
-      {d:'M22 236 C 40 238, 50 244, 56 262 C 70 290, 180 292, 280 288 C 340 284, 376 266, 398 262', color:'fresh', dur:5.5, n:8},
-      {d:'M22 236 C 44 238, 54 226, 62 200 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 262', color:'gradient', kt:'0;0.08;0.2;1', dur:7, n:5}
+      {d:'M22 236 C 40 238, 50 244, 56 262 C 70 290, 180 292, 280 288 C 340 284, 376 266, 398 264', color:'fresh', dur:5.5, n:8},
+      {d:'M22 236 C 44 238, 54 226, 62 200 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 264', color:'gradient', kt:'0;0.08;0.2;1', dur:7, n:5}
     ],
     pathsOpen:[
-      {d:'M22 236 C 40 238, 52 236, 64 232 C 74 220, 76 200, 74 186 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 262', color:'gradient', kt:'0;0.08;0.2;1', dur:6.5, n:9},
-      {d:'M22 236 C 40 240, 48 256, 56 268 C 70 290, 180 292, 280 288 C 340 284, 376 266, 398 262', color:'fresh', dur:6, n:3, size:2.6}
+      {d:'M22 236 C 40 238, 52 236, 64 232 C 74 220, 76 200, 74 186 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 264', color:'gradient', kt:'0;0.08;0.2;1', dur:6.5, n:9},
+      {d:'M22 236 C 40 240, 48 256, 56 268 C 70 290, 180 292, 280 288 C 340 284, 376 266, 398 264', color:'fresh', dur:6, n:3, size:2.6}
     ],
     stagnant:'M200 60 h190 v140 h-190z'
   },
@@ -299,19 +299,19 @@ const AIR = {
     grade:'ok',
     title:"Fan stopped, inlet at the heater's middle, exhaust ducted up",
     paths:[
-      {d:'M22 236 C 40 240, 50 256, 58 278 C 64 292, 70 296, 74 296 C 76 290, 74 240, 74 200 C 74 150, 100 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 262', color:'gradient', kt:'0;0.2;0.32;1', dur:10, n:6, duct:true},
-      {d:'M22 236 C 40 242, 52 262, 60 280 C 80 292, 180 292, 280 288 C 340 284, 376 266, 398 262', color:'fresh', dur:9, n:3, size:2.6, duct:true}
+      {d:'M22 236 C 40 240, 50 256, 58 278 C 64 292, 70 296, 74 296 C 76 290, 74 240, 74 200 C 74 150, 100 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 264', color:'gradient', kt:'0;0.2;0.32;1', dur:10, n:6, duct:true},
+      {d:'M22 236 C 40 242, 52 262, 60 280 C 80 292, 180 292, 280 288 C 340 284, 376 266, 398 264', color:'fresh', dur:9, n:3, size:2.6, duct:true}
     ],
     pathsOpen:[
-      {d:'M22 236 C 40 238, 52 236, 64 232 C 74 220, 76 205, 74 188 C 74 150, 100 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 262', color:'gradient', kt:'0;0.08;0.2;1', dur:9.5, n:7, duct:true},
-      {d:'M22 236 C 40 240, 48 256, 56 268 C 70 290, 180 292, 280 288 C 340 284, 376 266, 398 262', color:'fresh', dur:9, n:2, size:2.6, duct:true}
+      {d:'M22 236 C 40 238, 52 236, 64 232 C 74 220, 76 205, 74 188 C 74 150, 100 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 264', color:'gradient', kt:'0;0.08;0.2;1', dur:9.5, n:7, duct:true},
+      {d:'M22 236 C 40 240, 48 256, 56 268 C 70 290, 180 292, 280 288 C 340 284, 376 266, 398 264', color:'fresh', dur:9, n:2, size:2.6, duct:true}
     ]
   },
   'off|middle|straight': {
     grade:'bad',
     title:"Fan stopped, inlet at the heater's middle, exhaust straight through the wall",
     paths:[
-      {d:'M398 262 C 380 272, 330 290, 270 290 C 210 291, 150 291, 112 286 C 100 282, 96 270, 96 258 C 94 248, 80 240, 22 236', color:'gradient', kt:'0;0.5;0.68;1', dur:12, n:6, size:2.8}
+      {d:'M398 264 C 380 272, 330 290, 270 290 C 210 291, 150 291, 112 286 C 100 282, 96 270, 96 258 C 94 248, 80 240, 22 236', color:'gradient', kt:'0;0.5;0.68;1', dur:12, n:6, size:2.8}
     ],
     stagnant:'M105 24 h291 v200 h-291z', revIn:true
   },
@@ -319,48 +319,48 @@ const AIR = {
     grade:'ok',
     title:"Fan on, inlet in the floor under the heater, exhaust ducted up",
     paths:[
-      {d:'M73 312 L 73 200 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 262', color:'gradient', kt:'0;0.12;0.25;1', dur:6.5, n:9, duct:true},
-      {d:'M73 300 C 84 296, 100 292, 130 292 C 200 292, 300 290, 398 262', color:'fresh', dur:6, n:2, size:2.4, duct:true}
+      {d:'M73 312 L 73 200 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 264', color:'gradient', kt:'0;0.12;0.25;1', dur:6.5, n:9, duct:true},
+      {d:'M73 300 C 84 296, 100 292, 130 292 C 200 292, 300 290, 398 264', color:'fresh', dur:6, n:2, size:2.4, duct:true}
     ],
     pathsOpen:[
-      {d:'M73 312 L 73 200 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 262', color:'gradient', kt:'0;0.12;0.25;1', dur:6.5, n:6, duct:true},
-      {d:'M73 300 C 84 296, 100 292, 130 292 C 200 292, 300 290, 398 262', color:'fresh', dur:5.5, n:5, duct:true}
+      {d:'M73 312 L 73 200 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 264', color:'gradient', kt:'0;0.12;0.25;1', dur:6.5, n:6, duct:true},
+      {d:'M73 300 C 84 296, 100 292, 130 292 C 200 292, 300 290, 398 264', color:'fresh', dur:5.5, n:5, duct:true}
     ]
   },
   'on|bottom|straight': {
     grade:'ok',
     title:"Fan on, inlet in the floor under the heater, exhaust straight through the wall",
     paths:[
-      {d:'M73 312 L 73 200 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 262', color:'gradient', kt:'0;0.12;0.25;1', dur:6.5, n:9},
-      {d:'M73 300 C 84 296, 100 292, 130 292 C 200 292, 300 290, 398 262', color:'fresh', dur:6, n:2, size:2.4}
+      {d:'M73 312 L 73 200 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 264', color:'gradient', kt:'0;0.12;0.25;1', dur:6.5, n:9},
+      {d:'M73 300 C 84 296, 100 292, 130 292 C 200 292, 300 290, 398 264', color:'fresh', dur:6, n:2, size:2.4}
     ],
     pathsOpen:[
-      {d:'M73 312 L 73 200 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 262', color:'gradient', kt:'0;0.12;0.25;1', dur:6.5, n:6},
-      {d:'M73 300 C 84 296, 100 292, 130 292 C 200 292, 300 290, 398 262', color:'fresh', dur:5.5, n:5}
+      {d:'M73 312 L 73 200 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 264', color:'gradient', kt:'0;0.12;0.25;1', dur:6.5, n:6},
+      {d:'M73 300 C 84 296, 100 292, 130 292 C 200 292, 300 290, 398 264', color:'fresh', dur:5.5, n:5}
     ]
   },
   'off|bottom|riser': {
     grade:'ok',
     title:"Fan stopped, inlet in the floor under the heater, exhaust ducted up",
     paths:[
-      {d:'M73 312 L 73 200 C 74 150, 100 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 262', color:'gradient', kt:'0;0.12;0.28;1', dur:9, n:7, duct:true},
-      {d:'M73 312 L 73 200 C 74 150, 120 60, 200 50 C 270 45, 330 90, 340 135 C 345 170, 360 215, 398 262', color:'gradient', kt:'0;0.12;0.28;1', dur:9.8, n:5, duct:true}
+      {d:'M73 312 L 73 200 C 74 150, 100 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 264', color:'gradient', kt:'0;0.12;0.28;1', dur:9, n:7, duct:true},
+      {d:'M73 312 L 73 200 C 74 150, 120 60, 200 50 C 270 45, 330 90, 340 135 C 345 170, 360 215, 398 264', color:'gradient', kt:'0;0.12;0.28;1', dur:9.8, n:5, duct:true}
     ],
     pathsOpen:[
-      {d:'M73 312 L 73 200 C 74 150, 100 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 262', color:'gradient', kt:'0;0.12;0.28;1', dur:9, n:6, duct:true},
-      {d:'M73 300 C 84 296, 100 292, 130 292 C 200 292, 300 290, 398 262', color:'fresh', dur:9, n:3, size:2.6, duct:true}
+      {d:'M73 312 L 73 200 C 74 150, 100 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 264', color:'gradient', kt:'0;0.12;0.28;1', dur:9, n:6, duct:true},
+      {d:'M73 300 C 84 296, 100 292, 130 292 C 200 292, 300 290, 398 264', color:'fresh', dur:9, n:3, size:2.6, duct:true}
     ]
   },
   'off|bottom|straight': {
     grade:'ok',
     title:"Fan stopped, inlet in the floor under the heater, exhaust straight through the wall",
     paths:[
-      {d:'M73 312 L 73 200 C 74 150, 100 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 262', color:'gradient', kt:'0;0.12;0.28;1', dur:16, n:5},
-      {d:'M73 312 L 73 200 C 74 150, 120 60, 200 50 C 270 45, 330 90, 340 135 C 345 170, 360 215, 398 262', color:'gradient', kt:'0;0.12;0.28;1', dur:17, n:4}
+      {d:'M73 312 L 73 200 C 74 150, 100 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 264', color:'gradient', kt:'0;0.12;0.28;1', dur:16, n:5},
+      {d:'M73 312 L 73 200 C 74 150, 120 60, 200 50 C 270 45, 330 90, 340 135 C 345 170, 360 215, 398 264', color:'gradient', kt:'0;0.12;0.28;1', dur:17, n:4}
     ],
     pathsOpen:[
-      {d:'M73 312 L 73 200 C 74 150, 100 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 262', color:'gradient', kt:'0;0.12;0.28;1', dur:16, n:4},
-      {d:'M73 300 C 84 296, 100 292, 130 292 C 200 292, 300 290, 398 262', color:'fresh', dur:15, n:3, size:2.6}
+      {d:'M73 312 L 73 200 C 74 150, 100 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 264', color:'gradient', kt:'0;0.12;0.28;1', dur:16, n:4},
+      {d:'M73 300 C 84 296, 100 292, 130 292 C 200 292, 300 290, 398 264', color:'fresh', dur:15, n:3, size:2.6}
     ]
   },
   'none': {
@@ -379,8 +379,8 @@ const AIR = {
     title:'Fan on, inlet above the heater, exhaust ducted up',
     ach:'6 / h', achG:'good', head:'6 / h', headG:'good', feet:'warm', feetG:'good', co2:980, co28:2250, co2note:'steady state',
     paths:[
-      {d:'M22 160 C 46 163, 60 172, 70 182 C 78 150, 88 110, 120 70 C 170 40, 260 40, 320 70 C 360 95, 350 150, 330 180 C 315 205, 320 240, 398 262', color:'gradient', dur:6, n:10, duct:true},
-      {d:'M22 160 C 50 165, 66 176, 74 186 C 90 130, 110 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 262', color:'gradient', dur:6.8, n:8, duct:true}
+      {d:'M22 160 C 46 163, 60 172, 70 182 C 78 150, 88 110, 120 70 C 170 40, 260 40, 320 70 C 360 95, 350 150, 330 180 C 315 205, 320 240, 398 264', color:'gradient', dur:6, n:10, duct:true},
+      {d:'M22 160 C 50 165, 66 176, 74 186 C 90 130, 110 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 264', color:'gradient', dur:6.8, n:8, duct:true}
     ]
   },
   'on|above|straight': {
@@ -388,8 +388,8 @@ const AIR = {
     title:'Fan on, inlet above the heater, exhaust straight through the wall',
     ach:'6 / h', achG:'good', head:'6 / h', headG:'good', feet:'warm', feetG:'good', co2:980, co28:2250, co2note:'steady state',
     paths:[
-      {d:'M22 160 C 46 163, 60 172, 70 182 C 78 150, 88 110, 120 70 C 170 40, 260 40, 320 70 C 360 95, 350 150, 330 180 C 315 205, 320 240, 398 262', color:'gradient', dur:6, n:10},
-      {d:'M22 160 C 50 165, 66 176, 74 186 C 90 130, 110 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 262', color:'gradient', dur:6.8, n:8}
+      {d:'M22 160 C 46 163, 60 172, 70 182 C 78 150, 88 110, 120 70 C 170 40, 260 40, 320 70 C 360 95, 350 150, 330 180 C 315 205, 320 240, 398 264', color:'gradient', dur:6, n:10},
+      {d:'M22 160 C 50 165, 66 176, 74 186 C 90 130, 110 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 264', color:'gradient', dur:6.8, n:8}
     ]
   },
   'on|below|riser': {
@@ -397,7 +397,7 @@ const AIR = {
     title:'Fan on, inlet below the heater',
     ach:'6 / h', achG:'warn', head:'about 2 / h, a third of the fan', headG:'bad', feet:'cold layer', feetG:'bad', co2:2300, co28:5500, co2note:'at head height, steady',
     paths:[
-      {d:'M22 283 C 80 288, 180 292, 280 288 C 340 284, 376 266, 398 262', color:'fresh', dur:5, n:9, duct:true},
+      {d:'M22 283 C 80 288, 180 292, 280 288 C 340 284, 376 266, 398 264', color:'fresh', dur:5, n:9, duct:true},
       {d:'M22 280 C 60 284, 110 290, 200 290 C 300 290, 360 272, 398 260', color:'fresh', dur:5.6, n:7, duct:true},
       {d:'M76 190 C 72 150, 84 90, 130 52 C 200 30, 310 40, 350 76 C 330 104, 262 112, 226 92 C 240 72, 290 60, 330 68', color:'hot', dur:7, n:7, noguide:true}
     ],
@@ -408,7 +408,7 @@ const AIR = {
     title:'Fan on, inlet below the heater',
     ach:'6 / h', achG:'warn', head:'about 2 / h, a third of the fan', headG:'bad', feet:'cold layer', feetG:'bad', co2:2300, co28:5500, co2note:'at head height, steady',
     paths:[
-      {d:'M22 283 C 80 288, 180 292, 280 288 C 340 284, 376 266, 398 262', color:'fresh', dur:5, n:9},
+      {d:'M22 283 C 80 288, 180 292, 280 288 C 340 284, 376 266, 398 264', color:'fresh', dur:5, n:9},
       {d:'M22 280 C 60 284, 110 290, 200 290 C 300 290, 360 272, 398 260', color:'fresh', dur:5.6, n:7},
       {d:'M76 190 C 72 150, 84 90, 130 52 C 200 30, 310 40, 350 76 C 330 104, 262 112, 226 92 C 240 72, 290 60, 330 68', color:'hot', dur:7, n:7, noguide:true}
     ],
@@ -419,8 +419,8 @@ const AIR = {
     title:'Fan stopped, inlet above the heater, exhaust ducted up',
     ach:'2 to 3 / h', achG:'warn', head:'2 to 3 / h', headG:'warn', feet:'warm', feetG:'good', co2:1750, co28:4100, co2note:'steady state at 2.5 / h',
     paths:[
-      {d:'M22 160 C 46 163, 60 172, 70 182 C 78 150, 88 110, 120 70 C 170 40, 260 40, 320 70 C 360 95, 350 150, 330 180 C 315 205, 320 240, 398 262', color:'gradient', dur:10, n:6, duct:true},
-      {d:'M22 160 C 50 165, 66 176, 74 186 C 90 130, 110 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 262', color:'gradient', dur:11, n:5, duct:true}
+      {d:'M22 160 C 46 163, 60 172, 70 182 C 78 150, 88 110, 120 70 C 170 40, 260 40, 320 70 C 360 95, 350 150, 330 180 C 315 205, 320 240, 398 264', color:'gradient', dur:10, n:6, duct:true},
+      {d:'M22 160 C 50 165, 66 176, 74 186 C 90 130, 110 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 264', color:'gradient', dur:11, n:5, duct:true}
     ]
   },
   'off|above|straight': {
@@ -428,7 +428,7 @@ const AIR = {
     title:'Fan stopped, inlet above the heater, exhaust straight through the wall',
     ach:'1 to 2 / h, backwards', achG:'bad', head:'under 1 / h', headG:'bad', feet:'cold draught', feetG:'bad', co2:1900, co28:4800, co2note:'after 20 minutes, still climbing',
     paths:[
-      {d:'M398 262 C 380 264, 330 288, 270 289 C 210 290, 150 290, 112 282 C 100 278, 98 262, 98 240 C 98 215, 96 200, 96 186 C 92 190, 68 166, 22 160', color:'gradient', kt:'0;0.5;0.68;1', dur:9, n:9, size:3},
+      {d:'M398 264 C 380 264, 330 288, 270 289 C 210 290, 150 290, 112 282 C 100 278, 98 262, 98 240 C 98 215, 96 200, 96 186 C 92 190, 68 166, 22 160', color:'gradient', kt:'0;0.5;0.68;1', dur:9, n:9, size:3},
       {d:'M398 258 C 370 262, 300 282, 230 284 C 170 286, 130 280, 108 270 C 100 262, 102 236, 104 214 C 104 220, 90 180, 22 162', color:'gradient', kt:'0;0.5;0.68;1', dur:10, n:6, size:2.8, noguide:true}
     ],
     stagnant:'M105 24 h291 v160 h-291z', revIn:true
@@ -438,8 +438,8 @@ const AIR = {
     title:'Fan stopped, inlet below the heater, exhaust ducted up',
     ach:'2 to 3 / h', achG:'warn', head:'1 to 2 / h', headG:'warn', feet:'cold at the heater', feetG:'bad', co2:1750, co28:4100, co2note:'steady state at 2.5 / h',
     paths:[
-      {d:'M22 283 C 60 282, 74 262, 80 215 C 92 150, 95 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 262', color:'gradient', dur:9, n:7, duct:true},
-      {d:'M22 283 C 60 283, 76 262, 82 215 C 95 140, 120 60, 200 50 C 270 45, 330 90, 340 135 C 345 170, 360 215, 398 262', color:'gradient', dur:9.8, n:6, duct:true}
+      {d:'M22 283 C 60 282, 74 262, 80 215 C 92 150, 95 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 264', color:'gradient', dur:9, n:7, duct:true},
+      {d:'M22 283 C 60 283, 76 262, 82 215 C 95 140, 120 60, 200 50 C 270 45, 330 90, 340 135 C 345 170, 360 215, 398 264', color:'gradient', dur:9.8, n:6, duct:true}
     ],
     stagnant:'M240 100 h60 v50 h-60z'
   },
@@ -448,8 +448,8 @@ const AIR = {
     title:'Fan stopped, inlet at the floor by the heater, exhaust straight through the wall',
     ach:'about 1 / h', achG:'bad', head:'about 1 / h', headG:'bad', feet:'cold at the floor', feetG:'bad', co2:1900, co28:4800, co2note:'after 20 minutes, still climbing',
     paths:[
-      {d:'M22 283 C 60 282, 74 262, 80 215 C 92 150, 95 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 262', color:'gradient', dur:16, n:5},
-      {d:'M22 283 C 60 283, 76 262, 82 215 C 95 140, 120 60, 200 50 C 270 45, 330 90, 340 135 C 345 170, 360 215, 398 262', color:'gradient', dur:17, n:4}
+      {d:'M22 283 C 60 282, 74 262, 80 215 C 92 150, 95 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 264', color:'gradient', dur:16, n:5},
+      {d:'M22 283 C 60 283, 76 262, 82 215 C 95 140, 120 60, 200 50 C 270 45, 330 90, 340 135 C 345 170, 360 215, 398 264', color:'gradient', dur:17, n:4}
     ],
     stagnant:'M200 60 h190 v150 h-190z'
   }
@@ -479,7 +479,7 @@ const DRY_PATHS = {
   offBottom: [{d:'M73 312 L 73 200 C 74 150, 95 70, 160 48 C 240 32, 330 24, 398 22', color:'gradient', kt:'0;0.12;0.28;1', dur:8, n:7, size:3, noguide:true}],
   on:  [{d:'M110 60 C 200 34, 310 24, 398 22', color:'hot', dur:5, n:5, size:2.8, noguide:true}],
   offAbove: [{d:'M60 60 C 180 34, 300 24, 398 22', color:'hot', dur:5, n:5, size:2.8, noguide:true},
-             {d:'M398 262 C 370 266, 300 280, 230 284', color:'fresh', dur:5, n:4, size:2.6, noguide:true}],
+             {d:'M398 264 C 370 266, 300 280, 230 284', color:'fresh', dur:5, n:4, size:2.6, noguide:true}],
   offBelow: [{d:'M22 283 C 60 282, 74 262, 80 215 C 92 150, 95 70, 160 48 C 240 32, 330 24, 398 22', color:'gradient', dur:8, n:7, size:3, noguide:true}]
 };
 
@@ -607,11 +607,11 @@ function linkToSwitch(g, key, flip){
 const STALL_PATHS = {
   'off|above|straight': [
     {d:'M60 154 C 48 156, 36 158, 22 160 L11 161 L11 291 L-2 291', color:'hot', dur:16, n:2, size:2.6},
-    {d:'M398 262 C 380 268, 340 276, 300 280', color:'fresh', dur:14, n:2, size:2.4}
+    {d:'M398 264 C 380 268, 340 276, 300 280', color:'fresh', dur:14, n:2, size:2.4}
   ],
   'off|middle|straight': [
     {d:'M60 230 C 48 232, 36 234, 22 236 L11 237 L11 291 L-2 291', color:'hot', dur:16, n:2, size:2.6},
-    {d:'M398 262 C 380 268, 340 276, 300 280', color:'fresh', dur:14, n:2, size:2.4}
+    {d:'M398 264 C 380 268, 340 276, 300 280', color:'fresh', dur:14, n:2, size:2.4}
   ]
 };
 
