@@ -720,6 +720,7 @@ function render(){
   document.querySelectorAll('.sw--hot').forEach(c=>c.classList.remove('sw--hot'));
   if(hotKey){ const c=cardOf(hotKey); if(c) c.classList.add('sw--hot'); }
   fitHits();
+  relight();
   const sNow = score(key, angleEff, state.heater, state.exhaust, induct, half, dryOpen), card=document.getElementById('scoreCard');
   if(card){ const g=scoreGrade(sNow); card.dataset.g = g; document.getElementById('scoreNum').textContent = sNow; document.getElementById('scoreWord').textContent = {good:'Best choice',warn:'Acceptable',bad:'Avoid'}[g]; }
   const dimSeg=(k,off)=>{ const seg=document.querySelector('[data-key="'+k+'"]'); if(!seg) return; if(seg.closest('.sw')) seg.closest('.sw').classList.toggle('sw--off', none || off); seg.querySelectorAll('button').forEach(b=>{ b.disabled = off; }); };
@@ -743,9 +744,12 @@ document.querySelectorAll('.seg').forEach(seg=>{
 document.getElementById('toggle').addEventListener('click',()=>{paused=!paused; applyPause();});
 linkToSwitch(document.getElementById('duct'),'duct',()=>cycle('duct'));
 linkToSwitch(document.getElementById('heaterg'),'heater',()=>cycle('heater'));
+/* a hovered switch row lights itself and its element; render() calls relight() so the light survives the redraw a click causes */
+let litKey=null;
+function relight(){ document.querySelectorAll('#svg .lit').forEach(g=>g.classList.remove('lit')); if(!litKey) return; document.querySelectorAll('#svg .hit[data-sw="'+litKey+'"]').forEach(g=>g.classList.add('lit')); const c=cardOf(litKey); if(c) c.classList.add('sw--hot'); }
 document.querySelectorAll('.lab-card .sw').forEach(sw=>{ const seg=sw.querySelector('.seg'); if(!seg) return; const key=seg.dataset.key;
-  sw.addEventListener('mouseenter',()=>document.querySelectorAll('#svg .hit[data-sw="'+key+'"]').forEach(g=>g.classList.add('lit')));
-  sw.addEventListener('mouseleave',()=>document.querySelectorAll('#svg .lit').forEach(g=>g.classList.remove('lit'))); });
+  sw.addEventListener('mouseenter',()=>{ litKey=key; relight(); });
+  sw.addEventListener('mouseleave',()=>{ litKey=null; sw.classList.remove('sw--hot'); relight(); }); });
 const rankList=document.getElementById('rank');
 function buildRank(){
 rankList.innerHTML='';
