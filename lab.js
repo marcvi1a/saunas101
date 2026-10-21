@@ -585,7 +585,10 @@ function cycle(key){ const seg=document.querySelector('.seg[data-key="'+key+'"]'
 function fitHits(){
   document.querySelectorAll('#svg .hit').forEach(g=>{
     g.querySelectorAll(':scope > rect.hitbox').forEach(r=>r.remove());
-    let b; try{ b=g.getBBox(); }catch(e){ return; }
+    const texts=[...g.querySelectorAll('text')]; texts.forEach(t=>{ t.style.display='none'; });   // the frame fits the drawn thing, not its words
+    let b; try{ b=g.getBBox(); }catch(e){ b=null; }
+    texts.forEach(t=>{ t.style.display=''; });
+    if(!b) return;
     if(!b || (b.width===0 && b.height===0)) return;
     const pad=6, w=Math.max(b.width+2*pad, 24), h=Math.max(b.height+2*pad, 24);
     g.appendChild(el('rect',{class:'hitbox', x:b.x+b.width/2-w/2, y:b.y+b.height/2-h/2, width:w, height:h, rx:3, fill:'none', 'pointer-events':'all'}));
