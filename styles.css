@@ -155,7 +155,8 @@ h1{font-size:30px;font-weight:400;letter-spacing:0;line-height:1.1}
 .sw{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 12px;transition:background-color .15s,border-color .15s}
 .sw--hot{background:var(--track);border-color:var(--ink)}
 .hit{cursor:pointer}
-#svg .hit:hover,#svg .hit.lit{filter:drop-shadow(0 0 1.5px var(--cedar)) drop-shadow(0 0 3px var(--cedar))}
+#svg .hit > rect.hitbox{fill:none;stroke:none}
+#svg .hit:hover > rect.hitbox,#svg .hit.lit > rect.hitbox{stroke:var(--cedar);stroke-width:1;fill:var(--cedar);fill-opacity:.06}
 #dyn,#glow{pointer-events:none}
 .seg.seg--grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
 

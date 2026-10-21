@@ -588,7 +588,7 @@ function fitHits(){
     let b; try{ b=g.getBBox(); }catch(e){ return; }
     if(!b || (b.width===0 && b.height===0)) return;
     const pad=6, w=Math.max(b.width+2*pad, 24), h=Math.max(b.height+2*pad, 24);
-    g.appendChild(el('rect',{class:'hitbox', x:b.x+b.width/2-w/2, y:b.y+b.height/2-h/2, width:w, height:h, fill:'none', 'pointer-events':'all'}));
+    g.appendChild(el('rect',{class:'hitbox', x:b.x+b.width/2-w/2, y:b.y+b.height/2-h/2, width:w, height:h, rx:3, fill:'none', 'pointer-events':'all'}));
   });
 }
 function linkToSwitch(g, key, flip){
