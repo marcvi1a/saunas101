@@ -65,7 +65,7 @@ const f = D.feet(state, flows);      // { ankleT_upper, ankleT_lower, ankleV, fe
 | 8 no ventilation | 0 / 0 / 1.2 | 52.0 / 62.3 / 87.8 | 25.5 / 30.3 | 23.9 / 27.5 | 55 / 59 | **0.429** | **0.449** | 0.587 |
 
 - The upper bather's head-to-ankle difference without a fan is now 26–27 K, inside VTT's measured "typical 25–30 K" (version 1: 17–19 K). The boundary layers cool the 0.55 m level.
-- Over all 651 states, with the gradient term the score no longer uses: (1 − PPD_VG)(1 − PPD_AD) (equal weight) is 0.347–0.621 (median 0.393), and upper-only is 0.349–0.815. Means by heater: open stones 0.44, closed 0.40, wall 0.39.
+- Over all 651 states, with the gradient term the score no longer uses: (1 − PPD_VG)(1 − PPD_AD) (equal weight) is 0.347–0.621 (median 0.393), and upper-only is 0.349–0.815.
 - The new mapping compresses the scale. ASHRAE's gradient model caps dissatisfaction at 65.5 %, so the floor is 0.345, and every no-fan wall-inlet layout lands at 0.40–0.43.
 - With TS = +2 instead of +3, every factor rises by 0.01–0.03; the ranking is unchanged.
 
@@ -117,7 +117,7 @@ Magnitude: a 10 K surface–air difference over 0.6 m drives about 4 l/s per met
 
 ### 3.6 Heater
 - **Thermostat:** the plume's mean temperature at the ceiling is held at 90 °C.
-- **Open stones:** one surface temperature from P = A[εσ(T⁴ − T_rs⁴) + 1.31(T − T_air)^(4/3)]. Radiant share 70–75 % at 259–359 °C.
+- **Open stones:** a stone bed, the same law as breathing.js's `heaterFlow` (one open heater for the whole model). Room air is drawn in evenly along the stone height, buoyancy against the bed's Ergun loss (stones Ø75 mm, voidage 0.40), and leaves at the top as the plume's source. The outer stones sit at the bed's mean air temperature, Ta + ΔT/2, and radiate εσA(T⁴ − T_rs⁴) with ε = 0.90; the rest of the output leaves with the bed's air. Over all states: radiant share 21–31 %, outer stones 120–168 °C, bed flow 10–11 l/s, output 2.3–3.7 kW. The bed's draw along the stones is the line sink that captures a middle or low inlet jet, and a floor jet goes through the bed. The earlier envelope balance (one surface radiating and convecting, no air through the stones) gave 70–75 % radiant at 259–359 °C and twice the output, heating the floor slab to 50 °C; breathing.js already had the bed, so the two modules disagreed by three times.
 - **Casing heaters:**
   - stones on top radiate at 285 °C (measured 260–310);
   - **new in v2: the casing sides radiate at the measured 72 °C and the underside of the wall heater at the measured 60 °C**, with εσA(T⁴ − T_rs⁴), capped at 90 % of P;
@@ -225,7 +225,7 @@ At 0.05 m the RMS goes 6.2 → 5.8 K. The insulated-floor series (12 layouts, an
 ## 7. The three assumptions I am least sure of
 1. **TS = +3 and the extrapolation of Liu's models** from ≤ 8.4 K/m to 11–50 K/m. The 65.5 % cap sets the scale's floor.
 2. **Mixing across the interface below the plume source** is missing. The ankle temperature still responds about 1.8× too strongly to inlet height: low inlet with high exhaust 12 K too cold, captured inlet with low exhaust 10 K too warm.
-3. **The heater's radiant share** (open stones 70 %, upper bound; casing heaters from one VTT heater's measured temperatures).
+3. **The heater's radiant share** (open stones 21–31 % from the stone bed's through-flow, no measured open heater yet; casing heaters from one VTT heater's measured temperatures).
 
 ## 8. Next checks
 - A measured sauna profile with bathers and an open-stone heater.

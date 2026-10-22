@@ -8,9 +8,10 @@
    If flows is omitted, an airflow stand-in (marked as such) is iterated with the profile.
    Every constant is sourced in D_report.md. Physics, in one paragraph:
    - The room is a stack of horizontal layers in steady state, read 30 min into a session after a 1 h heat-up.
-   - The heater's output = the room's losses at the thermostat set point. Open stones: an envelope balance
-     (Stefan-Boltzmann plus turbulent free convection at one surface temperature) splits it into radiation and a
-     plume fed along the stone height. Casing heaters: cool casing (measured), stones on top radiate at their
+   - The heater's output = the room's losses at the thermostat set point. Open stones: a stone bed that draws room air
+     in through its sides (buoyancy against the Ergun loss of the bed, breathing.js's heaterFlow, so the whole model has
+     one open heater); the outer stones sit at the bed's mean air temperature and radiate, the rest leaves as hot air
+     at the top of the stones. Casing heaters: cool casing (measured), stones on top radiate at their
      measured temperature, the rest leaves as hot channel air through the top; a weak boundary layer rises along the casing.
    - The plume follows Morton-Taylor-Turner entrainment through the stratified room and fills it from the top
      (filling box). The ceiling sensor reads the plume's mean temperature where it meets the ceiling.
@@ -31,6 +32,8 @@
 const G = 9.81, RAIR = 287.05, PATM = 101325, CP = 1007, SIGMA = 5.670e-8, TK = 273.15;
 const rho = T => PATM / (RAIR * (T + TK));
 const SQRTPI = Math.sqrt(Math.PI);
+const BREATHING = require('./breathing.js');   // the open heater's stone-bed flow and the stones' emissivity: one source for the whole model
+const bedFlow = BREATHING._heaterFlow, EPS_STONE = BREATHING.CONST.epsStone;
 
 /* ---------- empirical coefficients ---------- */
 const ALPHA = 0.10;        // top-hat plume entrainment (Morton, Taylor & Turner 1956; Linden 1999)
@@ -90,7 +93,7 @@ const GEO = {
   ankleLower: { x: 0.945, h: 0.10, mouth: 1.20 },   // lower-bench bather: ankles ~0.30 m in front of the bench edge
 };
 const HEATERS = {
-  open:   { zb: 0.06, zt: 0.76, halfW: 0.14,  Aside: 4 * 0.28 * 0.70, Atop: 0.28 * 0.28, Abot: 0, sth: 0, intakeH: null, hCasing: 0.70 },
+  open:   { zb: 0.06, zt: 0.76, halfW: 0.14,  Aside: 4 * 0.28 * 0.70, Atop: 0.28 * 0.28, Abot: 0, sth: 0, intakeH: null, hCasing: 0.70, bed: true },
   closed: { zb: 0.00, zt: 0.67, halfW: 0.145, Aside: 4 * 0.29 * 0.67, Atop: 0.29 * 0.29, Abot: 0, casing: true, intakeH: 0.03, hCasing: 0.67 },
   wall:   { zb: 0.29, zt: 0.68, halfW: 0.145, Aside: 4 * 0.29 * 0.39, Atop: 0.29 * 0.29, Abot: 0.29 * 0.29, casing: true, intakeH: 0.30, hCasing: 0.39 },
 };
@@ -367,7 +370,7 @@ function solveRoom(C, flows, warm) {
     }
   };
   const plumeAdds = [], jets = [], applied = new Uint8Array(64), ib = layerOf(ht.zb), itop = layerOf(ht.zt), Hsrc = Math.max(1e-3, ht.zt - ht.zb);
-  let mP = 0, Hp = 0, M2 = 0, Tp = 0, Qv = 0, qlin = 0, riseStopped = false, ThLast = 300;
+  let mP = 0, Hp = 0, M2 = 0, Tp = 0, Qv = 0, qlin = 0, riseStopped = false, ThLast = 300, bedQc = 0, bedV = 0;
   const applyAdds = (i, forcedToo) => {
     for (let q = 0; q < plumeAdds.length; q++) {
       const a = plumeAdds[q];
@@ -427,15 +430,18 @@ function solveRoom(C, flows, warm) {
       const pB = CASRAD ? Math.max(0, (ht.Abot || 0) * EPS * SIGMA * (r4(T_CASING_BOT) - Tr4)) : 0;
       const sc = Math.min(1, 0.9 * P / Math.max(1e-9, pT + pS + pB));   // the measured surfaces radiate; never more than 90 % of the output
       Prad = (pT + pS + pB) * sc; PradT = pT * sc * (1 - shB); PradS = pS * sc * (1 - shB); PradBo = pB * sc * (1 - shB);
-    } else {           // open stones: one envelope temperature where radiation + free convection carry the output
-      const Aenv = ht.Aside + ht.Atop, Tah = Tf(0.5 * (ht.zb + ht.zt));
-      let t = Math.max(Tah + 1, ThLast);
-      for (let k = 0; k < 8; k++) {
-        const x = t + TK, dT = Math.max(0, t - Tah), c = Math.cbrt(dT);
-        const f = Aenv * (EPS * SIGMA * (x * x * x * x - Tr4) + 1.31 * dT * c) - P, df = Aenv * (4 * EPS * SIGMA * x * x * x + 1.31 * (4 / 3) * c);
-        const tn = Math.max(Tah + 0.1, t - f / df); if (Math.abs(tn - t) < 0.01) { t = tn; break; } t = tn;
+    } else {           // open stones: a stone bed. Room air is drawn in through the stones (buoyancy against the bed's Ergun loss),
+                       // the outer stones sit at the bed's mean air temperature and radiate, the rest leaves with the air at the top
+      const Aenv = ht.Aside + ht.Atop, Tah = Tf(0.5 * (ht.zb + ht.zt)), ra = rho(Tah);
+      let Qc = bedQc > 0 ? Math.min(P, bedQc) : 0.75 * P, Ts = Tah, V = 0;
+      for (let k = 0; k < 40; k++) {
+        V = bedFlow('open', Qc, Tah, 0); Ts = Tah + Qc / (ra * CP * V) / 2;
+        const x = Ts + TK, Qr = Math.max(0, Aenv * EPS_STONE * SIGMA * (x * x * x * x - Tr4)), Qn = Math.max(0.05 * P, P - Qr);
+        if (Math.abs(Qn - Qc) < 0.5) { Qc = Qn; break; }
+        Qc = 0.5 * (Qc + Qn);
       }
-      Th = t; ThLast = t; Prad = Math.max(0, Aenv * EPS * SIGMA * (((Th + TK) * (Th + TK) * (Th + TK) * (Th + TK)) - Tr4));
+      bedQc = Qc; bedV = bedFlow('open', Qc, Tah, 0);
+      Th = Ts; ThLast = Ts; Prad = P - Qc;
       PradS = Prad * (1 - shB) * ht.Aside / Aenv; PradT = Prad * (1 - shB) * ht.Atop / Aenv; PradBo = 0;
     }
     let Pcas = 0;
@@ -443,7 +449,7 @@ function solveRoom(C, flows, warm) {
       const ov = Math.max(0, Math.min((i + 1) * dz, ht.zt) - Math.max(i * dz, ht.zb)), dT = T_CASING - T[i];
       if (ov > 0 && dT > 0) Pcas += 1.42 * Math.pow(dT / Math.max(0.1, ht.zt - ht.zb), 0.25) * dT * ht.Aside * ov / (ht.zt - ht.zb);
     }
-    const Pconv = P - Prad, Pth = ht.casing ? Math.max(0, Pconv - Pcas) : 0, PradB = Prad * shB;
+    const Pconv = P - Prad, Pth = ht.casing ? Math.max(0, Pconv - Pcas) : (ht.bed ? Math.max(0, Pconv) : 0), PradB = Prad * shB;
     for (let i = 0; i < N; i++) qW[i] = (PradS * wS[i] + PradT * wT[i] + PradBo * wB[i]) / Abd[i];
     const qF = (PradS * wS[N] + PradBo * wB[N]) / Af, qC = (PradS * wS[N + 1] + PradT * wT[N + 1]) / Ac;
 
@@ -502,7 +508,7 @@ function solveRoom(C, flows, warm) {
             chi = zmax >= ht.zb ? Math.min(1, draw / o.q) : 0;
             capt.how = 'floor jet under a wall heater: fountain rises ' + zmax.toFixed(2) + ' m, captured ' + (100 * chi).toFixed(0) + ' %';
           } else capt.how = 'floor inlet straight into the heater base';
-          if (chi > 0) plumeAdds.push({ i: layerOf(Math.max(ht.zb, 0.01)), m: m * chi, T: Tin, M: o.q * chi * U0, forced: !!ht.casing });
+          if (chi > 0) plumeAdds.push({ i: layerOf(Math.max(ht.zb, 0.01)), m: m * chi, T: Tin, M: o.q * chi * U0, forced: !!(ht.casing || ht.bed) });
           capt.frac = chi;
           if (chi < 1) jets.push({ role: 'inlet', h: 0.01, m: m * (1 - chi), T: Tin, U0: 0, d, x0: ht.xc, dir: 1, Q0: o.q * (1 - chi), fallen: true });
           continue;
@@ -516,18 +522,27 @@ function solveRoom(C, flows, warm) {
       jets.push({ role: o.role, h: o.h, m, T: Tin, U0: 0, d: 0.01, x0: null, dir: 0, Q0: o.q, lazy: true });
     }
 
-    /* heater plume (MTT top-hat; d(M^2)/dz = 2 g' Q^2). Open stones: one plume fed along the stone height.
+    /* heater plume (MTT top-hat; d(M^2)/dz = 2 g' Q^2). Open stones: the bed's air, drawn in along the stone height, leaves the top.
        Casing: a boundary-layer plume along the warm casing, then the channel air leaving the stones at the top. */
     pl.M.fill(0); pl.e.fill(0); pl.w.fill(0); pl.b.fill(0); pl.Tp.fill(0); pl.elin.fill(0); pl.m.fill(0);
-    qlin = ht.casing ? Pcas / Hsrc : Math.max(0, Pconv) / Hsrc; applied.fill(0);
+    qlin = ht.casing ? Pcas / Hsrc : (ht.bed ? 0 : Math.max(0, Pconv) / Hsrc); applied.fill(0);
     let qth = 0, mth = 0, Tint = 0;
     if (ht.casing) { Tint = Tf(ht.intakeH); qth = QTH_REF * Math.cbrt(Math.max(1, Pth) * ht.hCasing / (PTH_REF * HTH_REF)); mth = rho(Tint) * qth; rem[layerOf(ht.intakeH)] += mth; }
+    else if (ht.bed) {   // the bed draws its air evenly along the stone height; the enthalpy it takes is that of the layers it draws from
+      qth = bedV; mth = rho(Tf(0.5 * (ht.zb + ht.zt))) * qth; let hsum = 0;
+      for (let i = 0; i < N; i++) { const ov = Math.max(0, Math.min((i + 1) * dz, ht.zt) - Math.max(i * dz, ht.zb)); if (ov > 0) { const dmi = mth * ov / Hsrc; rem[i] += dmi; hsum += dmi * T[i]; } }
+      Tint = mth > 0 ? hsum / mth : Tf(0.5 * (ht.zb + ht.zt));
+    }
     Qv = Math.PI * ht.halfW * ht.halfW * 0.05; M2 = Math.pow(Qv * 0.05, 2); mP = rho(T[ib]) * Qv; Hp = mP * CP * T[ib]; Tp = T[ib];
     pl.e[ib] += mP;
     let fin, finStop;
-    if (!ht.casing) { fin = rise(ib, ht.zb, H + 1); finStop = riseStopped; }
+    if (!ht.casing && !ht.bed) { fin = rise(ib, ht.zb, H + 1); finStop = riseStopped; }
     else {
-      rise(ib, ht.zb, ht.zt);   // the boundary layer along the casing joins the channel air above the stones, stalled or not
+      rise(ib, ht.zb, ht.zt);   // the boundary layer along the casing (none on a bed) joins the channel air above the stones, stalled or not
+      if (ht.bed) for (let i = ib; i <= itop && i < N; i++) {   // the bed is a line sink along the stones: inlet jets beside it are captured by its draw
+        const ov = Math.max(0, Math.min((i + 1) * dz, ht.zt) - Math.max(i * dz, ht.zb));
+        if (ov > 0) { pl.elin[i] = qth / Hsrc; pl.w[i] = Math.max(pl.w[i], qth / ht.Atop); }
+      }
       if (M2 < 0) M2 = 0;
       // the channel air (and anything forced through the casing) leaves the stones at the top
       applyAdds(itop, true);

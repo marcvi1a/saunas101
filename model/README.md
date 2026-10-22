@@ -5,7 +5,7 @@ The score of every switch state on /ventilation comes from here. Nothing in it i
 | file | what it does | derivation |
 |---|---|---|
 | airflow.js | pressure balance of the room: every opening, the stratified room air, bare ducts cooling outdoors, the door gaps, the fan on its curve, reversed flows | docs/airflow.md |
-| feet.js | the room's temperature from floor to ceiling, and the feet factor from the ASHRAE 55 ankle-draught model only (the head-to-ankle gradient would count the heat factor's cold lower zone twice) | docs/feet.md |
+| feet.js | the room's temperature from floor to ceiling (the open heater a stone bed drawing room air through its stones, by breathing.js's bed law), and the feet factor from the ASHRAE 55 ankle-draught model only (the head-to-ankle gradient would count the heat factor's cold lower zone twice) | docs/feet.md |
 | breathing.js | the heater's plume and the inlet's jet: how much fresh air reaches the upper bather's mouth, and the CO₂ there | docs/breathing.md |
 | score.js | breathing from CO₂ at the mouth along Fanger's dissatisfied curve: full at EN 16798-1 Category I, zero at the CO₂ of a sealed room with the same heater; times feet, löyly and heat | docs/score.md |
 | evaluate.js | joins them, with the page's two settings: a 2 mm gap under the door and the air judged at steady state; adds the löyly factor, the share of the heater's steam-carrying rising air that comes down to the benches instead of leaving at the ceiling (from breathing.routes); an open drying vent can only lower a score, so a vent-open state scores the lower of its physics and the same layout shut; adds the heat factor, the share of the room's heat (thermostat over outdoor) the two bathers sit in from ankles to mouth, from the converged profile | |

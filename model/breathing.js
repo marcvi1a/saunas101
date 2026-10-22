@@ -872,7 +872,7 @@ function allStates() {
   return out;
 }
 
-module.exports = { breathing, routes, standInAirflow, defaultProfile, allStates, CONST: K, GEO, co2GenPerBather, _heaterModel: heaterModel, _heatBalance: heatBalance };
+module.exports = { breathing, routes, standInAirflow, defaultProfile, allStates, CONST: K, GEO, co2GenPerBather, _heaterModel: heaterModel, _heatBalance: heatBalance, _heaterFlow: heaterFlow };
 
 /* ---------- runner: CSV + sanity checks ---------- */
 if (require.main === module) {
