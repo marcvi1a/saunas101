@@ -157,7 +157,7 @@ Two ASHRAE 55 models, both conditioned on the whole-body thermal sensation TS:
   PPD_AD = 100·e^y/(1 + e^y), y = −2.58 + 3.05 v_ankle − 1.06 TS
 
   This agrees with the published reference implementation's example (18.6 % at v = 0.3 m/s near neutral TS).
-- feetFactor_k = 1 − PPD_AD/100, the ankle draught only. PPD_VG is still computed and reported, but the score leaves it out: the heat factor (evaluate.js) already measures how warm the body is from ankles to mouth, and the gradient would count the same cold lower zone twice. At TS +3 the draught term is 0.98–1.00 in every state. feetFactor is the mean of the two bathers; feetFactor_upper is the upper bather alone.
+- feetFactor_k = 1 − PPD_AD/100, the ankle draught only. PPD_VG is still computed and reported, but the score leaves it out: the heat factor (evaluate.js) already measures how warm the body is from ankles to mouth, and the gradient would count the same cold lower zone twice. At TS +3 the draught term is 0.98–1.00 in every state, so the score leaves it out: dropping it changed 42 of 579 reachable layouts by 1 point and none of the 4 named layouts. feetFactor is the mean of the two bathers; feetFactor_upper is the upper bather alone.
 
 **TS = +3.** PMV cannot be computed at 60–90 °C air (the model's range ends at 30 °C), and a sauna bather's whole-body sensation is at least "hot", the top of the seven-point scale these models were fitted on.
 

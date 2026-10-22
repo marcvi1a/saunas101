@@ -24,10 +24,10 @@
    - Every inflow is a buoyant jet: merged into the heater plume (momentum-flux balance, or the capture width of a
      line sink in a stream), or entraining room air (Ricou-Spalding, then MTT) and inserted at its neutral level.
    - Comfort: ASHRAE 55-2020 Addendum a vertical-gradient model (Liu et al. 2020) and ASHRAE 55 ankle-draft model
-     (Liu et al. 2016), both with whole-body sensation TS = +3. feetFactor = mean over the two bathers of (1 - PPD_ankle draft)
-     only: how warm the body is from ankles to mouth is the score's heat factor (evaluate.js), so the head-to-ankle gradient
-     would count the same cold lower zone twice. PPD_gradient is still computed and reported. feetFactor_upper and
-     feetFactor_lower given separately. */
+     (Liu et al. 2016), both with whole-body sensation TS = +3. feetFactor = mean over the two bathers of (1 - PPD_ankle draft),
+     reported, not scored: at TS +3 it is 0.98-1.00 in every state and moved a score by 1 point at most, so the score is
+     breathing x loyly x heat (evaluate.js), heat carrying how warm the body is from ankles to mouth. PPD_gradient is computed
+     and reported too. feetFactor_upper and feetFactor_lower given separately. */
 
 const G = 9.81, RAIR = 287.05, PATM = 101325, CP = 1007, SIGMA = 5.670e-8, TK = 273.15;
 const rho = T => PATM / (RAIR * (T + TK));

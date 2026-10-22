@@ -11,7 +11,7 @@ Status: the self-test passes. The stand-in holds every hard invariant, and all 1
 
 ## 1. The score (what the page note can say)
 
-> **Score = 100 × breathing × feet × löyly × heat**, rounded, then scaled so the model's best state is 100; an open drying vent scores no more than the same layout shut (evaluate.js).
+> **Score = 100 × breathing × löyly × heat**, rounded, then scaled so the model's best state is 100; an open drying vent scores no more than the same layout shut (evaluate.js).
 > **Breathing** = (PD(4,580) − PD(ΔCO₂)) / (PD(4,580) − PD(550)), between 0 and 1, where PD(ΔC) = 395·e^(−1.83·q^0.25) and q = 5,556 / ΔC. ΔC is CO₂ above outdoor air at the mouth, 30 minutes in.
 
 In words: breathing is 1 when the air at the mouth is as fresh as EN 16798-1's best category (550 ppm above outdoor, about 970 ppm here) and 0 at the CO₂ of a sealed room with the same heater. Löyly is the share of the heater's rising air that comes down to the benches instead of leaving at the ceiling. Heat is the share of the room's heat, 90 °C at the thermostat over 25 °C outdoor, that the two bathers sit in, averaged from ankles to mouth. In between it follows the share of people who find the air stale.

@@ -1,6 +1,6 @@
 /* Saunas 101 · the ventilation lab: states, the scores and the air from scores.js (the model), drawing, switches, layouts. Needs site.js first (units) and scores.js. */
 /* ---------- the score ----------
-   Every state's score comes from model/ (airflow, breathing, feet), computed by build.js into scores.js: SCORES by address, BEST_STATE the model's top layout. */
+   Every state's score comes from model/ (airflow, breathing, the temperature profile), computed by build.js into scores.js: SCORES by address, BEST_STATE the model's top layout. */
 const ROCK_FILLS=['#6a6a6a','#595959','#4e4e4e','#444444','#5f5f5f','#3c3c3c'];
 function rock(cx,cy,R,rnd){
   const k=5+Math.floor(rnd()*3), sx=1+rnd()*0.35, rot=rnd()*Math.PI, pts=[];

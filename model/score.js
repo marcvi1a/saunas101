@@ -1,7 +1,7 @@
 'use strict';
 /* Saunas 101 ventilation model, agent E: the score.
 
-   score = round(100 × breathing × feet), 0 to 100.
+   score = round(100 × breathing × löyly × heat), 0 to 100.
 
    breathing: from the CO₂ at the bather's mouth (agent C, ppm, 30 minutes into the session, 2 bathers).
      It is 1 at or below EN 16798-1 Category I (550 ppm above outdoor air) and 0 at the CO₂ of a sealed room with
@@ -13,7 +13,8 @@
        PD(ΔC) = 395 · exp(−1.83 · q^0.25)  %,   q = G / ΔC = 5,556 / ΔC   (l/s per person, ΔC in ppm above outdoor)
        breathing = (PD(5,000 − C_out) − PD(ΔC)) / (PD(5,000 − C_out) − PD(550)),  clamped to [0, 1]
 
-   feet: agent D's feetFactor, the ankle draught only, passed through unchanged (no floor, no clamp) so the harness sees what D produced.
+   löyly and heat: shares from evaluate.js, 1 when not given. The ankle draught (feet.js) is not scored: at sauna heat it moved a score
+   by 1 point at most.
 
    Every number below is a cited standard value or a unit conversion; see E_report.md. */
 
@@ -71,19 +72,18 @@ function mouthValues(breathing) {
   return [breathing.co2AtMouth];
 }
 
-function score({ breathing, feet, zeroCO2, loyly, heat /* , flows, state */ }) {
+function score({ breathing, zeroCO2, loyly, heat /* , flows, state */ }) {
   const cOut = breathing && Number.isFinite(breathing.co2Outdoor) ? breathing.co2Outdoor : C_OUT_DEFAULT;
   const vals = mouthValues(breathing);
   let sum = 0;
   for (const c of vals) sum += breathingFactorFromCO2(c, cOut, zeroCO2);
   const breathingFactor = sum / vals.length;
-  const feetFactor = feet ? feet.feetFactor : NaN;
   /* löyly: the share of the heater's steam-carrying rising air that comes down to the benches instead of leaving at the ceiling (evaluate.js, from breathing.routes); 1 when not given */
   const loylyFactor = Number.isFinite(loyly) ? loyly : 1;
   /* heat: the share of the room's heat (thermostat over outdoor) the bathers sit in, from ankles to mouth (evaluate.js); 1 when not given */
   const heatFactor = Number.isFinite(heat) ? heat : 1;
-  const raw = 100 * breathingFactor * feetFactor * loylyFactor * heatFactor;
-  return { breathingFactor, feetFactor, loylyFactor, heatFactor, score: Number.isFinite(raw) ? Math.round(raw) : NaN };
+  const raw = 100 * breathingFactor * loylyFactor * heatFactor;
+  return { breathingFactor, loylyFactor, heatFactor, score: Number.isFinite(raw) ? Math.round(raw) : NaN };
 }
 
 /* The mapping as a table, for the report and the page note. */
