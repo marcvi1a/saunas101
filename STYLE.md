@@ -10,6 +10,7 @@ The page follows saunaslava.com.br: EB Garamond for headings, Manrope for text, 
 4. Rule titles name the rule in words and carry no figures and no final full stop (Low ceiling, Warm feet); the figures go in the description, which runs 2 lines on desktop: between 140 and 160 characters, checked at build. Rules are numbered in the title's own type and the numbers run on across pages (construction 1 to 9, heater 10 on): the build writes them, the sources carry none.
 5. Rules are about building. Upkeep (restacking stones, cleaning) is not a rule.
 6. Links inside text look as on saunaslava.com.br: no underline, the muted brown (#7C6A64), a shade darker on hover.
+7. Every colour in `styles.css` is a token on `:root` with a dark value in both dark blocks; a softer text is the ink token mixed down (`color-mix(in srgb,var(--ink) 78%,transparent)`), never a fixed rgba of black, which vanishes on a phone in dark mode. Check the 3 pages in dark mode at phone width after any colour change.
 
 ## Pages and addresses
 
