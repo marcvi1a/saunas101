@@ -1,1 +1,3 @@
 .DS_Store
+model/*.csv
+model/check/*.csv

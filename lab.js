@@ -1,149 +1,8 @@
-/* Saunas 101 · the ventilation lab: states, model, drawing, switches, ranked list. Needs site.js first (units). */
-/* ---------- the model behind the score and the CO₂ ----------
-   head: fresh air reaching the breathing zone, changes per hour (12 m³, 2 bathers need 6)
-   feet: 1 warm · 0.5 cold at the heater or the floor · 0.25 a cold layer · 0.1 a draught */
-const MODEL = {
-  'on|above|riser':    {head:6,   feet:1},
-  'on|above|straight': {head:6,   feet:1},
-  'off|above|riser':   {head:2.5, feet:1},
-  'off|below|riser':   {head:1.5, feet:0.5},
-  'off|below|straight':{head:0.9, feet:0.5},
-  'on|below|riser':    {head:1.8, feet:0.25},
-  'on|below|straight': {head:1.8, feet:0.25},
-  'off|above|straight':{head:0.5, feet:0.1},
-  'on|middle|riser':   {head:2.4, feet:0.4},
-  'on|middle|straight':{head:2.4, feet:0.4},
-  'off|middle|riser':  {head:2.0, feet:0.6},
-  'off|middle|straight':{head:0.4, feet:0.15},
-  'on|bottom|riser':   {head:5.0, feet:0.9},
-  'on|bottom|straight':{head:5.0, feet:0.9},
-  'off|bottom|riser':  {head:3.2, feet:0.9},
-  'off|bottom|straight':{head:1.2, feet:0.9},
-  'in0|on|riser':      {head:0.5, feet:0.5},
-  'in0|on|straight':   {head:0.5, feet:0.5},
-  'in0|off|riser':     {head:0.3, feet:0.6},
-  'in0|off|straight':  {head:0.15, feet:0.6},
-  'out0|above':        {head:0.3, feet:0.3},
-  'out0|middle':       {head:0.6, feet:0.6},
-  'out0|below':        {head:0.7, feet:0.5},
-  'out0|bottom':       {head:0.9, feet:0.9},
-  'none':              {head:0.2, feet:1}
-};
-const NEED = 6;                      // 6 changes of 12 m³ = 20 l/s, what 2 bathers need for 1,000 ppm
-const GEN2 = 3333;                   // ppm per hour added by 2 seated bathers in 12 m³ (0.04 m³/h of CO₂)
-const TILT = {
-  'on|above|riser':    {f:1},
-  'on|above|straight': {f:1},
-  'on|below|riser':    {f:1},
-  'on|below|straight': {f:1},
-  'off|above|riser':   {f:1.07},
-  'off|above|straight':{f:0.9},
-  'off|below|riser':   {f:1.04},
-  'off|below|straight':{f:1.35},
-  'on|middle|riser':   {f:1.3},
-  'on|middle|straight':{f:1.3},
-  'off|middle|riser':  {f:1.04},
-  'off|middle|straight':{f:0.5},
-  'on|bottom|riser':   {f:1},
-  'on|bottom|straight':{f:1},
-  'off|bottom|riser':  {f:1},
-  'off|bottom|straight':{f:1},
-  'none':              {f:1}
-};
-const HEATER = {
-  'on|above|riser':    {f:1},
-  'on|above|straight': {f:1},
-  'on|below|riser':    {f:0.8},
-  'on|below|straight': {f:0.8},
-  'off|above|riser':   {f:1},
-  'off|above|straight':{f:1},
-  'off|below|riser':   {f:0.9},
-  'off|below|straight':{f:0.9},
-  'on|middle|riser':   {f:1.875, feet:0.75},
-  'on|middle|straight':{f:1.875, feet:0.75},
-  'off|middle|riser':  {f:1.3,  feet:0.8},
-  'off|middle|straight':{f:1},
-  'on|bottom|riser':   {f:0.85, feet:0.85},
-  'on|bottom|straight':{f:0.85, feet:0.85},
-  'off|bottom|riser':  {f:0.85, feet:0.85},
-  'off|bottom|straight':{f:0.85, feet:0.85},
-  'none':              {f:1}
-};
-/* the exhaust under the upper bench, 75 cm up instead of 26: the fan or the stack draws from higher, the floor zone drops out */
-const EXH = {
-  'on|above|riser':    {f:1,   feet:0.75},
-  'on|above|straight': {f:1,   feet:0.75},
-  'on|below|riser':    {f:1.6, feet:0.5},
-  'on|below|straight': {f:1.6, feet:0.5},
-  'off|above|riser':   {f:1,   feet:0.75},
-  'off|above|straight':{f:0.6, feet:0.3},
-  'off|below|riser':   {f:1,   feet:0.6},
-  'off|below|straight':{f:2,   feet:0.55},
-  'on|middle|riser':   {f:1,   feet:0.5},
-  'on|middle|straight':{f:1,   feet:0.5},
-  'off|middle|riser':  {f:1,   feet:0.65},
-  'off|middle|straight':{f:2.5, feet:0.55},
-  'on|bottom|riser':   {f:1,   feet:0.8},
-  'on|bottom|straight':{f:1,   feet:0.8},
-  'off|bottom|riser':  {f:1,   feet:0.8},
-  'off|bottom|straight':{f:1.6, feet:0.85},
-  'in0|on|riser':      {f:2.5, feet:0.5},
-  'in0|on|straight':   {f:2.5, feet:0.5},
-  'in0|off|riser':     {f:1.2, feet:0.6},
-  'in0|off|straight':  {f:2,   feet:0.6}
-};
-const WALL = {
-  'on|below|riser':    {f:0.75, feet:0.25},
-  'on|below|straight': {f:0.75, feet:0.25},
-  'off|below|riser':   {f:0.85},
-  'off|below|straight':{f:0.85},
-  'on|bottom|riser':   {f:0.75, feet:0.8},
-  'on|bottom|straight':{f:0.75, feet:0.8},
-  'off|bottom|riser':  {f:0.75, feet:0.8},
-  'off|bottom|straight':{f:0.75, feet:0.8},
-};
-const HTABLE = {open:HEATER, wall:WALL};
-function hmod(k, heater){ const t=HTABLE[heater]; return (t && t[k]) ? t[k] : null; }
-/* the inlet duct: a chimney is a column of warm air, and an inlet duct carries cold air. Run inside the room its air warms about halfway,
-   worth half the duct's height; its mouth cannot go below the floor. Keyed on the no-exhaust-duct states. */
-const IDUCT = {
-  'on|above|straight':  {f:1},
-  'on|middle|straight': {f:1},
-  'on|below|straight':  {f:1},
-  'off|above|straight': {f:0.4, feet:0.8, stall:true},
-  'off|middle|straight':{f:0.5, feet:0.8, stall:true},
-  'off|below|straight': {f:1}
-};
-const COMBO = {};
-function comboOf(k, exhaust, induct){ return (induct && exhaust==='upper' && COMBO[k]) ? COMBO[k] : null; }
-const BARE = 0.93;   // a bare exhaust duct outdoors: its air cools a few degrees on the way up, about 7 % less flow than an insulated one
-/* the half duct: outlet at 1.2 m instead of 2 m. Chimney = duct top − inlet height; flow ∝ √height */
-const HALF = {
-  'off|above|riser':  {f:0.45},
-  'off|middle|riser': {f:0.70},
-  'off|below|riser':  {f:0.76},
-  'off|bottom|riser': {f:0.77},
-  'on|above|riser':   {f:1},
-  'on|middle|riser':  {f:1},
-  'on|below|riser':   {f:1},
-  'on|bottom|riser':  {f:1}
-};
-function headOf(k, angle, heater, exhaust, induct, half){ const c=comboOf(k,exhaust,induct); if(c) return c.head; const m=hmod(k,heater); const bare = (k.startsWith('off|') && k.endsWith('|riser')) ? BARE : 1; return bare * MODEL[k].head * ((angle==='up45' && TILT[k]) ? TILT[k].f : 1) * (m ? m.f : 1) * ((exhaust==='upper' && EXH[k]) ? EXH[k].f : 1) * ((induct && IDUCT[k]) ? IDUCT[k].f : 1) * ((half && HALF[k]) ? HALF[k].f : 1); }
-function feetOf(k, heater, exhaust, induct){
-  const c=comboOf(k,exhaust,induct); if(c) return c.feet;
-  const m=hmod(k,heater); let f = (m && m.feet!=null) ? m.feet : MODEL[k].feet;
-  if(exhaust==='upper' && EXH[k] && EXH[k].feet!=null) f = Math.min(f, EXH[k].feet);
-  if(induct && IDUCT[k] && IDUCT[k].feet!=null) f = Math.max(f, IDUCT[k].feet);
-  return f;
-}
-/* the drying vent open while bathing: the hottest air leaves at the ceiling, so the feet term halves, and the head air is capped at the figure the vent's own verdict gives (or cut by a fifth where it gives none); it never raises a score */
-const DRY_HEAD = 0.8, DRY_FEET = 0.5;
-function runScore(k, angle, heater, exhaust, induct, half, dry){
-  let head = headOf(k,angle,heater,exhaust,induct,half), feet = feetOf(k,heater,exhaust,induct);
-  if(dry){ const d = DRY[k]; head = Math.min(head, (d && d.headN!=null) ? d.headN : head*DRY_HEAD); feet = feet*DRY_FEET; }
-  return Math.min(head/NEED,1)*(0.5+0.5*feet);
-}
-function score(k, angle, heater, exhaust, induct, half, dry){ return Math.round(100*runScore(k, angle, heater, exhaust, induct, half, dry)); }
+/* Saunas 101 · the ventilation lab: states, the scores from scores.js, drawing, switches, layouts. Needs site.js first (units) and scores.js. */
+/* ---------- the score ----------
+   Every state's score comes from model/ (airflow, breathing, feet), computed by build.js into scores.js: SCORES by address, BEST_STATE the model's top layout. */
+/* the inlet duct stalls without a fan behind an inlet above or in the middle (model/airflow.js): the drawing shows the stalled loop */
+const IDUCT_STALL = {'off|above|straight':true, 'off|middle|straight':true};
 const ROCK_FILLS=['#6a6a6a','#595959','#4e4e4e','#444444','#5f5f5f','#3c3c3c'];
 function rock(cx,cy,R,rnd){
   const k=5+Math.floor(rnd()*3), sx=1+rnd()*0.35, rot=rnd()*Math.PI, pts=[];
@@ -176,7 +35,6 @@ function drawHeater(){
     g.appendChild(st);
   }
 }   // fans taken as always running: a power cut stops the heater too
-function co2After(aHead, hours, people){ const a=Math.max(aHead,1e-6); return Math.round((420 + (GEN2*people/2)/a*(1-Math.exp(-a*hours)))/10)*10; }
 const scoreGrade = s => s>=70?'good':s>=35?'warn':'bad';
 
 /* ---------- the layouts, ranked ---------- */
@@ -185,7 +43,7 @@ const PRESETS = [
   {name:'No ventilation',         vent:'none', heater:'open'},
   {name:'Gravity ventilation',    vent:'yes', fan:'off', inlet:'below', duct:'straight', exhaust:'upper', heater:'open', angle:'straight', dry:'closed'},
   {name:'Mechanical ventilation', vent:'yes', fan:'on',  inlet:'above', duct:'straight', exhaust:'lower', heater:'open', angle:'straight', dry:'closed'},
-  {name:'Absolute best',          vent:'yes', fan:'on',  inlet:'above', duct:'riser',    exhaust:'lower', heater:'open', angle:'straight', dry:'closed'}
+  Object.assign({name:'Absolute best'}, BEST_STATE)
 ];
 const PRESET_KEYS = ['fan','inlet','duct','exhaust','heater','angle','dry'];
 
@@ -194,6 +52,7 @@ const state = { vent:'yes', fan:'on', inlet:'above', angle:'straight', heater:'o
 /* the address: 7 words in switch order (inlet, exhaust, fan, duct, heater, inlet angle, drying vent), the switches' own words; no ventilation is no-<heater> */
 const HASH_WORD = { inlet:{above:'above', middle:'middle', below:'low', bottom:'floor'}, fan:{on:'exhaust', off:'none'}, duct:{straight:'none', riser:'long', half:'short', inletduct:'inlet'}, angle:{straight:'straight', up45:'45'} };
 const HASH_KEY = {}; for(const k in HASH_WORD){ HASH_KEY[k]={}; for(const v in HASH_WORD[k]) HASH_KEY[k][HASH_WORD[k][v]]=v; }
+const hashOf = st => st.vent==='none' ? 'no-'+st.heater : [HASH_WORD.inlet[st.inlet], st.exhaust, HASH_WORD.fan[st.fan], HASH_WORD.duct[st.duct], st.heater, HASH_WORD.angle[st.angle], st.dry].join('-');
 const HEATERS = ['open','closed','wall'];
 let paused=false;
 const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -208,15 +67,6 @@ const DUCT_UP_HALF=' C 404 262, 408 230, 408 200 C 408 170, 408 150, 408 128';
 const DUCT_UP_HI_HALF=' C 404 200, 408 180, 408 165 C 408 150, 408 140, 408 128';
 const HALF_TOP = 132;   // 1.2 m
 const OUT_HI={x:398,y:202}, LEAK_IN={x:398,y:290}, LEAK_OUT={x:398,y:60};
-/* the stack, for the no-fan layouts: outside air at 25 °C; inside, the column between the two openings warms from 40 °C at the floor to 92.5 °C under the ceiling,
-   so the driving pressure is (ρ_out − ρ_in)·g·Δh with ρ_in from the column's mean temperature; two Ø125 openings in series, Cd 0.6, so Q = Cd·A·√(ΔP/ρ).
-   Only ratios are used: the factor for the grille under the upper bench against the lower one, and for the short duct against the full riser. Heights are the drawing's own. */
-const hOf = y => (300 - y) / (300 / 2.1);
-const H_IN = {above:hOf(IN_ABOVE.y), middle:hOf(IN_MIDDLE.y), below:hOf(IN_BELOW.y), bottom:0}, H_OUT = {lower:hOf(OUT.y), upper:hOf(OUT_HI.y), riser:hOf(-10), half:hOf(HALF_TOP)};
-function stackP(h1, h2){ const lo=Math.min(h1,h2), hi=Math.max(h1,h2); if(hi<=lo) return 0; const t = 40 + 25*Math.min((lo+hi)/2, 2.1); const dRho = 1.184*(1 - 298/(t+273)); return dRho*9.81*(hi-lo); }
-const stackRatio = (hIn, outA, outB) => Math.sqrt(stackP(hIn, H_OUT[outA]) / stackP(hIn, H_OUT[outB]));
-['below','bottom'].forEach(i => { EXH['off|'+i+'|straight'].f = stackRatio(H_IN[i], 'upper', 'lower'); });   // both grilles sit above these inlets, so the ratio is the whole story
-Object.keys(HALF).filter(k => k.startsWith('off|')).forEach(k => { HALF[k].f = stackRatio(H_IN[k.split('|')[1]], 'half', 'riser'); });
 function outPos(){ return state.exhaust==='upper' ? OUT_HI : OUT; }
 /* the grille's top edge sits 5 cm under the bench above it: centre 264 under the lower bench, 202 under the upper; every path that met the grille at 264 meets it at 202 */
 function toUpper(d){
@@ -634,7 +484,7 @@ function render(){
   const dryOpen = !none && state.dry==='open';
   let o = dryOpen ? Object.assign({}, base, DRY[key]||{}) : base;
   const flipped = !none && state.exhaust==='upper' && key==='off|middle|straight' && !induct;
-  const stall = induct && IDUCT[key] && IDUCT[key].stall;
+  const stall = induct && IDUCT_STALL[key];
   if(stall) o = Object.assign({}, o, {paths:STALL_PATHS[key], pathsOpen:null, stagnant:'M105 24 h291 v250 h-291z', revIn:false, stall:true});
   if(flipped){ const r=AIR[key.replace('straight','riser')]; o=Object.assign({}, o, {paths:r.paths, pathsOpen:r.pathsOpen, stagnant:r.stagnant, revIn:false}); }
   const withDuct = !none && (state.duct==='riser' || half);
@@ -730,7 +580,7 @@ function render(){
   if(hotKey){ const c=cardOf(hotKey); if(c) c.classList.add('sw--hot'); }
   fitHits();
   relight();
-  const sNow = score(key, angleEff, state.heater, state.exhaust, induct, half, dryOpen), card=document.getElementById('scoreCard');
+  const sNow = SCORES[hashOf(state)], card=document.getElementById('scoreCard');
   if(card){ const g=scoreGrade(sNow); card.dataset.g = g; document.getElementById('scoreNum').textContent = sNow; document.getElementById('scoreWord').textContent = {good:'Best choice',warn:'Acceptable',bad:'Avoid'}[g]; }
   const dimSeg=(k,off)=>{ const seg=document.querySelector('[data-key="'+k+'"]'); if(!seg) return; if(seg.closest('.sw')) seg.closest('.sw').classList.toggle('sw--off', none || off); seg.querySelectorAll('button').forEach(b=>{ b.disabled = off; }); };
   dimSeg('angle', state.inlet==='bottom' || induct);
@@ -738,7 +588,7 @@ function render(){
   if(!rankList.dataset.built){ buildRank(); rankList.dataset.built='1'; }
   document.querySelectorAll('.rk').forEach(b=>{ const p=PRESETS[+b.dataset.i]; const on = p.vent==='none' ? none : (!none && PRESET_KEYS.every(f=>state[f]===p[f])); b.setAttribute('aria-pressed', on ? 'true':'false'); });
   applyPause();
-  labState = none ? 'no-'+state.heater : [HASH_WORD.inlet[state.inlet], state.exhaust, HASH_WORD.fan[state.fan], HASH_WORD.duct[state.duct], state.heater, HASH_WORD.angle[state.angle], state.dry].join('-');
+  labState = hashOf(state);
   writeHash();
   applyUnits();
 }
@@ -763,8 +613,7 @@ const rankList=document.getElementById('rank');
 function buildRank(){
 rankList.innerHTML='';
 PRESETS.forEach((p,i)=>{
-  const k = p.vent==='none' ? 'none' : [p.fan,p.inlet,p.duct].join('|');
-  const s = score(k, p.angle||'straight', p.heater, p.exhaust||'lower', false, false, false), g = scoreGrade(s);
+  const s = SCORES[hashOf(p)], g = scoreGrade(s);
   const li=document.createElement('li');
   li.innerHTML='<button type="button" class="rk '+g+'" data-i="'+i+'">'
     +'<span class="rk-t">'+p.name+'</span>'
