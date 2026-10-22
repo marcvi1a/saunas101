@@ -57,7 +57,7 @@ Drawing units: h = (300 − y) × 2.1 / 300. x is horizontal, the heater wall at
 |---|---|---|
 | outdoor air | 25 °C, 101.3 kPa | Brazil, where the site's readers are |
 | thermostat | 90 °C at the sensor, ceiling above the heater | |
-| heater | 12 kW rated (the site's own rule: 1 kW per m³) | at steady state it supplies the losses; split into convective and radiant per a cited source |
+| heater | 12 kW rated, a ceiling the steady losses (2.2–2.8 kW) never reach, so the rating does not move the scores | at steady state it supplies the losses; split into convective and radiant per a cited source |
 | inlet, exhaust openings | Ø125 mm each, grille free area per a cited typical value | |
 | drying vent | Ø125 mm | |
 | door | 0.70 × 1.90 m glass door, 10 mm gap under it, 2 mm gap along the top; rest of the envelope sealed by the foil barrier | |

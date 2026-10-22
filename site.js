@@ -81,7 +81,7 @@ function renderCalc(fill){
   if(fill) for(const k in calcIds) document.getElementById(calcIds[k]).value = calcFmt(toShow(k, calc[k]));
   document.querySelectorAll('#calc [data-u="len"]').forEach(s=>{ s.textContent = imp ? 'ft' : 'm'; });
   document.querySelectorAll('#calc [data-u="area"]').forEach(s=>{ s.textContent = imp ? 'ft²' : 'm²'; });
-  const vol = calc.w*calc.d*calc.h, eff = vol + 1.2*calc.g, kw = Math.round(eff); calc.kw = kw;
+  const vol = calc.w*calc.d*calc.h, eff = vol + 1.2*calc.g, kw = Math.round(0.8*eff); calc.kw = kw;   /* 0.8 kW per m³: published sizing tables run 0.7 to 0.8, heater makers' room ranges about 0.85 at their middle */
   const volTxt = m3 => imp ? Math.round(m3/(FT*FT*FT))+'\u202Fft³' : calcFmt(m3)+'\u202Fm³';
   if(!(vol>0)){ out.textContent = 'Enter the width, depth and height of the room.'; return; }
   out.innerHTML = '<span><strong>'+volTxt(vol)+'</strong> of room' + (calc.g>0 ? ', counted as <strong>'+volTxt(eff)+'</strong> with the glass' : '') + '.</span><span>It needs an electric heater of about <strong>'+kw+'\u202FkW</strong>.</span>';
