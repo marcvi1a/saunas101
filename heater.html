@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&family=Manrope:wght@400;500;600;700&display=swap">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="stylesheet" href="/styles.css?v=e426cb59">
+<link rel="stylesheet" href="/styles.css?v=17f946d1">
 </head>
 <body>
 <div class="wrap">
@@ -41,7 +41,8 @@
         <label class="calc-f"><span class="calc-l">Width</span><span class="calc-in"><input id="calcW" type="number" inputmode="decimal" min="0" step="0.1"><span class="calc-u" data-u="len"></span></span></label>
         <label class="calc-f"><span class="calc-l">Depth</span><span class="calc-in"><input id="calcD" type="number" inputmode="decimal" min="0" step="0.1"><span class="calc-u" data-u="len"></span></span></label>
         <label class="calc-f"><span class="calc-l">Height</span><span class="calc-in"><input id="calcH" type="number" inputmode="decimal" min="0" step="0.1"><span class="calc-u" data-u="len"></span></span></label>
-        <label class="calc-f"><span class="calc-l">Glass or bare wall</span><span class="calc-in"><input id="calcG" type="number" inputmode="decimal" min="0" step="0.1"><span class="calc-u" data-u="area"></span></span></label>
+        <label class="calc-f calc-wide"><span class="calc-l">Glass</span><span class="calc-in"><input id="calcG" type="number" inputmode="decimal" min="0" step="0.1"><span class="calc-u" data-u="area"></span></span></label>
+        <label class="calc-f calc-wide"><span class="calc-l">Bare brick or stone</span><span class="calc-in"><input id="calcM" type="number" inputmode="decimal" min="0" step="0.1"><span class="calc-u" data-u="area"></span></span></label>
       </div>
       <p class="calc-out" id="calcOut"></p>
     </div>
@@ -53,7 +54,7 @@
   </div>
   <ul class="facts">
     <li id="heater-size"><h4>9. Heater sized to the room</h4><p>An electric heater needs about 0.8 kW for every m³ of room, measured inside the panelling. Undersized, it runs flat out and never makes löyly, the steam.</p></li>
-    <li id="glass"><h4>10. Glass counts as extra room</h4><p>A glass, brick or stone wall leaks the heat that wood panelling keeps in. For each m² of it, add 1.2 m³ to the room volume before you pick the heater size.</p></li>
+    <li id="glass"><h4>10. Glass and bare walls count as extra room</h4><p>Glass leaks the heat that wood panelling keeps in, and brick, stone or concrete soaks it up. Add 0.6 m³ per m² of glass and 1.2 m³ per m² of bare wall.</p></li>
     <li id="stones"><h4>11. Lots of stones, loosely stacked</h4><p>Stones store the heat that turns water into steam, so a deep bed gives soft, lasting löyly. Stack 5 to 10 cm stones loosely so air passes, over every element.</p></li>
     <li id="warmup"><h4>12. Stones take time to warm up</h4><p>A deep stone bed takes about 1 h to heat through, longer than a bare-element heater needs to warm the air. The soft heat and the löyly are worth the wait.</p></li>
     <li id="sensor"><h4>13. Sensor above the heater</h4><p>The sensor sits over the stones, just under the ceiling, where the manual puts it. By the door or the inlet it reads cold air and never stops the heater.</p></li>
@@ -69,6 +70,6 @@
   </footer>
 </div>
 
-<script src="/site.js?v=ad702dcc" defer></script>
+<script src="/site.js?v=0c0c7688" defer></script>
 </body>
 </html>

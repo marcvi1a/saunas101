@@ -67,28 +67,28 @@ document.getElementById('units').addEventListener('click',e=>{ const b=e.target.
 
 /* heater size calculator: metres inside, shown and typed in the reader's units; the text converter skips its block */
 const FT = 0.3048;
-const calc = { w:2.1, d:2.1, h:2.1, g:0 };
-const CALC_HASH = /^#(\d+(?:\.\d+)?)x(\d+(?:\.\d+)?)x(\d+(?:\.\d+)?)(?:\+(\d+(?:\.\d+)?))?$/;
+const calc = { w:2.1, d:2.1, h:2.1, g:0, m:0 };
+const CALC_HASH = /^#(\d+(?:\.\d+)?)x(\d+(?:\.\d+)?)x(\d+(?:\.\d+)?)(?:\+(\d+(?:\.\d+)?))?(?:\+(\d+(?:\.\d+)?))?$/;   // width x depth x height, + m² of glass, + m² of bare wall
 const calcNum = x => String(Math.round(x*100)/100);
-const calcHash = () => '#' + calcNum(calc.w) + 'x' + calcNum(calc.d) + 'x' + calcNum(calc.h) + (calc.g > 0 ? '+' + calcNum(calc.g) : '');
-(function(){ const m = location.hash.match(CALC_HASH); if(!m) return; calc.w = +m[1]; calc.d = +m[2]; calc.h = +m[3]; calc.g = m[4] ? +m[4] : 0; })();
-const calcIds = { w:'calcW', d:'calcD', h:'calcH', g:'calcG' };
+const calcHash = () => '#' + calcNum(calc.w) + 'x' + calcNum(calc.d) + 'x' + calcNum(calc.h) + (calc.g > 0 || calc.m > 0 ? '+' + calcNum(calc.g) : '') + (calc.m > 0 ? '+' + calcNum(calc.m) : '');
+(function(){ const m = location.hash.match(CALC_HASH); if(!m) return; calc.w = +m[1]; calc.d = +m[2]; calc.h = +m[3]; calc.g = m[4] ? +m[4] : 0; calc.m = m[5] ? +m[5] : 0; })();
+const calcIds = { w:'calcW', d:'calcD', h:'calcH', g:'calcG', m:'calcM' };
 const calcFmt = x => String(Math.round(x*10)/10);
 function renderCalc(fill){
   const out = document.getElementById('calcOut'); if(!out) return;
   const imp = units==='imperial';
-  const toShow = (k, m) => k==='g' ? (imp ? m/(FT*FT) : m) : (imp ? m/FT : m);
+  const toShow = (k, m) => (k==='g' || k==='m') ? (imp ? m/(FT*FT) : m) : (imp ? m/FT : m);
   if(fill) for(const k in calcIds) document.getElementById(calcIds[k]).value = calcFmt(toShow(k, calc[k]));
   document.querySelectorAll('#calc [data-u="len"]').forEach(s=>{ s.textContent = imp ? 'ft' : 'm'; });
   document.querySelectorAll('#calc [data-u="area"]').forEach(s=>{ s.textContent = imp ? 'ft²' : 'm²'; });
-  const vol = calc.w*calc.d*calc.h, eff = vol + 1.2*calc.g, kw = Math.round(0.8*eff); calc.kw = kw;   /* 0.8 kW per m³: published sizing tables run 0.7 to 0.8, heater makers' room ranges about 0.85 at their middle */
+  const vol = calc.w*calc.d*calc.h, eff = vol + 0.6*calc.g + 1.2*calc.m, kw = Math.round(0.8*eff); calc.kw = kw;   /* 0.8 kW per m³: published sizing tables run 0.7 to 0.8, heater makers' room ranges about 0.85 at their middle. Glass only leaks heat, about 0.6 m³ worth per m²; brick and stone also soak it up while the room warms, about 1.2 m³ */
   const volTxt = m3 => imp ? Math.round(m3/(FT*FT*FT))+'\u202Fft³' : calcFmt(m3)+'\u202Fm³';
   if(!(vol>0)){ out.textContent = 'Enter the width, depth and height of the room.'; return; }
-  out.innerHTML = '<span><strong>'+volTxt(vol)+'</strong> of room' + (calc.g>0 ? ', counted as <strong>'+volTxt(eff)+'</strong> with the glass' : '') + '.</span><span>It needs an electric heater of about <strong>'+kw+'\u202FkW</strong>.</span>';
+  out.innerHTML = '<span><strong>'+volTxt(vol)+'</strong> of room' + (calc.g>0 || calc.m>0 ? ', counted as <strong>'+volTxt(eff)+'</strong> with the '+[calc.g>0 ? 'glass' : '', calc.m>0 ? 'bare wall' : ''].filter(String).join(' and ') : '') + '.</span><span>It needs an electric heater of about <strong>'+kw+'\u202FkW</strong>.</span>';
 }
 for(const k in calcIds){ const el = document.getElementById(calcIds[k]); if(!el) continue;
   el.addEventListener('input', ()=>{ const n = parseFloat(el.value); const v = isFinite(n) && n>0 ? n : 0; const imp = units==='imperial';
-    calc[k] = k==='g' ? (imp ? v*FT*FT : v) : (imp ? v*FT : v); renderCalc(false); try{ history.replaceState(null,'', calcHash()); }catch(x){} }); }
+    calc[k] = (k==='g' || k==='m') ? (imp ? v*FT*FT : v) : (imp ? v*FT : v); renderCalc(false); try{ history.replaceState(null,'', calcHash()); }catch(x){} }); }
 renderCalc(true);
 
 /* share: the system share sheet where there is one and no mouse, the clipboard everywhere else, as on saunaslava.com.br; each control says what it shares */
