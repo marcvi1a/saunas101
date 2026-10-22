@@ -81,7 +81,7 @@ function particle(pathD,color,dur,offset,size){
    Every stream comes from the model (AIRS, written by build.js from model/): each opening's flow, where its outdoor air goes first (into the heater,
    along the floor, to the benches), the part that leaves without reaching the benches, the outlets, the heater's plume, and how stale the air is.
    One moving dot stands for Q_DOT l/s; the dots move faster when more air moves. */
-const Q_DOT = 1.2, FLOOR_Y = 292, PLUME_TOP = 186, STILL = 0.15;
+const Q_DOT = 1.2, FLOOR_Y = 280, PLUME_TOP = 186, STILL = 0.15;   // the floor stretch runs 18 units (13 cm) above the floor line, clear of it
 const fx = v => String(Math.round(v*10)/10);
 function spline(P){   // a smooth path through the points: Catmull-Rom as cubic Béziers
   let d = 'M'+fx(P[0][0])+' '+fx(P[0][1]);
@@ -114,24 +114,24 @@ function exitPts(op){ return entryPts(op).slice().reverse(); }
 /* the last stretch to an outlet, from the bench zone */
 function approachPts(op){
   const y = inletY(), gy = outPos().y;
-  if(op==='e') return gy > 230 ? [[352,206],[385,250]] : [[354,150],[386,190]];
-  if(op==='d') return [[340,44],[384,26]];
-  if(op==='t') return [[345,72],[384,63]];
-  if(op==='l') return [[362,262],[386,287]];
-  return state.inlet==='bottom' ? [[112,270],[80,290]] : [[150,y-16],[60,y-5]];
+  if(op==='e') return gy > 230 ? [[350,206],[372,248]] : [[350,150],[372,188]];
+  if(op==='d') return [[338,50],[372,36]];
+  if(op==='t') return [[340,76],[372,66]];
+  if(op==='l') return [[352,258],[372,278]];
+  return state.inlet==='bottom' ? [[112,262],[84,280]] : [[150,y-16],[48,y-6]];
 }
 /* along the floor into an outlet that drains it */
 function floorOutPts(op, fromRight){
   const gy = outPos().y;
   if(fromRight){
-    if(op==='e') return gy > 230 ? [[388,284]] : [[384,272],[388,236]];
-    if(op==='l') return [[388,290]];
-    return [[386,260],[390,130]];
+    if(op==='e') return gy > 230 ? [[372,272]] : [[370,262],[372,226]];
+    if(op==='l') return [[372,282]];
+    return [[370,252],[372,130]];
   }
-  if(op==='e') return gy > 230 ? [[330,FLOOR_Y],[382,286]] : [[330,FLOOR_Y],[378,276],[388,236]];
-  if(op==='l') return [[360,FLOOR_Y],[388,290]];
-  if(op==='i') return [[100,FLOOR_Y],[40,inletY()+4]];
-  return [[340,FLOOR_Y],[384,256],[390,130]];
+  if(op==='e') return gy > 230 ? [[330,FLOOR_Y],[370,272]] : [[330,FLOOR_Y],[366,262],[372,226]];
+  if(op==='l') return [[350,FLOOR_Y],[372,282]];
+  if(op==='i') return [[100,FLOOR_Y],[48,inletY()+2]];
+  return [[336,FLOOR_Y],[368,250],[372,130]];
 }
 /* into the heater and up through it to the top of the stones */
 function heaterPts(op, P0){
@@ -145,10 +145,11 @@ function heaterPts(op, P0){
   if(h==='closed') return floorIn ? [[73,294],[73,240],[73,200],[73,PLUME_TOP]] : [[right?90:56,294],[73,280],[73,230],[73,198],[73,PLUME_TOP]];
   return floorIn ? [[73,286],[73,262],[73,230],[73,198],[73,PLUME_TOP]] : [[right?86:60,264],[73,260],[73,230],[73,198],[73,PLUME_TOP]];   // wall heater, its intake 30 cm up
 }
-const PLUME_UP = [[80,150],[94,98],[122,46],[200,27],[300,28]], PLUME_DOWN = [[356,46],[384,96],[380,160]], BENCH = [312,118];
+const PLUME_UP = [[80,150],[94,98],[122,52],[200,38],[300,40]], PLUME_DOWN = [[348,54],[368,98],[366,160]], BENCH = [312,118];
 /* the floor stretch from where a stream comes in, and its rise into the room once the floor has warmed it */
 function floorPts(op, P0){
-  if(RIGHT[op]) return [[380,FLOOR_Y],[300,FLOOR_Y],[215,FLOOR_Y]];
+  if(op==='d' || op==='t') return [[358,66],[340,170],[330,FLOOR_Y],[215,FLOOR_Y]];   // cold air from high up falls clear of the wall, then spreads
+  if(RIGHT[op]) return [[366,FLOOR_Y],[300,FLOOR_Y],[215,FLOOR_Y]];
   if(op==='i' && state.inlet==='bottom') return [[100,FLOOR_Y],[160,FLOOR_Y]];
   return [[P0[0]+18,FLOOR_Y-2],[120,FLOOR_Y],[190,FLOOR_Y]];
 }
@@ -162,10 +163,10 @@ function benchPts(op){
     if(state.inlet==='below') return [[60,FLOOR_Y-2],[140,FLOOR_Y],[200,268],[215,215]];   // the warm floor lifts it
     return [[60,y-8],[150,y-40],[230,170]];
   }
-  if(op==='l') return [[370,FLOOR_Y],[290,FLOOR_Y-3],[215,262],[225,205]];
-  if(op==='t') return [[372,70],[340,95]];
-  if(op==='d') return [[372,30],[345,62]];
-  return [[372,gy+6],[340,gy-30]];   // the grille running backwards
+  if(op==='l') return [[364,FLOOR_Y],[290,FLOOR_Y-3],[215,258],[225,205]];
+  if(op==='t') return [[364,76],[340,96]];
+  if(op==='d') return [[364,42],[345,64]];
+  return [[362,gy+4],[340,gy-30]];   // the grille running backwards
 }
 /* how many dots a flow gets, shared among outlets by their flow (largest remainder) */
 function share(f, outs){
@@ -195,8 +196,10 @@ function airStreams(A){
     const shortTo = DOOR[shortToModel] ? ((outs.find(o=>o[2]!=='c') || outs[0])[0]) : shortToModel;
     const E = entryPts(op), P0 = E[E.length-1];
     /* into the heater, up the plume, then down through the benches to an outlet (or straight out at the ceiling) */
-    const viaHeater = (RIGHT[op] ? E.concat([[380,FLOOR_Y],[250,FLOOR_Y],[130,FLOOR_Y]]) : E).concat(heaterPts(op, P0));
-    const iIn = (RIGHT[op] ? E.length+3 : E.length), iTop = viaHeater.length-1;
+    /* from the exhaust wall the air crosses the floor to the heater; from high up it first falls clear of the wall */
+    const pre = (op==='d' || op==='t') ? [[358,66],[340,170],[330,FLOOR_Y],[250,FLOOR_Y],[130,FLOOR_Y]] : RIGHT[op] ? [[366,FLOOR_Y],[250,FLOOR_Y],[130,FLOOR_Y]] : [];
+    const viaHeater = E.concat(pre, heaterPts(op, P0));
+    const iIn = E.length + pre.length, iTop = viaHeater.length-1;
     for(const [dst, n] of share(toHeater-heaterShort, downOuts.length ? downOuts : outs)){
       const P = viaHeater.concat(PLUME_UP, (dst==='d'||dst==='t') ? [] : PLUME_DOWN, approachPts(dst), exitPts(dst));
       out.push(stream(P, n, v, [iIn, iTop]));
@@ -207,7 +210,7 @@ function airStreams(A){
     }
     /* along the floor: the part the outlets drain before it reaches the benches stays cold all the way out */
     const F = E.concat(floorPts(op, P0));
-    if(short >= 0.3 && shortTo){ const P = E.concat(RIGHT[op] ? [[384,FLOOR_Y-1]] : floorPts(op, P0).slice(0,2), floorOutPts(shortTo, !!RIGHT[op]), exitPts(shortTo)); out.push(stream(P, Math.max(1, Math.round(short/Q_DOT)), v*0.8, 'cold')); }
+    if(short >= 0.3 && shortTo){ const P = E.concat((op==='d' || op==='t') ? [[358,66],[340,170],[340,FLOOR_Y]] : RIGHT[op] ? [[366,FLOOR_Y]] : floorPts(op, P0).slice(0,2), floorOutPts(shortTo, !!RIGHT[op]), exitPts(shortTo)); out.push(stream(P, Math.max(1, Math.round(short/Q_DOT)), v*0.8, 'cold')); }
     for(const [dst, n] of share(toFloor-short, downOuts.length ? downOuts : outs)){
       const P = F.concat(RISE, [BENCH], approachPts(dst), exitPts(dst));
       out.push(stream(P, n, v*0.8, [F.length-1, F.length+RISE.length]));
@@ -224,7 +227,7 @@ function airStreams(A){
 }
 /* the heater's own loop: up the plume, across the ceiling, down past the benches and back along the floor */
 function heaterLoop(A){
-  const loop = [[73,PLUME_TOP],[86,120],[115,48],[200,26],[320,30],[378,85],[384,160],[360,228],[260,256],[160,268],[105,258],[96,226],[86,200],[73,PLUME_TOP]];
+  const loop = [[73,PLUME_TOP],[86,120],[115,54],[200,38],[320,40],[362,85],[368,160],[350,226],[260,252],[160,262],[110,254],[100,226],[88,200],[73,PLUME_TOP]];
   return Object.assign(stream(loop, Math.max(2, Math.min(6, Math.round(A.p/25))), 70, 'hot'), {size: 2.8});
 }
 function drawStream(g, s){
@@ -359,7 +362,7 @@ function render(){
   }
   }
   if(!none){
-    const dry=ventEl(398,22, !dryOpen ? {t:'DRYING VENT',c:''} : qd < -STILL ? {t:'DRYING VENT|HOT AIR OUT',c:'lblBad'} : qd > STILL ? {t:'DRYING VENT|COLD AIR IN',c:'lblBad'} : {t:'DRYING VENT|ALMOST NO FLOW',c:'lblBad'}, dryOpen?'vent':'ventIdle', false);
+    const dry=ventEl(398,22, {t:'DRYING VENT',c:''}, dryOpen?'vent':'ventIdle', false);
     linkToSwitch(dry,'dry',()=>cycle('dry')); vents.appendChild(dry);
   }
 
