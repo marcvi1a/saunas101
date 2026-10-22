@@ -30,7 +30,11 @@ function evaluate(state) {
   const ceilingOut = R.outlets.reduce((a, o) => a + o.q * ((o.shares && o.shares.ceiling != null) ? o.shares.ceiling : (o.fromZone === "ceiling" ? 1 : 0)), 0);
   const loyly = R.plume > 0 ? Math.max(0, 1 - ceilingOut / R.plume) : 1;
   const s = score.score({ breathing: b, feet: f, flows, state, zeroCO2, loyly });
-  return { flows, breathing: b, feet: f, breathingFactor: s.breathingFactor, feetFactor: s.feetFactor, loylyFactor: s.loylyFactor, raw: s.breathingFactor * s.feetFactor * s.loylyFactor, score: s.score, iter: it, converged: conv };
+  const product = s.breathingFactor * s.feetFactor * s.loylyFactor;
+  /* the drying vent is for after the session (rule 16): open during one, it can only lower a score, so the layout scores the lower of its own physics and the same layout with the vent shut; the flows and the drawing stay the physics */
+  const capRaw = (state.vent === "yes" && state.dry === "open") ? evaluate(Object.assign({}, state, { dry: "closed" })).raw : Infinity;
+  const raw = Math.min(product, capRaw);
+  return { flows, breathing: b, feet: f, breathingFactor: s.breathingFactor, feetFactor: s.feetFactor, loylyFactor: s.loylyFactor, product, capRaw: Number.isFinite(capRaw) ? capRaw : null, raw, score: Math.round(100 * raw), iter: it, converged: conv };
 }
 
 /* the page's address words, the same as lab.js uses: 7 words in switch order, no-<heater> for no ventilation */

@@ -156,10 +156,20 @@ function runInvariants(evaluate, opts = {}) {
   });
 
   /* H3 the page's structure: score = round(100 × breathing × feet) */
-  check('H3', 'hard', 'score = round(100 × breathingFactor × feetFactor × loylyFactor)', c => {
+  check('H3', 'hard', 'score = round(100 × min(breathingFactor × feetFactor × loylyFactor, the drying-vent cap))', c => {
     for (const s of okStates) {
-      const r = get(s), want = Math.round(100 * r.breathingFactor * r.feetFactor * (r.loylyFactor != null ? r.loylyFactor : 1));
+      const r = get(s), prod = r.breathingFactor * r.feetFactor * (r.loylyFactor != null ? r.loylyFactor : 1), want = Math.round(100 * (r.capRaw != null ? Math.min(prod, r.capRaw) : prod));
       Math.abs(r.score - want) <= 1 ? c.ok() : c.fail(keyOf(s), 'score ' + r.score + ', product gives ' + want);
+    }
+  });
+
+  /* H3d an open drying vent can only lower a score */
+  check('H3d', 'hard', 'an open drying vent never scores above the same layout with the vent shut', c => {
+    for (const s of okStates) {
+      if (s.vent !== 'yes' || s.dry !== 'open') continue;
+      const r = get(s), shut = get(Object.assign({}, s, { dry: 'closed' }));
+      if (!shut) continue;
+      r.score <= shut.score ? c.ok() : c.fail(keyOf(s), 'open ' + r.score + ' > shut ' + shut.score);
     }
   });
 
@@ -577,7 +587,11 @@ function makeStandIn() {
   function evaluate(state) {
     const flows = airflow(state), b = breathing(state, flows), ft = feet(state, flows);
     const sc = scoreMod.score({ breathing: b, feet: ft, flows, state });
-    return { flows, breathing: b, feet: ft, breathingFactor: sc.breathingFactor, feetFactor: sc.feetFactor, score: sc.score, profile: T };
+    /* the page's rule: an open drying vent can only lower a score */
+    const product = sc.breathingFactor * sc.feetFactor;
+    const capRaw = (state.vent === 'yes' && state.dry === 'open') ? evaluate(Object.assign({}, state, { dry: 'closed' })).raw : null;
+    const raw = capRaw != null ? Math.min(product, capRaw) : product;
+    return { flows, breathing: b, feet: ft, breathingFactor: sc.breathingFactor, feetFactor: sc.feetFactor, capRaw, raw, score: Math.round(100 * raw), profile: T };
   }
   return { evaluate, airflow };
 }
@@ -596,6 +610,7 @@ function mutants(base) {
   return [
     { target: 'H1', name: 'NaN feet in one state', evaluate: s => { const r = clone(ev(s)); if (s.inlet === 'middle' && s.fan === 'off' && s.duct === 'half' && s.heater === 'wall' && s.dry === 'open' && s.angle === 'up45' && s.exhaust === 'upper') { r.feetFactor = NaN; r.score = NaN; } return r; } },
     { target: 'H3', name: 'score ignores feet', evaluate: s => { const r = clone(ev(s)); r.score = Math.round(100 * r.breathingFactor); return r; } },
+    { target: 'H3d', name: 'an open drying vent earns points', evaluate: s => { const r = clone(ev(s)); if (s.vent === 'yes' && s.dry === 'open') { r.capRaw = null; r.score = Math.min(100, r.score + 5); r.breathingFactor = Math.min(1, r.score / 100 / Math.max(1e-9, r.feetFactor)); } return r; } },
     { target: 'H5', name: 'outflows halved (mass not conserved)', evaluate: s => { const r = clone(ev(s)); r.flows.openings.forEach(o => { if (o.q < 0) o.q *= 0.5; }); let a = 0, b = 0, by = {}; r.flows.openings.forEach(o => { if (o.q > 0) a += o.q; else b -= o.q; by[o.name] = o.q; }); r.flows.qOutdoorIn = a; r.flows.qOutdoorOut = b; r.flows.mainInletQ = by.inlet || 0; r.flows.mainExhaustQ = by.exhaust || 0; r.flows.dryQ = by.dry || 0; r.flows.doorLowQ = by.doorLow || 0; r.flows.doorTopQ = by.doorTop || 0; return r; } },
     { target: 'H6', name: 'sealed room leaks through a main inlet', evaluate: s => { const r = clone(ev(s)); if (s.vent === 'none') { r.flows.mainInletQ = 0.004; r.flows.openings.push({ name: 'inlet', h: 0.98, q: 0.004, rho: RHO_OUT }); r.flows.qOutdoorIn += 0.004; } return r; } },
     { target: 'H9', name: 'high inlet never reverses', evaluate: s => { const r = clone(ev(s)); r.flows.reversed = false; return r; } },
