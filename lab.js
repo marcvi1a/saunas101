@@ -184,10 +184,15 @@ function stream(P, n, v, warm){
 }
 function airStreams(A){
   const qIn = A.s.reduce((a,s)=>a+s[1],0), v = 30 + 50*Math.min(1, qIn/20), out = [];
-  const outs = A.o.map(o=>[o[0], o[1], o[2]]);
+  /* the door's gaps are in the model and the score but not in the drawing: their streams are left out, and what leaves through them is drawn leaving through the designed outlets */
+  const DOOR = {l:1, t:1};
+  const outs = A.o.filter(o=>!DOOR[o[0]]).map(o=>[o[0], o[1], o[2]]);
+  if(!outs.length) return [heaterLoop(A)];
   const ceilOuts = outs.filter(o=>o[2]==='c'), downOuts = outs.filter(o=>o[2]!=='c');
   const toOutlet = (P, op) => P.concat(op==='d'||op==='t' ? [] : PLUME_DOWN.filter(()=>false), approachPts(op), exitPts(op));
-  for(const [op, q, toHeater, toFloor, short, shortTo, toBenches, heaterShort] of A.s){
+  for(const [op, q, toHeater, toFloor, short, shortToModel, toBenches, heaterShort] of A.s){
+    if(DOOR[op]) continue;
+    const shortTo = DOOR[shortToModel] ? ((outs.find(o=>o[2]!=='c') || outs[0])[0]) : shortToModel;
     const E = entryPts(op), P0 = E[E.length-1];
     /* into the heater, up the plume, then down through the benches to an outlet (or straight out at the ceiling) */
     const viaHeater = (RIGHT[op] ? E.concat([[380,FLOOR_Y],[250,FLOOR_Y],[130,FLOOR_Y]]) : E).concat(heaterPts(op, P0));
@@ -214,10 +219,13 @@ function airStreams(A){
       out.push(stream(P, n, v, [E.length-1, B.length-1]));
     }
   }
-  /* the heater's own loop: up the plume, across the ceiling, down past the benches and back along the floor */
-  const loop = [[73,PLUME_TOP],[86,120],[115,48],[200,26],[320,30],[378,85],[384,160],[360,228],[260,256],[160,268],[105,258],[96,226],[86,200],[73,PLUME_TOP]];
-  out.push(Object.assign(stream(loop, Math.max(2, Math.min(6, Math.round(A.p/25))), 70, 'hot'), {size: 2.8}));
+  out.push(heaterLoop(A));
   return out;
+}
+/* the heater's own loop: up the plume, across the ceiling, down past the benches and back along the floor */
+function heaterLoop(A){
+  const loop = [[73,PLUME_TOP],[86,120],[115,48],[200,26],[320,30],[378,85],[384,160],[360,228],[260,256],[160,268],[105,258],[96,226],[86,200],[73,PLUME_TOP]];
+  return Object.assign(stream(loop, Math.max(2, Math.min(6, Math.round(A.p/25))), 70, 'hot'), {size: 2.8});
 }
 function drawStream(g, s){
   for(let k=0;k<s.n;k++){
@@ -325,10 +333,8 @@ function render(){
 
   // vents
   const vents=document.getElementById('vents'); vents.innerHTML='';
-  if(Math.abs(A.q[3]) >= Q_DOT/2) vents.appendChild(ventEl(LEAK_IN.x,LEAK_IN.y,{t:'DOOR GAP', c: A.q[3]>0 ? 'lblIn' : 'lblOut', x:384, y:295},'vent',false));
-  if(Math.abs(A.q[4]) >= Q_DOT/2) vents.appendChild(ventEl(LEAK_OUT.x,LEAK_OUT.y,{t:'DOOR TOP', c: A.q[4]>0 ? 'lblIn' : 'lblOut'},'vent',false));
   if(none){
-    const t=el('text',{x:384,y:274,class:'lbl lblBad','text-anchor':'end'}); t.textContent='NO INLET · NO EXHAUST · DOOR GAPS ONLY'; vents.appendChild(t);
+    const t=el('text',{x:392,y:290,class:'lbl lblBad','text-anchor':'end'}); t.textContent='NO INLET · NO EXHAUST · DOOR GAPS ONLY'; vents.appendChild(t);
   }
   const inPos = ({above:IN_ABOVE, middle:IN_MIDDLE, below:IN_BELOW, bottom:IN_BOTTOM})[state.inlet];
   const [qi, qe, qd, ql, qt] = A.q;
