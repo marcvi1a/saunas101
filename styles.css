@@ -150,6 +150,7 @@ h1{font-size:30px;font-weight:400;letter-spacing:0;line-height:1.1}
 .units .sep{color:var(--line)}
 .units button:focus-visible{outline:2px solid var(--fresh);outline-offset:2px}
 .sub{color:color-mix(in srgb,var(--ink) 78%,transparent);font-size:14px;line-height:1.6;margin:8px 0 0}
+@media (max-width:560px){.sub-2{display:block}}
 .eyebrow{font-family:var(--sans);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:color-mix(in srgb,var(--ink) 60%,transparent)}
 
 .scoreBig{font-family:var(--serif);font-weight:600;font-size:40px;white-space:nowrap;line-height:1;letter-spacing:-.01em;margin-top:2px}
