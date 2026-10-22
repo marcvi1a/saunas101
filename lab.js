@@ -286,11 +286,23 @@ function fitHits(){
     g.appendChild(el('rect',{class:'hitbox', x:x0, y:y0, width:x1-x0, height:y1-y0, rx:3, fill:'none', 'pointer-events':'all'}));
   });
 }
+/* below 1200 px a change from a switch, a layout or the drawing brings the score and the animation fully into view:
+   up when they sit under the tabs, down when they run past the bottom of the screen; nothing moves when they are already whole */
+const NARROW = window.matchMedia('(max-width:1199px)');
+function showDrawing(){
+  if(!NARROW.matches) return;
+  const top=document.querySelector('.lab-top'), tabs=document.querySelector('.tabs'); if(!top) return;
+  const r=top.getBoundingClientRect(), lo=(tabs ? tabs.getBoundingClientRect().bottom : 0) + 12, hi=window.innerHeight - 8;
+  let dy=0;
+  if(r.top < lo - 1) dy = r.top - lo;
+  else if(r.bottom > hi + 1) dy = Math.min(r.bottom - hi, r.top - lo);
+  if(Math.abs(dy) > 1) window.scrollBy({ top: dy, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+}
 function linkToSwitch(g, key, flip){
   g.classList.add('hit'); g.dataset.sw=key;
   g.addEventListener('mouseenter',()=>{ hotKey=key; const c=cardOf(key); if(c) c.classList.add('sw--hot'); });
   g.addEventListener('mouseleave',()=>{ hotKey=null; const c=cardOf(key); if(c) c.classList.remove('sw--hot'); });
-  g.addEventListener('click',()=>{ flip(); render(); });
+  g.addEventListener('click',()=>{ flip(); render(); showDrawing(); });
 }
 
 function render(){
@@ -406,7 +418,7 @@ function applyPause(){
   const t=document.getElementById('toggle'), p=(paused||reduce); t.dataset.state = p?'paused':'playing'; t.setAttribute('aria-label', p?'Play':'Pause'); t.title = p?'Play':'Pause';
 }
 document.querySelectorAll('.seg').forEach(seg=>{
-  seg.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; if(seg.dataset.key!=='vent' && seg.dataset.key!=='heater') state.vent='yes'; state[seg.dataset.key]=b.dataset.v; render(); });
+  seg.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; if(seg.dataset.key!=='vent' && seg.dataset.key!=='heater') state.vent='yes'; state[seg.dataset.key]=b.dataset.v; render(); showDrawing(); });
 });
 document.getElementById('toggle').addEventListener('click',()=>{paused=!paused; applyPause();});
 linkToSwitch(document.getElementById('duct'),'duct',()=>cycle('duct'));
@@ -429,7 +441,7 @@ PRESETS.forEach((p,i)=>{
   rankList.appendChild(li);
 });
 }
-rankList.addEventListener('click',e=>{ const b=e.target.closest('.rk'); if(!b) return; const p=PRESETS[+b.dataset.i]; if(!p) return; if(p.vent==='none'){ state.vent='none'; state.heater=p.heater; } else { state.vent='yes'; PRESET_KEYS.forEach(f=>{ state[f]=p[f]; }); } render(); });
+rankList.addEventListener('click',e=>{ const b=e.target.closest('.rk'); if(!b) return; const p=PRESETS[+b.dataset.i]; if(!p) return; if(p.vent==='none'){ state.vent='none'; state.heater=p.heater; } else { state.vent='yes'; PRESET_KEYS.forEach(f=>{ state[f]=p[f]; }); } render(); showDrawing(); });
 if(reduce) paused=true;
 
 
