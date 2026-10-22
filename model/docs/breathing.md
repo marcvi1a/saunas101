@@ -52,7 +52,7 @@ The same room with the door undercut sealed and the fan at 20 l/s: inlet above w
 4. Reference layout: envelope 881 W, ventilation 545 W, bathers 1,111 W, total P = 2.54 kW. That is 21 % of the 12 kW rating.
 5. Radiant split:
    1. Closed and wall casings: radiant fraction 0.10 (natural convector).
-   2. Open pillar: derived. `Q_rad = ε σ A_ext (T_s⁴ − T_w⁴)`, with the outer stone surface T_s taken as the bed's mean air temperature, A_ext = 0.86 m² and T_w the mean room temperature. This is a fixed point with the bed flow and gives a radiant fraction of 0.24.
+   2. Open pillar: derived, in `bedSplit` (feet.js calls the same function). The outer stones follow the bed air: the local room air at the bottom, the outlet air Ta + ΔT at the top, linear in 7 bands; each band radiates `ε σ A (T⁴ − T_w⁴)` and the top 0.08 m² at the outlet temperature, with T_w the mean room temperature here (feet.js uses its mean surface temperature). This is a fixed point with the bed flow and gives a radiant fraction of about 0.29 in the reference layout. Thermal images of open mesh heaters show the shape: a cool bottom near room air, 150–220 °C upper sides, 200–300 °C on top (Saunologia's Harvia Spirit 9 kW test, https://saunologia.fi/testi-harvia-spirit-9kw/, and HUUM Drop 9 kW test, https://saunologia.fi/test-huum-drop-9-kw-uku-wifi/; moderate confidence, heat-up states). No measured radiant split exists for any sauna heater; Fan, Holmberg & Heikkinen's 1994 figure of 73 % comes from an arithmetic slip (a space resistance used as a conductance) and corrects to about 0.46 kW from the stone top.
 6. Convective output Q_c: 1,925 W (open), 2,283 W (closed and wall).
 
 ### 2.2 The heater's own through-flow

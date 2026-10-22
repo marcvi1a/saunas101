@@ -9,9 +9,9 @@
    Every constant is sourced in D_report.md. Physics, in one paragraph:
    - The room is a stack of horizontal layers in steady state, read 30 min into a session after a 1 h heat-up.
    - The heater's output = the room's losses at the thermostat set point. Open stones: a stone bed that draws room air
-     in through its sides (buoyancy against the Ergun loss of the bed, breathing.js's heaterFlow, so the whole model has
-     one open heater); the outer stones sit at the bed's mean air temperature and radiate, the rest leaves as hot air
-     at the top of the stones. Casing heaters: cool casing (measured), stones on top radiate at their
+     in through its sides (buoyancy against the Ergun loss of the bed; breathing.js's bedSplit, so the whole model has
+     one open heater); the outer stones run from the local air at the bottom to the outlet air at the top and radiate
+     band by band, each band by its own view; the rest leaves as hot air at the top of the stones. Casing heaters: cool casing (measured), stones on top radiate at their
      measured temperature, the rest leaves as hot channel air through the top; a weak boundary layer rises along the casing.
    - The plume follows Morton-Taylor-Turner entrainment through the stratified room and fills it from the top
      (filling box). The ceiling sensor reads the plume's mean temperature where it meets the ceiling.
@@ -33,7 +33,7 @@ const G = 9.81, RAIR = 287.05, PATM = 101325, CP = 1007, SIGMA = 5.670e-8, TK = 
 const rho = T => PATM / (RAIR * (T + TK));
 const SQRTPI = Math.sqrt(Math.PI);
 const BREATHING = require('./breathing.js');   // the open heater's stone-bed flow and the stones' emissivity: one source for the whole model
-const bedFlow = BREATHING._heaterFlow, EPS_STONE = BREATHING.CONST.epsStone;
+const bedSplit = BREATHING._bedSplit, BED_BANDS = BREATHING._bedBands, EPS_STONE = BREATHING.CONST.epsStone;
 
 /* ---------- empirical coefficients ---------- */
 const ALPHA = 0.10;        // top-hat plume entrainment (Morton, Taylor & Turner 1956; Linden 1999)
@@ -294,6 +294,16 @@ function solveRoom(C, flows, warm) {
     wB[N] = Af * rg.fp(ht.zb); s += wB[N];
     for (let k = 0; k < N + 2; k++) wB[k] = s > 0 ? wB[k] / s : 0;
   }
+  /* open stones: each band of the bed's sides radiates by its own view (its stones are cooler at the bottom, facing the floor) */
+  const wSb = [];
+  if (ht.bed) for (let j = 0; j < BED_BANDS; j++) {
+    const a0 = ht.zb + (ht.zt - ht.zb) * j / BED_BANDS, a1 = ht.zb + (ht.zt - ht.zb) * (j + 1) / BED_BANDS, w = new Float64Array(N + 2);
+    let s = 0;
+    for (let i = 0; i < N; i++) { w[i] = rg.Xseg(a0, a1, i * dz, (i + 1) * dz); s += w[i]; }
+    w[N] = Af * (rg.fp(a0) - rg.fp(a1)); w[N + 1] = Af * (rg.fp(H - a1) - rg.fp(H - a0)); s += w[N] + w[N + 1];
+    for (let k = 0; k < N + 2; k++) w[k] /= s;
+    wSb.push(w);
+  }
   const shB = ArTot / (ArTot + Asurf);
 
   /* state */
@@ -422,7 +432,7 @@ function solveRoom(C, flows, warm) {
 
     /* heater envelope */
     const Tr4 = Math.pow(Trs + TK, 4);
-    let Th, Prad, PradS, PradT, PradBo;
+    let Th, Prad, PradS, PradT, PradBo, PradSb = null;
     if (ht.casing) {   // cool casing: only the stones on top radiate; the rest leaves as hot air through the top
       Th = T_STONE;
       const r4 = t => (t + TK) * (t + TK) * (t + TK) * (t + TK);
@@ -430,19 +440,14 @@ function solveRoom(C, flows, warm) {
       const pB = CASRAD ? Math.max(0, (ht.Abot || 0) * EPS * SIGMA * (r4(T_CASING_BOT) - Tr4)) : 0;
       const sc = Math.min(1, 0.9 * P / Math.max(1e-9, pT + pS + pB));   // the measured surfaces radiate; never more than 90 % of the output
       Prad = (pT + pS + pB) * sc; PradT = pT * sc * (1 - shB); PradS = pS * sc * (1 - shB); PradBo = pB * sc * (1 - shB);
-    } else {           // open stones: a stone bed. Room air is drawn in through the stones (buoyancy against the bed's Ergun loss),
-                       // the outer stones sit at the bed's mean air temperature and radiate, the rest leaves with the air at the top
-      const Aenv = ht.Aside + ht.Atop, Tah = Tf(0.5 * (ht.zb + ht.zt)), ra = rho(Tah);
-      let Qc = bedQc > 0 ? Math.min(P, bedQc) : 0.75 * P, Ts = Tah, V = 0;
-      for (let k = 0; k < 40; k++) {
-        V = bedFlow('open', Qc, Tah, 0); Ts = Tah + Qc / (ra * CP * V) / 2;
-        const x = Ts + TK, Qr = Math.max(0, Aenv * EPS_STONE * SIGMA * (x * x * x * x - Tr4)), Qn = Math.max(0.05 * P, P - Qr);
-        if (Math.abs(Qn - Qc) < 0.5) { Qc = Qn; break; }
-        Qc = 0.5 * (Qc + Qn);
-      }
-      bedQc = Qc; bedV = bedFlow('open', Qc, Tah, 0);
-      Th = Ts; ThLast = Ts; Prad = P - Qc;
-      PradS = Prad * (1 - shB) * ht.Aside / Aenv; PradT = Prad * (1 - shB) * ht.Atop / Aenv; PradBo = 0;
+    } else {           // open stones: a stone bed (breathing.js's bedSplit). Room air is drawn in through the stones, the outer stones
+                       // run from the local air at the bottom to the outlet air at the top and radiate, the rest leaves with the air at the top
+      const Tah = Tf(0.5 * (ht.zb + ht.zt)), bs = bedSplit(P, Tah, Trs, ht.Aside, ht.Atop, bedQc), aB = ht.Aside / BED_BANDS;
+      bedQc = bs.Qc; bedV = bs.V; Th = bs.Ttop; ThLast = Th; Prad = P - bs.Qc;
+      const r4 = t => (t + TK) * (t + TK) * (t + TK) * (t + TK);
+      const pB = bs.bands.map(t => EPS_STONE * SIGMA * aB * Math.max(0, r4(t) - Tr4)), pT = EPS_STONE * SIGMA * ht.Atop * Math.max(0, r4(bs.Ttop) - Tr4);
+      const sum = pT + pB.reduce((a, b) => a + b, 0), sc = sum > 0 ? Prad / sum : 0;   // the bands share exactly what the bed did not give its air
+      PradSb = pB.map(p => p * sc * (1 - shB)); PradS = PradSb.reduce((a, b) => a + b, 0); PradT = pT * sc * (1 - shB); PradBo = 0;
     }
     let Pcas = 0;
     if (ht.casing) for (let i = 0; i < N; i++) {   // the warm casing (T_CASING) heats the air beside it: a wall-plume source along its height
@@ -450,8 +455,9 @@ function solveRoom(C, flows, warm) {
       if (ov > 0 && dT > 0) Pcas += 1.42 * Math.pow(dT / Math.max(0.1, ht.zt - ht.zb), 0.25) * dT * ht.Aside * ov / (ht.zt - ht.zb);
     }
     const Pconv = P - Prad, Pth = ht.casing ? Math.max(0, Pconv - Pcas) : (ht.bed ? Math.max(0, Pconv) : 0), PradB = Prad * shB;
-    for (let i = 0; i < N; i++) qW[i] = (PradS * wS[i] + PradT * wT[i] + PradBo * wB[i]) / Abd[i];
-    const qF = (PradS * wS[N] + PradBo * wB[N]) / Af, qC = (PradS * wS[N + 1] + PradT * wT[N + 1]) / Ac;
+    const sideTo = k => { if (!PradSb) return PradS * wS[k]; let q = 0; for (let j = 0; j < PradSb.length; j++) q += PradSb[j] * wSb[j][k]; return q; };
+    for (let i = 0; i < N; i++) qW[i] = (sideTo(i) + PradT * wT[i] + PradBo * wB[i]) / Abd[i];
+    const qF = (sideTo(N) + PradBo * wB[N]) / Af, qC = (sideTo(N + 1) + PradT * wT[N + 1]) / Ac;
 
     /* inflows: capture, or jets */
     ins.fill(0); insH.fill(0); rem.fill(0);

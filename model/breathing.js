@@ -193,22 +193,32 @@ function heaterFlow(type, Qc, Ta, boost) {
   for (let i = 0; i < 60; i++) { const m = Math.sqrt(lo * hi); if (f(m) > 0) lo = m; else hi = m; }
   return Math.sqrt(lo * hi);
 }
+/* the open heater's stone bed: room air drawn in through the stones (heaterFlow) and heated on its way up. The outer stones follow
+   the bed air, the local room air at the bottom and the outlet air at the top (thermal images of open mesh heaters: a cool bottom,
+   200-300 °C at the top; Saunologia's Harvia Spirit and HUUM Drop tests), so the sides radiate band by band and the top at the
+   outlet temperature. Trad: the surroundings' radiant temperature. One function for breathing.js and feet.js. */
+const BED_BANDS = 7;
+function bedSplit(P, Ta, Trad, Aside, Atop, Qc0) {
+  const rA = rhoOf(Ta), Tr4 = Math.pow(Trad + TK, 4), aB = Aside / BED_BANDS;
+  const rad = dt => { let q = Atop * Math.max(0, Math.pow(Ta + dt + TK, 4) - Tr4); for (let j = 0; j < BED_BANDS; j++) q += aB * Math.max(0, Math.pow(Ta + dt * (j + 0.5) / BED_BANDS + TK, 4) - Tr4); return K.epsStone * SIGMA * q; };
+  let Qc = Qc0 > 0 ? Math.min(P, Qc0) : 0.75 * P, V = 0, dT = 0;
+  for (let k = 0; k < 40; k++) {
+    V = heaterFlow('open', Qc, Ta, 0); dT = Qc / (rA * CP * V);
+    const Qn = Math.max(0.05 * P, P - rad(dT));
+    if (Math.abs(Qn - Qc) < 0.5) { Qc = Qn; break; }
+    Qc = 0.5 * (Qc + Qn);
+  }
+  V = heaterFlow('open', Qc, Ta, 0); dT = Qc / (rA * CP * V);
+  const bands = []; for (let j = 0; j < BED_BANDS; j++) bands.push(Ta + dT * (j + 0.5) / BED_BANDS);
+  return { Qc, V, dT, bands, Ttop: Ta + dT, Tside: Ta + dT / 2 };
+}
 function heaterModel(type, P, T) {
   const hp = GEO.heater[type];
   const Ta = type === 'open' ? T(0.5 * (hp.z0 + hp.z1)) : T(0.5 * (hp.i0 + hp.i1));
   let radFrac = K.radFracCasing, Qc = (1 - radFrac) * P, V = heaterFlow(type, Qc, Ta, 0), Ts = null;
-  if (type === 'open') {                  // radiant output of the exposed stones: outer stone surface ≈ mean air temperature in the bed
-    const Aext = 4 * hp.w * (hp.z1 - hp.z0) + hp.w * hp.w, Tw = meanT(T, 0, GEO.H);
-    for (let i = 0; i < 30; i++) {
-      V = heaterFlow(type, Qc, Ta, 0);
-      Ts = Ta + Qc / (rhoOf(Ta) * CP * V) / 2;
-      const Qr = K.epsStone * SIGMA * Aext * (Math.pow(Ts + TK, 4) - Math.pow(Tw + TK, 4));
-      const Qn = Math.max(0.05 * P, P - Qr);
-      if (Math.abs(Qn - Qc) < 0.5) { Qc = Qn; break; }
-      Qc = 0.5 * (Qc + Qn);
-    }
-    V = heaterFlow(type, Qc, Ta, 0);
-    radFrac = 1 - Qc / P;
+  if (type === 'open') {                  // the stone bed: outer stones from the local air at the bottom to the outlet air at the top
+    const bs = bedSplit(P, Ta, meanT(T, 0, GEO.H), 4 * hp.w * (hp.z1 - hp.z0), hp.w * hp.w, Qc);
+    Qc = bs.Qc; V = bs.V; Ts = bs.Tside; radFrac = 1 - Qc / P;
   }
   return finishPlume({ type, hp, Ta, P, Qc, radFrac, V, Ts }, T);
 }
@@ -872,7 +882,7 @@ function allStates() {
   return out;
 }
 
-module.exports = { breathing, routes, standInAirflow, defaultProfile, allStates, CONST: K, GEO, co2GenPerBather, _heaterModel: heaterModel, _heatBalance: heatBalance, _heaterFlow: heaterFlow };
+module.exports = { breathing, routes, standInAirflow, defaultProfile, allStates, CONST: K, GEO, co2GenPerBather, _heaterModel: heaterModel, _heatBalance: heatBalance, _heaterFlow: heaterFlow, _bedSplit: bedSplit, _bedBands: BED_BANDS };
 
 /* ---------- runner: CSV + sanity checks ---------- */
 if (require.main === module) {
