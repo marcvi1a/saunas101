@@ -362,12 +362,14 @@ function runInvariants(evaluate, opts = {}) {
   });
 
   /* H15 the score's own monotonicity: more CO₂ at the mouth never raises breathingFactor */
-  check('H15', 'hard', 'breathingFactor never rises with CO₂ at the mouth', c => {
-    const pts = okStates.map(s => ({ k: keyOf(s), r: get(s) }))
+  /* breathing's zero is the sealed room with the same heater, so the order holds among states with one heater */
+  check('H15', 'hard', 'breathingFactor never rises with CO₂ at the mouth, among states with the same heater', c => {
+    const pts = okStates.map(s => ({ k: keyOf(s), r: get(s), h: s.heater }))
       .filter(p => fin(p.r.breathing && p.r.breathing.co2AtMouth) && !Array.isArray(p.r.breathing.co2AtMouthByBather))
-      .sort((a, b) => a.r.breathing.co2AtMouth - b.r.breathing.co2AtMouth);
+      .sort((a, b) => a.h < b.h ? -1 : a.h > b.h ? 1 : a.r.breathing.co2AtMouth - b.r.breathing.co2AtMouth);
     for (let i = 1; i < pts.length; i++) {
       const p = pts[i - 1], q = pts[i];
+      if (p.h !== q.h) { c.ok(); continue; }
       if (q.r.breathingFactor > p.r.breathingFactor + 1e-9 && q.r.breathing.co2AtMouth > p.r.breathing.co2AtMouth)
         c.fail(q.k, 'CO₂ ' + q.r.breathing.co2AtMouth.toFixed(0) + ' scores ' + q.r.breathingFactor.toFixed(4) + ' > ' + p.r.breathingFactor.toFixed(4) + ' at ' + p.r.breathing.co2AtMouth.toFixed(0) + ' (' + p.k + ')');
       else c.ok();

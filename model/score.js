@@ -4,8 +4,9 @@
    score = round(100 × breathing × feet), 0 to 100.
 
    breathing: from the CO₂ at the bather's mouth (agent C, ppm, 30 minutes into the session, 2 bathers).
-     It is 1 at or below EN 16798-1 Category I (550 ppm above outdoor air) and 0 at the 5,000 ppm
-     occupational limit. Between the two it falls with the share of people who find the air
+     It is 1 at or below EN 16798-1 Category I (550 ppm above outdoor air) and 0 at the CO₂ of a sealed room with
+     the same heater (evaluate.js passes it as zeroCO2), so the page's scale runs from a sealed sauna to the best layout;
+     without zeroCO2 the zero falls back to the 5,000 ppm occupational limit. Between the two it falls with the share of people who find the air
      unacceptable, Fanger's dissatisfied-versus-ventilation curve, which is the curve EN 16798-1's
      categories are cut from (Cat I/II/III/IV = 15/20/30/40 % dissatisfied at 10/7/4/2.5 l/s per person):
 
@@ -47,14 +48,15 @@ function pdFromDeltaCO2(dc) {
 }
 
 /* Breathing factor for one mouth. c: CO₂ at the mouth (ppm); cOut: outdoor CO₂ (ppm). */
-function breathingFactorFromCO2(c, cOut) {
+function breathingFactorFromCO2(c, cOut, cZero) {
   const co = Number.isFinite(cOut) ? cOut : C_OUT_DEFAULT;
+  const cz = Number.isFinite(cZero) ? cZero : C_LIMIT;
   if (!Number.isFinite(c)) return NaN;
   const dc = c - co;
   if (dc <= DC_CAT_I) return 1;
-  if (c >= C_LIMIT) return 0;
+  if (c >= cz) return 0;
   const pdGood = pdFromDeltaCO2(DC_CAT_I);
-  const pdLimit = pdFromDeltaCO2(C_LIMIT - co);
+  const pdLimit = pdFromDeltaCO2(cz - co);
   const f = (pdLimit - pdFromDeltaCO2(dc)) / (pdLimit - pdGood);
   return Math.min(1, Math.max(0, f));
 }
@@ -69,11 +71,11 @@ function mouthValues(breathing) {
   return [breathing.co2AtMouth];
 }
 
-function score({ breathing, feet /* , flows, state */ }) {
+function score({ breathing, feet, zeroCO2 /* , flows, state */ }) {
   const cOut = breathing && Number.isFinite(breathing.co2Outdoor) ? breathing.co2Outdoor : C_OUT_DEFAULT;
   const vals = mouthValues(breathing);
   let sum = 0;
-  for (const c of vals) sum += breathingFactorFromCO2(c, cOut);
+  for (const c of vals) sum += breathingFactorFromCO2(c, cOut, zeroCO2);
   const breathingFactor = sum / vals.length;
   const feetFactor = feet ? feet.feetFactor : NaN;
   const raw = 100 * breathingFactor * feetFactor;

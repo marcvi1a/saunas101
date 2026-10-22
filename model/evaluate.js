@@ -9,6 +9,10 @@ breathing.GEO.door.low1 = breathing.GEO.door.low0 + SETTINGS.doorGapLow;
 breathing.CONST.sessionS = SETTINGS.sessionS;
 if (Math.abs(feet.GEO.door.gapLow - SETTINGS.doorGapLow) > 1e-9) throw new Error("feet.js carries a different door gap from SETTINGS");
 
+/* breathing's zero: the CO₂ at the mouth in a sealed room with the same heater, so a sealed sauna scores 0 and every vented layout is measured from it */
+const SEALED = {};
+function sealedCO2(heater) { if (!(heater in SEALED)) SEALED[heater] = evaluate({ vent: "none", heater }).breathing.co2AtMouth; return SEALED[heater]; }
+
 const ITER = 6, TOL = 1e-5;   /* m³/s on the outdoor inflow: the profile and the flows agree within it */
 function evaluate(state) {
   let prof = airflow.defaultProfile, flows = airflow.airflow(state, prof), last = flows.qOutdoorIn, it, conv = false;
@@ -20,7 +24,8 @@ function evaluate(state) {
     last = flows.qOutdoorIn;
   }
   const b = breathing.breathing(state, flows), f = feet.feet(state, flows);
-  const s = score.score({ breathing: b, feet: f, flows, state });
+  const zeroCO2 = state.vent === "none" ? b.co2AtMouth : sealedCO2(state.heater);
+  const s = score.score({ breathing: b, feet: f, flows, state, zeroCO2 });
   return { flows, breathing: b, feet: f, breathingFactor: s.breathingFactor, feetFactor: s.feetFactor, score: s.score, iter: it, converged: conv };
 }
 
