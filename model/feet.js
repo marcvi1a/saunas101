@@ -501,7 +501,12 @@ function solveRoom(C, flows, warm) {
           capt.frac = chi; capt.how = (aimed ? 'jet aimed at the heater' : 'jet passing beside the heater') + ', captured ' + (100 * chi).toFixed(0) + ' % (line sink capture width)';
           if (chi < 1) {
             let hRel = inl.h;
-            if (Uv > 0) { const Fb = G * Math.max(1e-6, (Tf(inl.h) - Tin) / (Tf(inl.h) + TK)) * o.q; hRel = Math.min(H - dz, inl.h + FOUNT * Math.pow(o.q * Uv, 0.75) / Math.sqrt(Fb)); }
+            if (Uv > 0) {
+              const gp = G * Math.max(1e-6, (Tf(inl.h) - Tin) / (Tf(inl.h) + TK)), Fb = gp * o.q;
+              hRel = Math.min(H - dz, inl.h + FOUNT * Math.pow(o.q * Uv, 0.75) / Math.sqrt(Fb));
+              // a jet aimed at the heater meets its face first: it rises only to where its path hits the heater (the path breathing.js marches)
+              if (aimed) { const tH = sH / Math.max(1e-6, Uh), zHit = inl.h + Uv * tH - 0.5 * gp * tH * tH; if (zHit >= ht.zb && zHit <= ht.zt) hRel = Math.min(hRel, zHit); }
+            }
             jets.push({ role: 'inlet', h: hRel, m: m * (1 - chi), T: Tin, U0, d, x0: aimed ? sH : 0, dir: 1, attach: (!aimed && Uv === 0) ? 'floor' : null, impinged: aimed, Q0: o.q * (1 - chi) });
           }
           continue;

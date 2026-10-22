@@ -130,7 +130,7 @@ MTT top-hat with α = 0.10: dQ/dz = 2√π α M^½; d(M²)/dz = 2 g′ Q²; enth
 ### 3.8 Inflows
 - Vena-contracta jets: U₀ = q/(0.61 A).
 - Inlet above the stones: momentum-flux merge with the plume.
-- Middle and low inlets: line-sink capture width e/U.
+- Middle and low inlets: line-sink capture width e/U. An angled jet rises as a fountain (2.46 M^¾F^−½), but a jet aimed at the heater rises only to where its path meets the heater face, the path breathing.js marches; at 45° the middle inlet's jet hits the stones at 0.67 m.
 - Floor inlet: captured by open stones and a floor-standing casing; under the wall heater, a fountain (2.46 M^¾F^−½).
 - Uncaptured air: Ricou–Spalding jet phase over l_M = M^¾/F^½, then a falling MTT plume inserted at its neutral height.
 
