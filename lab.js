@@ -1,8 +1,6 @@
-/* Saunas 101 · the ventilation lab: states, the scores from scores.js, drawing, switches, layouts. Needs site.js first (units) and scores.js. */
+/* Saunas 101 · the ventilation lab: states, the scores and the air from scores.js (the model), drawing, switches, layouts. Needs site.js first (units) and scores.js. */
 /* ---------- the score ----------
    Every state's score comes from model/ (airflow, breathing, feet), computed by build.js into scores.js: SCORES by address, BEST_STATE the model's top layout. */
-/* the inlet duct stalls without a fan behind an inlet above or in the middle (model/airflow.js): the drawing shows the stalled loop */
-const IDUCT_STALL = {'off|above|straight':true, 'off|middle|straight':true};
 const ROCK_FILLS=['#6a6a6a','#595959','#4e4e4e','#444444','#5f5f5f','#3c3c3c'];
 function rock(cx,cy,R,rnd){
   const k=5+Math.floor(rnd()*3), sx=1+rnd()*0.35, rot=rnd()*Math.PI, pts=[];
@@ -61,289 +59,9 @@ const FRESH_HEX = darkUI ? '#63B3D6' : '#378DE2', HOT_HEX = darkUI ? '#F09A52' :
 
 /* ---------- geometry ---------- */
 const IN_ABOVE={x:22,y:160}, IN_MIDDLE={x:22,y:236}, IN_BELOW={x:22,y:283}, IN_BOTTOM={x:73,y:298}, OUT={x:398,y:264}, SENSOR={x:73,y:22};
-const DUCT_UP=' C 404 262, 408 200, 408 150 C 408 100, 408 50, 408 -6';
-const DUCT_UP_HI=' C 404 200, 408 150, 408 110 C 408 60, 408 30, 408 -6';
-const DUCT_UP_HALF=' C 404 262, 408 230, 408 200 C 408 170, 408 150, 408 128';
-const DUCT_UP_HI_HALF=' C 404 200, 408 180, 408 165 C 408 150, 408 140, 408 128';
 const HALF_TOP = 132;   // 1.2 m
 const OUT_HI={x:398,y:202}, LEAK_IN={x:398,y:290}, LEAK_OUT={x:398,y:60};
 function outPos(){ return state.exhaust==='upper' ? OUT_HI : OUT; }
-/* the grille's top edge sits 5 cm under the bench above it: centre 264 under the lower bench, 202 under the upper; every path that met the grille at 264 meets it at 202 */
-function toUpper(d){
-  if(state.exhaust!=='upper') return d;
-  return d.replace(/, (\d+) (\d+), 398 26[024]/g, (m,x,y)=>', '+x+' '+Math.min(+y,218)+', 398 202')
-          .replace(/^M398 26\d C (\d+) (\d+),/, 'M398 202 C $1 221,');
-}
-
-/* ---------- air states: fan × inlet × duct ---------- */
-const AIR = {
-  'in0|on|riser': {
-    grade:'bad',
-    title:'Fan on, no inlet, exhaust ducted up',
-    paths:[{d:'M398 290 C 380 294, 340 296, 300 294 C 320 280, 360 268, 398 264', color:'fresh', dur:4, n:8}],
-    stagnant:'M105 24 h291 v220 h-291z', leakIn:true
-  },
-  'in0|on|straight': {
-    grade:'bad',
-    title:'Fan on, no inlet, exhaust straight through the wall',
-    paths:[{d:'M398 290 C 380 294, 340 296, 300 294 C 320 280, 360 268, 398 264', color:'fresh', dur:4, n:8}],
-    stagnant:'M105 24 h291 v220 h-291z', leakIn:true
-  },
-  'in0|off|riser': {
-    grade:'bad',
-    title:'Fan stopped, no inlet, exhaust ducted up',
-    paths:[{d:'M398 290 C 380 294, 340 296, 300 294 C 320 280, 360 268, 398 264', color:'fresh', dur:8, n:3, size:2.6}],
-    stagnant:'M105 24 h291 v220 h-291z', leakIn:true
-  },
-  'in0|off|straight': {
-    grade:'bad',
-    title:'Fan stopped, no inlet, exhaust straight through the wall',
-    paths:[{d:'M398 290 C 380 294, 340 296, 300 294 C 320 280, 360 268, 398 264', color:'fresh', dur:12, n:2, size:2.4}],
-    stagnant:'M105 24 h291 v220 h-291z', leakIn:true
-  },
-  'out0|above': {
-    grade:'bad',
-    title:'Inlet above the heater, no exhaust',
-    paths:[
-      {d:'M398 290 C 380 294, 330 292, 270 290 C 210 290, 150 290, 112 282 C 100 278, 98 262, 98 240 C 98 215, 96 200, 96 186 C 92 190, 68 166, 22 160', color:'gradient', dur:14, n:4, size:2.8},
-      {d:'M80 190 C 74 150, 95 70, 160 48 C 240 32, 330 45, 398 60', color:'hot', dur:12, n:3, size:2.6}
-    ],
-    stagnant:'M105 24 h291 v200 h-291z', revIn:true, leakOut:true, leakIn:true
-  },
-  'out0|middle': {
-    grade:'bad',
-    title:'Inlet at the heater\'s middle, no exhaust',
-    paths:[{d:'M22 236 C 40 240, 50 256, 58 278 C 64 292, 70 296, 74 296 C 76 290, 74 240, 74 200 C 74 150, 95 70, 160 48 C 240 32, 330 45, 398 60', color:'gradient', dur:14, n:4, size:2.8}],
-    stagnant:'M200 60 h190 v150 h-190z', leakOut:true
-  },
-  'out0|below': {
-    grade:'bad',
-    title:'Inlet at the floor by the heater, no exhaust',
-    paths:[{d:'M22 283 C 60 282, 74 262, 80 215 C 92 150, 95 70, 160 48 C 240 32, 330 45, 398 60', color:'gradient', dur:14, n:4, size:2.8}],
-    stagnant:'M200 60 h190 v150 h-190z', leakOut:true
-  },
-  'out0|bottom': {
-    grade:'bad',
-    title:'Inlet in the floor under the heater, no exhaust',
-    paths:[{d:'M73 312 L 73 200 C 74 150, 95 70, 160 48 C 240 32, 330 45, 398 60', color:'gradient', dur:13, n:5, size:2.8}],
-    stagnant:'M200 60 h190 v150 h-190z', leakOut:true
-  },
-  'on|middle|riser': {
-    grade:'ok',
-    title:"Fan on, inlet at the heater's middle, exhaust ducted up",
-    paths:[
-      {d:'M22 236 C 40 238, 50 244, 56 262 C 70 290, 180 292, 280 288 C 340 284, 376 266, 398 264', color:'fresh', dur:5.5, n:8, duct:true},
-      {d:'M22 236 C 44 238, 54 226, 62 200 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 264', color:'gradient', kt:'0;0.08;0.2;1', dur:7, n:5, duct:true}
-    ],
-    pathsOpen:[
-      {d:'M22 236 C 40 238, 52 236, 64 232 C 74 220, 76 200, 74 186 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 264', color:'gradient', kt:'0;0.08;0.2;1', dur:6.5, n:9, duct:true},
-      {d:'M22 236 C 40 240, 48 256, 56 268 C 70 290, 180 292, 280 288 C 340 284, 376 266, 398 264', color:'fresh', dur:6, n:3, size:2.6, duct:true}
-    ],
-    stagnant:'M200 60 h190 v140 h-190z'
-  },
-  'on|middle|straight': {
-    grade:'ok',
-    title:"Fan on, inlet at the heater's middle, exhaust straight through the wall",
-    paths:[
-      {d:'M22 236 C 40 238, 50 244, 56 262 C 70 290, 180 292, 280 288 C 340 284, 376 266, 398 264', color:'fresh', dur:5.5, n:8},
-      {d:'M22 236 C 44 238, 54 226, 62 200 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 264', color:'gradient', kt:'0;0.08;0.2;1', dur:7, n:5}
-    ],
-    pathsOpen:[
-      {d:'M22 236 C 40 238, 52 236, 64 232 C 74 220, 76 200, 74 186 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 264', color:'gradient', kt:'0;0.08;0.2;1', dur:6.5, n:9},
-      {d:'M22 236 C 40 240, 48 256, 56 268 C 70 290, 180 292, 280 288 C 340 284, 376 266, 398 264', color:'fresh', dur:6, n:3, size:2.6}
-    ],
-    stagnant:'M200 60 h190 v140 h-190z'
-  },
-  'off|middle|riser': {
-    grade:'ok',
-    title:"Fan stopped, inlet at the heater's middle, exhaust ducted up",
-    paths:[
-      {d:'M22 236 C 40 240, 50 256, 58 278 C 64 292, 70 296, 74 296 C 76 290, 74 240, 74 200 C 74 150, 100 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 264', color:'gradient', kt:'0;0.2;0.32;1', dur:10, n:6, duct:true},
-      {d:'M22 236 C 40 242, 52 262, 60 280 C 80 292, 180 292, 280 288 C 340 284, 376 266, 398 264', color:'fresh', dur:9, n:3, size:2.6, duct:true}
-    ],
-    pathsOpen:[
-      {d:'M22 236 C 40 238, 52 236, 64 232 C 74 220, 76 205, 74 188 C 74 150, 100 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 264', color:'gradient', kt:'0;0.08;0.2;1', dur:9.5, n:7, duct:true},
-      {d:'M22 236 C 40 240, 48 256, 56 268 C 70 290, 180 292, 280 288 C 340 284, 376 266, 398 264', color:'fresh', dur:9, n:2, size:2.6, duct:true}
-    ]
-  },
-  'off|middle|straight': {
-    grade:'bad',
-    title:"Fan stopped, inlet at the heater's middle, exhaust straight through the wall",
-    paths:[
-      {d:'M398 264 C 380 272, 330 290, 270 290 C 210 291, 150 291, 112 286 C 100 282, 96 270, 96 258 C 94 248, 80 240, 22 236', color:'gradient', kt:'0;0.5;0.68;1', dur:12, n:6, size:2.8}
-    ],
-    stagnant:'M105 24 h291 v200 h-291z', revIn:true
-  },
-  'on|bottom|riser': {
-    grade:'ok',
-    title:"Fan on, inlet in the floor under the heater, exhaust ducted up",
-    paths:[
-      {d:'M73 312 L 73 200 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 264', color:'gradient', kt:'0;0.12;0.25;1', dur:6.5, n:9, duct:true},
-      {d:'M73 300 C 84 296, 100 292, 130 292 C 200 292, 300 290, 398 264', color:'fresh', dur:6, n:2, size:2.4, duct:true}
-    ],
-    pathsOpen:[
-      {d:'M73 312 L 73 200 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 264', color:'gradient', kt:'0;0.12;0.25;1', dur:6.5, n:6, duct:true},
-      {d:'M73 300 C 84 296, 100 292, 130 292 C 200 292, 300 290, 398 264', color:'fresh', dur:5.5, n:5, duct:true}
-    ]
-  },
-  'on|bottom|straight': {
-    grade:'ok',
-    title:"Fan on, inlet in the floor under the heater, exhaust straight through the wall",
-    paths:[
-      {d:'M73 312 L 73 200 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 264', color:'gradient', kt:'0;0.12;0.25;1', dur:6.5, n:9},
-      {d:'M73 300 C 84 296, 100 292, 130 292 C 200 292, 300 290, 398 264', color:'fresh', dur:6, n:2, size:2.4}
-    ],
-    pathsOpen:[
-      {d:'M73 312 L 73 200 C 74 150, 100 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 264', color:'gradient', kt:'0;0.12;0.25;1', dur:6.5, n:6},
-      {d:'M73 300 C 84 296, 100 292, 130 292 C 200 292, 300 290, 398 264', color:'fresh', dur:5.5, n:5}
-    ]
-  },
-  'off|bottom|riser': {
-    grade:'ok',
-    title:"Fan stopped, inlet in the floor under the heater, exhaust ducted up",
-    paths:[
-      {d:'M73 312 L 73 200 C 74 150, 100 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 264', color:'gradient', kt:'0;0.12;0.28;1', dur:9, n:7, duct:true},
-      {d:'M73 312 L 73 200 C 74 150, 120 60, 200 50 C 270 45, 330 90, 340 135 C 345 170, 360 215, 398 264', color:'gradient', kt:'0;0.12;0.28;1', dur:9.8, n:5, duct:true}
-    ],
-    pathsOpen:[
-      {d:'M73 312 L 73 200 C 74 150, 100 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 264', color:'gradient', kt:'0;0.12;0.28;1', dur:9, n:6, duct:true},
-      {d:'M73 300 C 84 296, 100 292, 130 292 C 200 292, 300 290, 398 264', color:'fresh', dur:9, n:3, size:2.6, duct:true}
-    ]
-  },
-  'off|bottom|straight': {
-    grade:'ok',
-    title:"Fan stopped, inlet in the floor under the heater, exhaust straight through the wall",
-    paths:[
-      {d:'M73 312 L 73 200 C 74 150, 100 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 264', color:'gradient', kt:'0;0.12;0.28;1', dur:16, n:5},
-      {d:'M73 312 L 73 200 C 74 150, 120 60, 200 50 C 270 45, 330 90, 340 135 C 345 170, 360 215, 398 264', color:'gradient', kt:'0;0.12;0.28;1', dur:17, n:4}
-    ],
-    pathsOpen:[
-      {d:'M73 312 L 73 200 C 74 150, 100 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 264', color:'gradient', kt:'0;0.12;0.28;1', dur:16, n:4},
-      {d:'M73 300 C 84 296, 100 292, 130 292 C 200 292, 300 290, 398 264', color:'fresh', dur:15, n:3, size:2.6}
-    ]
-  },
-  'none': {
-    grade:'bad',
-    title:'No ventilation: no inlet, no exhaust',
-    ach:'0.3 / h, door gaps', achG:'bad', head:'about 0.2 / h', headG:'bad', feet:'warm', feetG:'good',
-    paths:[
-      {d:'M80 212 C 70 150, 90 70, 150 48 C 240 30, 340 34, 382 60 C 396 120, 396 220, 380 270 C 330 292, 200 294, 110 290 C 80 288, 72 250, 80 212 Z', color:'hot', dur:12, n:10, size:3},
-      {d:'M250 70 C 300 60, 340 90, 320 120 C 300 150, 230 140, 220 110 C 212 90, 230 76, 250 70 Z', color:'stale', dur:14, n:5, size:2.6, noguide:true},
-      {d:'M200 160 C 240 150, 300 170, 290 200 C 280 230, 210 230, 200 200 C 194 180, 190 166, 200 160 Z', color:'stale', dur:16, n:4, size:2.4, noguide:true}
-    ],
-    stagnant:'M105 24 h291 v160 h-291z'
-  },
-  'on|above|riser': {
-    grade:'best',
-    title:'Fan on, inlet above the heater, exhaust ducted up',
-    ach:'6 / h', achG:'good', head:'6 / h', headG:'good', feet:'warm', feetG:'good', co2:980, co28:2250, co2note:'steady state',
-    paths:[
-      {d:'M22 160 C 46 163, 60 172, 70 182 C 78 150, 88 110, 120 70 C 170 40, 260 40, 320 70 C 360 95, 350 150, 330 180 C 315 205, 320 240, 398 264', color:'gradient', dur:6, n:10, duct:true},
-      {d:'M22 160 C 50 165, 66 176, 74 186 C 90 130, 110 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 264', color:'gradient', dur:6.8, n:8, duct:true}
-    ]
-  },
-  'on|above|straight': {
-    grade:'best',
-    title:'Fan on, inlet above the heater, exhaust straight through the wall',
-    ach:'6 / h', achG:'good', head:'6 / h', headG:'good', feet:'warm', feetG:'good', co2:980, co28:2250, co2note:'steady state',
-    paths:[
-      {d:'M22 160 C 46 163, 60 172, 70 182 C 78 150, 88 110, 120 70 C 170 40, 260 40, 320 70 C 360 95, 350 150, 330 180 C 315 205, 320 240, 398 264', color:'gradient', dur:6, n:10},
-      {d:'M22 160 C 50 165, 66 176, 74 186 C 90 130, 110 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 264', color:'gradient', dur:6.8, n:8}
-    ]
-  },
-  'on|below|riser': {
-    grade:'bad',
-    title:'Fan on, inlet below the heater',
-    ach:'6 / h', achG:'warn', head:'about 2 / h, a third of the fan', headG:'bad', feet:'cold layer', feetG:'bad', co2:2300, co28:5500, co2note:'at head height, steady',
-    paths:[
-      {d:'M22 283 C 80 288, 180 292, 280 288 C 340 284, 376 266, 398 264', color:'fresh', dur:5, n:9, duct:true},
-      {d:'M22 280 C 60 284, 110 290, 200 290 C 300 290, 360 272, 398 260', color:'fresh', dur:5.6, n:7, duct:true},
-      {d:'M76 190 C 72 150, 84 90, 130 52 C 200 30, 310 40, 350 76 C 330 104, 262 112, 226 92 C 240 72, 290 60, 330 68', color:'hot', dur:7, n:7, noguide:true}
-    ],
-    stagnant:'M200 60 h190 v140 h-190z'
-  },
-  'on|below|straight': {
-    grade:'bad',
-    title:'Fan on, inlet below the heater',
-    ach:'6 / h', achG:'warn', head:'about 2 / h, a third of the fan', headG:'bad', feet:'cold layer', feetG:'bad', co2:2300, co28:5500, co2note:'at head height, steady',
-    paths:[
-      {d:'M22 283 C 80 288, 180 292, 280 288 C 340 284, 376 266, 398 264', color:'fresh', dur:5, n:9},
-      {d:'M22 280 C 60 284, 110 290, 200 290 C 300 290, 360 272, 398 260', color:'fresh', dur:5.6, n:7},
-      {d:'M76 190 C 72 150, 84 90, 130 52 C 200 30, 310 40, 350 76 C 330 104, 262 112, 226 92 C 240 72, 290 60, 330 68', color:'hot', dur:7, n:7, noguide:true}
-    ],
-    stagnant:'M200 60 h190 v140 h-190z'
-  },
-  'off|above|riser': {
-    grade:'ok',
-    title:'Fan stopped, inlet above the heater, exhaust ducted up',
-    ach:'2 to 3 / h', achG:'warn', head:'2 to 3 / h', headG:'warn', feet:'warm', feetG:'good', co2:1750, co28:4100, co2note:'steady state at 2.5 / h',
-    paths:[
-      {d:'M22 160 C 46 163, 60 172, 70 182 C 78 150, 88 110, 120 70 C 170 40, 260 40, 320 70 C 360 95, 350 150, 330 180 C 315 205, 320 240, 398 264', color:'gradient', dur:10, n:6, duct:true},
-      {d:'M22 160 C 50 165, 66 176, 74 186 C 90 130, 110 80, 170 55 C 240 35, 300 60, 300 110 C 300 150, 280 190, 280 225 C 280 245, 330 252, 398 264', color:'gradient', dur:11, n:5, duct:true}
-    ]
-  },
-  'off|above|straight': {
-    grade:'bad',
-    title:'Fan stopped, inlet above the heater, exhaust straight through the wall',
-    ach:'1 to 2 / h, backwards', achG:'bad', head:'under 1 / h', headG:'bad', feet:'cold draught', feetG:'bad', co2:1900, co28:4800, co2note:'after 20 minutes, still climbing',
-    paths:[
-      {d:'M398 264 C 380 264, 330 288, 270 289 C 210 290, 150 290, 112 282 C 100 278, 98 262, 98 240 C 98 215, 96 200, 96 186 C 92 190, 68 166, 22 160', color:'gradient', kt:'0;0.5;0.68;1', dur:9, n:9, size:3},
-      {d:'M398 258 C 370 262, 300 282, 230 284 C 170 286, 130 280, 108 270 C 100 262, 102 236, 104 214 C 104 220, 90 180, 22 162', color:'gradient', kt:'0;0.5;0.68;1', dur:10, n:6, size:2.8, noguide:true}
-    ],
-    stagnant:'M105 24 h291 v160 h-291z', revIn:true
-  },
-  'off|below|riser': {
-    grade:'ok',
-    title:'Fan stopped, inlet below the heater, exhaust ducted up',
-    ach:'2 to 3 / h', achG:'warn', head:'1 to 2 / h', headG:'warn', feet:'cold at the heater', feetG:'bad', co2:1750, co28:4100, co2note:'steady state at 2.5 / h',
-    paths:[
-      {d:'M22 283 C 60 282, 74 262, 80 215 C 92 150, 95 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 264', color:'gradient', dur:9, n:7, duct:true},
-      {d:'M22 283 C 60 283, 76 262, 82 215 C 95 140, 120 60, 200 50 C 270 45, 330 90, 340 135 C 345 170, 360 215, 398 264', color:'gradient', dur:9.8, n:6, duct:true}
-    ],
-    stagnant:'M240 100 h60 v50 h-60z'
-  },
-  'off|below|straight': {
-    grade:'ok',
-    title:'Fan stopped, inlet at the floor by the heater, exhaust straight through the wall',
-    ach:'about 1 / h', achG:'bad', head:'about 1 / h', headG:'bad', feet:'cold at the floor', feetG:'bad', co2:1900, co28:4800, co2note:'after 20 minutes, still climbing',
-    paths:[
-      {d:'M22 283 C 60 282, 74 262, 80 215 C 92 150, 95 70, 160 48 C 240 32, 340 50, 372 100 C 385 140, 380 200, 398 264', color:'gradient', dur:16, n:5},
-      {d:'M22 283 C 60 283, 76 262, 82 215 C 95 140, 120 60, 200 50 C 270 45, 330 90, 340 135 C 345 170, 360 215, 398 264', color:'gradient', dur:17, n:4}
-    ],
-    stagnant:'M200 60 h190 v150 h-190z'
-  }
-};
-
-
-const DRY = {
-  'on|middle|riser':   {note:'The open vent exhales the hottest air at the ceiling, or sucks cool air onto the top bench if the fan is strong; the floor keeps whatever the heater does not lift.'},
-  'on|middle|straight':{note:'The open vent exhales the hottest air at the ceiling, or sucks cool air onto the top bench if the fan is strong; the floor keeps whatever the heater does not lift.'},
-  'on|bottom|riser':   {note:'The open vent exhales the hottest air at the ceiling, or sucks cool air onto the top bench if the fan is strong. The heater keeps feeding the plume from below.'},
-  'on|bottom|straight':{note:'The open vent exhales the hottest air at the ceiling, or sucks cool air onto the top bench if the fan is strong. The heater keeps feeding the plume from below.'},
-  'off|middle|riser':  {grade:'ok'},
-  'off|middle|straight':{grade:'ok'},
-  'off|bottom|riser':  {grade:'ok'},
-  'off|bottom|straight':{grade:'ok'},
-  'on|above|riser':   {grade:'ok', headN:4, head:'about 4 / h', headG:'warn'},
-  'on|above|straight':{grade:'ok', headN:4, head:'about 4 / h', headG:'warn'},
-  'on|below|riser':   {note:'The open vent exhales the hottest air at the ceiling, or sucks cool air onto the top bench if the fan is strong; the floor short circuit continues underneath either way.'},
-  'on|below|straight':{note:'The open vent exhales the hottest air at the ceiling, or sucks cool air onto the top bench if the fan is strong; the floor short circuit continues underneath either way.'},
-  'off|above|riser':  {grade:'bad', ach:'2 to 3 / h', achG:'warn', headN:1.5, head:'1 to 2 / h', headG:'warn', feet:'cool draught', feetG:'bad', co2:1750, co28:4100},
-  'off|above|straight':{ach:'2 to 3 / h, backwards'},
-  'off|below|riser':  {grade:'ok', ach:'2 to 4 / h', achG:'warn', headN:2.5, head:'2 to 3 / h', headG:'warn', feet:'coldest of all', feetG:'bad', co2:1500, co28:3500},
-  'off|below|straight':{grade:'ok', ach:'2 to 4 / h', achG:'warn', headN:2.5, head:'2 to 3 / h', headG:'warn', feet:'coldest of all', feetG:'bad', co2:1500, co28:3500}
-};
-const DRY_PATHS = {
-  offMiddle: [{d:'M22 236 C 40 240, 50 256, 58 278 C 64 292, 70 296, 74 296 C 76 290, 74 240, 74 200 C 74 150, 95 70, 160 48 C 240 32, 330 24, 398 22', color:'gradient', kt:'0;0.2;0.32;1', dur:8, n:7, size:3, noguide:true}],
-  offBottom: [{d:'M73 312 L 73 200 C 74 150, 95 70, 160 48 C 240 32, 330 24, 398 22', color:'gradient', kt:'0;0.12;0.28;1', dur:8, n:7, size:3, noguide:true}],
-  on:  [{d:'M110 60 C 200 34, 310 24, 398 22', color:'hot', dur:5, n:5, size:2.8, noguide:true}],
-  offAbove: [{d:'M60 60 C 180 34, 300 24, 398 22', color:'hot', dur:5, n:5, size:2.8, noguide:true},
-             {d:'M398 264 C 370 266, 300 280, 230 284', color:'fresh', dur:5, n:4, size:2.6, noguide:true}],
-  offBelow: [{d:'M22 283 C 60 282, 74 262, 80 215 C 92 150, 95 70, 160 48 C 240 32, 330 24, 398 22', color:'gradient', dur:8, n:7, size:3, noguide:true}]
-};
-
-/* ---------- the drying vent left open while bathing ---------- */
-
 /* ---------- drawing helpers ---------- */
 const ns='http://www.w3.org/2000/svg';
 const el=(t,a={})=>{const e=document.createElementNS(ns,t);for(const k in a)e.setAttribute(k,a[k]);return e;};
@@ -359,35 +77,153 @@ function particle(pathD,color,dur,offset,size){
   c.appendChild(el('animateMotion',{dur:dur+'s',repeatCount:'indefinite',begin:(-offset)+'s',path:pathD}));
   return c;
 }
-const HEATER_RIGHT = 96, WARM_Y = 120;
-function heatKeyTimes(d, fallback){
-  const svg=document.getElementById('svg'); if(!svg || !svg.appendChild || !svg.removeChild) return fallback;
-  const tmp=el('path',{d:d}); tmp.setAttribute('fill','none'); tmp.setAttribute('stroke','none'); svg.appendChild(tmp);
-  if(!tmp.getTotalLength){ svg.removeChild(tmp); return fallback; }
-  const L=tmp.getTotalLength(), N=240, P=[];
-  if(!L){ svg.removeChild(tmp); return fallback; }
-  for(let i=0;i<=N;i++){ const q=tmp.getPointAtLength(L*i/N); P.push([q.x,q.y]); }
-  svg.removeChild(tmp);
-  let i1=-1;
-  for(let i=0;i<N-3;i++){ if(P[i][0] < 22) continue; const dy=P[i][1]-P[i+3][1], dx=Math.abs(P[i+3][0]-P[i][0]); if(dy>1 && dy>dx){ i1=i; break; } }   // climbing steeper than 45° over 3 samples
-  if(i1<0) return fallback;
-  let i2=-1;
-  for(let j=i1;j<=N;j++){ if(P[j][0] > HEATER_RIGHT || P[j][1] < WARM_Y){ i2=j; break; } }
-  if(i2<0) i2=Math.min(N, i1+Math.round(N*0.12));
-  let t1=Math.max(0.01, i1/N), t2=Math.max(t1+0.06, i2/N); t2=Math.min(0.99,t2);
-  return '0;'+t1.toFixed(3)+';'+t2.toFixed(3)+';1';
+/* ---------- the air the drawing shows ----------
+   Every stream comes from the model (AIRS, written by build.js from model/): each opening's flow, where its outdoor air goes first (into the heater,
+   along the floor, to the benches), the part that leaves without reaching the benches, the outlets, the heater's plume, and how stale the air is.
+   One moving dot stands for Q_DOT l/s; the dots move faster when more air moves. */
+const Q_DOT = 1.2, FLOOR_Y = 292, PLUME_TOP = 186, STILL = 0.15;
+const fx = v => String(Math.round(v*10)/10);
+function spline(P){   // a smooth path through the points: Catmull-Rom as cubic Béziers
+  let d = 'M'+fx(P[0][0])+' '+fx(P[0][1]);
+  for(let i=0;i<P.length-1;i++){
+    const a=P[Math.max(0,i-1)], b=P[i], c=P[i+1], e=P[Math.min(P.length-1,i+2)];
+    d += ' C '+fx(b[0]+(c[0]-a[0])/6)+' '+fx(b[1]+(c[1]-a[1])/6)+', '+fx(c[0]-(e[0]-b[0])/6)+' '+fx(c[1]-(e[1]-b[1])/6)+', '+fx(c[0])+' '+fx(c[1]);
+  }
+  return d;
 }
-function addParticles(g,p,withDuct){
-  const up = state.duct==='half' ? (state.exhaust==='upper'?DUCT_UP_HI_HALF:DUCT_UP_HALF) : (state.exhaust==='upper'?DUCT_UP_HI:DUCT_UP);
-  const d = toUpper((withDuct && p.duct) ? p.d+up : p.d);
-  for(let k=0;k<p.n;k++){
-    const off=(p.dur/p.n)*k;
-    if(p.color==='gradient'){
-      const a=particle(d,FRESH_HEX,p.dur,off,p.size);
-      const kt = p.ktFixed || (k===0 ? (p._kt = heatKeyTimes(d, p.kt||'0;0.18;0.30;1')) : p._kt);
-      a.appendChild(el('animate',{attributeName:'fill',values:FRESH_HEX+';'+FRESH_HEX+';'+HOT_HEX+';'+HOT_HEX,keyTimes:kt,dur:p.dur+'s',repeatCount:'indefinite',begin:(-off)+'s'}));
-      g.appendChild(a);
-    } else g.appendChild(particle(d,'var(--'+p.color+')',p.dur,off,p.size));
+function polyLen(P, upto){ let L=0; const n = upto==null ? P.length-1 : upto; for(let i=1;i<=n;i++) L+=Math.hypot(P[i][0]-P[i-1][0], P[i][1]-P[i-1][1]); return L; }
+function inletY(){ return ({above:IN_ABOVE.y, middle:IN_MIDDLE.y, below:IN_BELOW.y, bottom:298})[state.inlet]; }
+function ductTop(){ return state.duct==='half' ? HALF_TOP : -6; }
+const RIGHT = {e:1, d:1, l:1, t:1};   // openings on the exhaust wall
+/* from outside to the room side of an opening, for air coming in */
+function entryPts(op){
+  const y = inletY(), gy = outPos().y;
+  if(op==='i'){
+    if(state.inlet==='bottom') return [[73,316],[73,298]];
+    const P = state.duct==='inletduct' ? [[-2,291],[11,291],[11,y],[22,y]] : [[6,y],[22,y]];
+    if(state.angle==='up45' && state.duct!=='inletduct') P.push([40,y-16]);
+    return P;
+  }
+  if(op==='e') return (state.duct==='riser'||state.duct==='half') ? [[408,ductTop()],[408,(ductTop()+gy)/2],[405,gy-12],[398,gy]] : [[414,gy],[398,gy]];
+  if(op==='d') return [[414,22],[398,22]];
+  if(op==='l') return [[414,291],[398,291]];
+  return [[414,60],[398,60]];
+}
+/* from the room side of an opening to outside, for air going out */
+function exitPts(op){ return entryPts(op).slice().reverse(); }
+/* the last stretch to an outlet, from the bench zone */
+function approachPts(op){
+  const y = inletY(), gy = outPos().y;
+  if(op==='e') return gy > 230 ? [[352,206],[385,250]] : [[354,150],[386,190]];
+  if(op==='d') return [[340,44],[384,26]];
+  if(op==='t') return [[345,72],[384,63]];
+  if(op==='l') return [[362,262],[386,287]];
+  return state.inlet==='bottom' ? [[112,270],[80,290]] : [[150,y-16],[60,y-5]];
+}
+/* along the floor into an outlet that drains it */
+function floorOutPts(op, fromRight){
+  const gy = outPos().y;
+  if(fromRight){
+    if(op==='e') return gy > 230 ? [[388,284]] : [[384,272],[388,236]];
+    if(op==='l') return [[388,290]];
+    return [[386,260],[390,130]];
+  }
+  if(op==='e') return gy > 230 ? [[330,FLOOR_Y],[382,286]] : [[330,FLOOR_Y],[378,276],[388,236]];
+  if(op==='l') return [[360,FLOOR_Y],[388,290]];
+  if(op==='i') return [[100,FLOOR_Y],[40,inletY()+4]];
+  return [[340,FLOOR_Y],[384,256],[390,130]];
+}
+/* into the heater and up through it to the top of the stones */
+function heaterPts(op, P0){
+  const h = state.heater, floorIn = op==='i' && state.inlet==='bottom', right = !!RIGHT[op];
+  if(op==='i' && state.inlet==='above') return [[48,166],[66,176],[80,166]];   // the jet drops into the plume above the stones
+  if(h==='open'){
+    if(floorIn) return [[73,290],[73,240],[73,200],[73,PLUME_TOP]];
+    const yy = Math.max(204, Math.min(284, right ? 284 : P0[1]));
+    return [[right?93:53, yy],[73, yy-14],[73,200],[73,PLUME_TOP]];
+  }
+  if(h==='closed') return floorIn ? [[73,294],[73,240],[73,200],[73,PLUME_TOP]] : [[right?90:56,294],[73,280],[73,230],[73,198],[73,PLUME_TOP]];
+  return floorIn ? [[73,286],[73,262],[73,230],[73,198],[73,PLUME_TOP]] : [[right?86:60,264],[73,260],[73,230],[73,198],[73,PLUME_TOP]];   // wall heater, its intake 30 cm up
+}
+const PLUME_UP = [[80,150],[94,98],[122,46],[200,27],[300,28]], PLUME_DOWN = [[356,46],[384,96],[380,160]], BENCH = [312,118];
+/* the floor stretch from where a stream comes in, and its rise into the room once the floor has warmed it */
+function floorPts(op, P0){
+  if(RIGHT[op]) return [[380,FLOOR_Y],[300,FLOOR_Y],[215,FLOOR_Y]];
+  if(op==='i' && state.inlet==='bottom') return [[100,FLOOR_Y],[160,FLOOR_Y]];
+  return [[P0[0]+18,FLOOR_Y-2],[120,FLOOR_Y],[190,FLOOR_Y]];
+}
+const RISE = [[202,262],[214,214],[262,160]];
+/* straight into the bench zone */
+function benchPts(op){
+  const y = inletY(), gy = outPos().y;
+  if(op==='i'){
+    if(state.inlet==='bottom') return [[100,282],[180,236],[250,170]];
+    if(state.inlet==='above') return [[48,y+4],[78,y-4],[98,112],[150,78],[240,86]];   // the jet crosses the plume, which heats and lifts it, then settles on the benches
+    if(state.inlet==='below') return [[60,FLOOR_Y-2],[140,FLOOR_Y],[200,268],[215,215]];   // the warm floor lifts it
+    return [[60,y-8],[150,y-40],[230,170]];
+  }
+  if(op==='l') return [[370,FLOOR_Y],[290,FLOOR_Y-3],[215,262],[225,205]];
+  if(op==='t') return [[372,70],[340,95]];
+  if(op==='d') return [[372,30],[345,62]];
+  return [[372,gy+6],[340,gy-30]];   // the grille running backwards
+}
+/* how many dots a flow gets, shared among outlets by their flow (largest remainder) */
+function share(f, outs){
+  const n = f >= 0.3 ? Math.max(1, Math.round(f/Q_DOT)) : 0, tot = outs.reduce((a,o)=>a+o[1],0);
+  if(!n || !tot) return [];
+  const raw = outs.map(o=>[o[0], n*o[1]/tot]); const res = raw.map(([op,x])=>[op, Math.floor(x), x-Math.floor(x)]);
+  let left = n - res.reduce((a,r)=>a+r[1],0); res.slice().sort((a,b)=>b[2]-a[2]).forEach(r=>{ if(left>0){ r[1]++; left--; } });
+  return res.filter(r=>r[1]>0).map(r=>[r[0], r[1]]);
+}
+/* a stream: its points, how many dots, and where its air warms (kt) or that it stays cold or hot */
+function stream(P, n, v, warm){
+  const L = polyLen(P), s = {d: spline(P), n, dur: Math.max(2.5, L/v), size: 3};
+  if(warm==='cold') s.color='fresh'; else if(warm==='hot') s.color='hot';
+  else { const a = Math.min(0.9, Math.max(0.01, polyLen(P, warm[0])/L)), b = Math.min(0.99, Math.max(a+0.03, polyLen(P, warm[1])/L)); s.kt = '0;'+a.toFixed(3)+';'+b.toFixed(3)+';1'; }
+  return s;
+}
+function airStreams(A){
+  const qIn = A.s.reduce((a,s)=>a+s[1],0), v = 30 + 50*Math.min(1, qIn/20), out = [];
+  const outs = A.o.map(o=>[o[0], o[1], o[2]]);
+  const ceilOuts = outs.filter(o=>o[2]==='c'), downOuts = outs.filter(o=>o[2]!=='c');
+  const toOutlet = (P, op) => P.concat(op==='d'||op==='t' ? [] : PLUME_DOWN.filter(()=>false), approachPts(op), exitPts(op));
+  for(const [op, q, toHeater, toFloor, short, shortTo, toBenches, heaterShort] of A.s){
+    const E = entryPts(op), P0 = E[E.length-1];
+    /* into the heater, up the plume, then down through the benches to an outlet (or straight out at the ceiling) */
+    const viaHeater = (RIGHT[op] ? E.concat([[380,FLOOR_Y],[250,FLOOR_Y],[130,FLOOR_Y]]) : E).concat(heaterPts(op, P0));
+    const iIn = (RIGHT[op] ? E.length+3 : E.length), iTop = viaHeater.length-1;
+    for(const [dst, n] of share(toHeater-heaterShort, downOuts.length ? downOuts : outs)){
+      const P = viaHeater.concat(PLUME_UP, (dst==='d'||dst==='t') ? [] : PLUME_DOWN, approachPts(dst), exitPts(dst));
+      out.push(stream(P, n, v, [iIn, iTop]));
+    }
+    for(const [dst, n] of share(heaterShort, ceilOuts.length ? ceilOuts : outs)){
+      const P = viaHeater.concat(PLUME_UP, approachPts(dst), exitPts(dst));
+      out.push(stream(P, n, v, [iIn, iTop]));
+    }
+    /* along the floor: the part the outlets drain before it reaches the benches stays cold all the way out */
+    const F = E.concat(floorPts(op, P0));
+    if(short >= 0.3 && shortTo){ const P = E.concat(RIGHT[op] ? [[384,FLOOR_Y-1]] : floorPts(op, P0).slice(0,2), floorOutPts(shortTo, !!RIGHT[op]), exitPts(shortTo)); out.push(stream(P, Math.max(1, Math.round(short/Q_DOT)), v*0.8, 'cold')); }
+    for(const [dst, n] of share(toFloor-short, downOuts.length ? downOuts : outs)){
+      const P = F.concat(RISE, [BENCH], approachPts(dst), exitPts(dst));
+      out.push(stream(P, n, v*0.8, [F.length-1, F.length+RISE.length]));
+    }
+    /* straight to the benches, warming as it mixes */
+    const B = E.concat(benchPts(op), [BENCH]);
+    for(const [dst, n] of share(toBenches, downOuts.length ? downOuts : outs)){
+      const P = B.concat(approachPts(dst), exitPts(dst));
+      out.push(stream(P, n, v, [E.length-1, B.length-1]));
+    }
+  }
+  /* the heater's own loop: up the plume, across the ceiling, down past the benches and back along the floor */
+  const loop = [[73,PLUME_TOP],[86,120],[115,48],[200,26],[320,30],[378,85],[384,160],[360,228],[260,256],[160,268],[105,258],[96,226],[86,200],[73,PLUME_TOP]];
+  out.push(Object.assign(stream(loop, Math.max(2, Math.min(6, Math.round(A.p/25))), 70, 'hot'), {size: 2.8}));
+  return out;
+}
+function drawStream(g, s){
+  for(let k=0;k<s.n;k++){
+    const off=(s.dur/s.n)*k;
+    if(s.kt){ const a=particle(s.d,FRESH_HEX,s.dur,off,s.size); a.appendChild(el('animate',{attributeName:'fill',values:FRESH_HEX+';'+FRESH_HEX+';'+HOT_HEX+';'+HOT_HEX,keyTimes:s.kt,dur:s.dur+'s',repeatCount:'indefinite',begin:(-off)+'s'})); g.appendChild(a); }
+    else g.appendChild(particle(s.d,'var(--'+s.color+')',s.dur,off,s.size));
   }
 }
 function ventEl(x,y,label,cls,onLeft,slope,rot){
@@ -419,23 +255,6 @@ function fanEl(x,y,on){
   f.appendChild(b); return f;
 }
 
-const TILT_PATHS = [
-  ['M22 160 C 46 163, 60 172, 70 182', 'M22 160 C 40 142, 56 134, 66 154 C 72 170, 72 180, 70 182'],
-  ['M22 160 C 50 165, 66 176, 74 186', 'M22 160 C 42 140, 60 132, 70 154 C 76 172, 76 182, 74 186'],
-  ['M22 283 C 80 288, 180 292, 280 288', 'M22 283 C 38 266, 54 260, 64 270 C 90 286, 180 292, 280 288'],
-  ['M22 280 C 60 284, 110 290, 200 290', 'M22 280 C 36 264, 52 258, 62 268 C 90 284, 130 290, 200 290'],
-  ['M22 283 C 60 282, 74 262, 80 215', 'M22 283 C 40 266, 66 250, 80 215'],
-  ['M22 236 C 40 238, 50 244, 56 262', 'M22 236 C 36 220, 48 216, 54 232 C 56 246, 56 256, 56 262'],
-  ['M22 236 C 44 238, 54 226, 62 200', 'M22 236 C 36 220, 50 212, 58 206 C 60 204, 61 202, 62 200'],
-  ['M22 236 C 40 238, 52 236, 64 232', 'M22 236 C 34 222, 48 216, 58 224 C 62 228, 63 230, 64 232'],
-  ['M22 236 C 40 240, 50 256, 58 278', 'M22 236 C 36 222, 48 220, 54 240 C 57 256, 58 268, 58 278'],
-  ['M22 236 C 40 242, 52 262, 60 280', 'M22 236 C 36 222, 48 222, 54 244 C 58 262, 59 272, 60 280'],
-  ['M22 236 C 40 240, 48 256, 56 268', 'M22 236 C 36 222, 48 220, 54 240 C 56 254, 56 262, 56 268'],
-  ['M22 283 C 60 283, 76 262, 82 215', 'M22 283 C 40 266, 68 250, 82 215']
-];
-let ANGLE_EFF='straight';
-function tilt(d){ if(ANGLE_EFF!=='up45') return d; for(const [a,b] of TILT_PATHS){ if(d.startsWith(a)) return b + d.slice(a.length); } return d; }
-
 /* a drawn element that stands for a switch: hover lights the switch card, click flips it */
 let hotKey = null;
 function cardOf(key){ const seg=document.querySelector('[data-key="'+key+'"]'); return seg && seg.closest ? seg.closest('.sw') : null; }
@@ -463,56 +282,32 @@ function linkToSwitch(g, key, flip){
   g.addEventListener('click',()=>{ flip(); render(); });
 }
 
-const STALL_PATHS = {
-  'off|above|straight': [
-    {d:'M60 154 C 48 156, 36 158, 22 160 L11 161 L11 291 L-2 291', color:'hot', dur:16, n:2, size:2.6},
-    {d:'M398 264 C 380 268, 340 276, 300 280', color:'fresh', dur:14, n:2, size:2.4}
-  ],
-  'off|middle|straight': [
-    {d:'M60 230 C 48 232, 36 234, 22 236 L11 237 L11 291 L-2 291', color:'hot', dur:16, n:2, size:2.6},
-    {d:'M398 264 C 380 268, 340 276, 300 280', color:'fresh', dur:14, n:2, size:2.4}
-  ]
-};
-
 function render(){
   const none = state.vent==='none'; state.none = none;
   if(state.duct==='inletduct' && state.inlet==='bottom') state.duct='straight';   // a floor hole has no duct to drop
   const induct = !none && state.duct==='inletduct';
   const half = !none && state.duct==='half';
-  const key = none ? 'none' : [state.fan,state.inlet,(state.duct==='riser'||half)?'riser':'straight'].join('|');
-  const base=AIR[key];
   const dryOpen = !none && state.dry==='open';
-  let o = dryOpen ? Object.assign({}, base, DRY[key]||{}) : base;
-  const flipped = !none && state.exhaust==='upper' && key==='off|middle|straight' && !induct;
-  const stall = induct && IDUCT_STALL[key];
-  if(stall) o = Object.assign({}, o, {paths:STALL_PATHS[key], pathsOpen:null, stagnant:'M105 24 h291 v250 h-291z', revIn:false, stall:true});
-  if(flipped){ const r=AIR[key.replace('straight','riser')]; o=Object.assign({}, o, {paths:r.paths, pathsOpen:r.pathsOpen, stagnant:r.stagnant, revIn:false}); }
   const withDuct = !none && (state.duct==='riser' || half);
   if(state.inlet==='bottom' || induct) state.angle='straight';   // a floor hole has no angle, and a duct has none
-  const angleEff = state.angle; ANGLE_EFF = angleEff;
+  const angleEff = state.angle;
+  const A = AIRS[hashOf(state)];
   drawHeater();
   const dyn=document.getElementById('dyn'); dyn.innerHTML='';
   const glow=document.getElementById('glow'); glow.innerHTML=''; glow.appendChild(el('path',{d:'M52 200 C 40 140, 60 48, 100 26 L 130 16 C 100 80, 110 140, 94 200 Z',class:'heatglow'}));
-  // stagnant air: grey balls circling slowly inside the zone, instead of a grey wash
-  const zone = o.stagnant && o.stagnant.match(/M(\d+) (\d+) h(\d+) v(\d+)/);
-  if(zone){
-    const [zx,zy,zw,zh]=zone.slice(1).map(Number);
-    const n=Math.max(3, Math.min(12, Math.round(zw*zh/5500)));
+  // stale air: grey dots circling in the bench zone, as many as the model's staleness says (none at the best air, 10 in a sealed room)
+  const nStale = Math.round(A.st*10);
+  if(nStale){
+    const zx=105, zy=24, zw=291, zh=220;
     let seed=zx*7+zy*13+zw; const rnd=()=>{ seed=(seed*9301+49297)%233280; return seed/233280; };
-    for(let i=0;i<n;i++){
+    for(let i=0;i<nStale;i++){
       const r=8+rnd()*7, cx=zx+r+rnd()*(zw-2*r), cy=zy+r+rnd()*(zh-2*r), dur=9+rnd()*7;
       const d=`M${(cx+r).toFixed(1)} ${cy.toFixed(1)} A${r.toFixed(1)} ${r.toFixed(1)} 0 1 1 ${(cx-r).toFixed(1)} ${cy.toFixed(1)} A${r.toFixed(1)} ${r.toFixed(1)} 0 1 1 ${(cx+r).toFixed(1)} ${cy.toFixed(1)}`;
       const b=particle(d,'var(--stale)',dur,rnd()*dur,2.7); b.setAttribute('opacity','0.7'); dyn.appendChild(b);
     }
   }
-  const legStale=document.getElementById('legStale'); if(legStale) legStale.hidden=!zone;
-  const viaDuct = d => { if(!induct) return d; const y=({above:160, middle:236, below:283})[state.inlet]; return d.replace(/^M22 (\d+) /, (m,yy)=>'M-2 291 L11 291 L11 '+yy+' L22 '+yy+' ').replace(/, 22 16[02]$/, m=>m+' L11 161 L11 291 L-2 291'); };
-  ((state.heater==='open' && o.pathsOpen) ? o.pathsOpen : o.paths).forEach(p=>addParticles(dyn,Object.assign({},p,{d:viaDuct(tilt(p.d))}),withDuct));
-  if(dryOpen) ((state.fan==='on' ? DRY_PATHS.on : ({above:DRY_PATHS.offAbove, middle:DRY_PATHS.offMiddle, below:DRY_PATHS.offBelow, bottom:DRY_PATHS.offBottom})[state.inlet]) || []).forEach(p=>addParticles(dyn,Object.assign({},p,{d:tilt(p.d)}),false));
-  if(o.revIn){ // hot air leaking out of the high inlet, down the slope if the hole is tilted
-    const leak = state.inlet==='middle' ? (angleEff==='up45' ? 'M58 220 C 46 222, 34 228, 22 236' : 'M60 230 C 48 232, 36 234, 22 236') : (angleEff==='up45' ? 'M58 144 C 46 146, 34 152, 22 160' : 'M60 154 C 48 156, 36 158, 22 160');
-    for(let k=0;k<3;k++) dyn.appendChild(particle(induct ? leak+' L11 161 L11 291 L-2 291' : leak,'var(--hot)',induct?4:2.4,0.8*k,2.6));
-  }
+  const legStale=document.getElementById('legStale'); if(legStale) legStale.hidden=!nStale;
+  airStreams(A).forEach(s=>drawStream(dyn, s));
 
   // duct
   const dg=document.getElementById('duct'); dg.innerHTML='';
@@ -530,19 +325,23 @@ function render(){
 
   // vents
   const vents=document.getElementById('vents'); vents.innerHTML='';
+  if(Math.abs(A.q[3]) >= Q_DOT/2) vents.appendChild(ventEl(LEAK_IN.x,LEAK_IN.y,{t:'DOOR GAP', c: A.q[3]>0 ? 'lblIn' : 'lblOut', x:384, y:295},'vent',false));
+  if(Math.abs(A.q[4]) >= Q_DOT/2) vents.appendChild(ventEl(LEAK_OUT.x,LEAK_OUT.y,{t:'DOOR TOP', c: A.q[4]>0 ? 'lblIn' : 'lblOut'},'vent',false));
   if(none){
-    const t=el('text',{x:392,y:290,class:'lbl lblBad','text-anchor':'end'}); t.textContent='NO INLET · NO EXHAUST · DOOR GAPS ONLY'; vents.appendChild(t);
+    const t=el('text',{x:384,y:274,class:'lbl lblBad','text-anchor':'end'}); t.textContent='NO INLET · NO EXHAUST · DOOR GAPS ONLY'; vents.appendChild(t);
   }
   const inPos = ({above:IN_ABOVE, middle:IN_MIDDLE, below:IN_BELOW, bottom:IN_BOTTOM})[state.inlet];
+  const [qi, qe, qd, ql, qt] = A.q;
   let inLabel, outLabel, inCls='vent', outCls='vent';
-  if(o.idle){ inLabel={t:'IN · NO FLOW',c:''}; outLabel={t:'OUT · NO FLOW',c:''}; inCls=outCls='ventIdle'; }
-  else if(o.stall){ inLabel={t:'IN · STALLED, A WARM PLUG|SITS IN THE DUCT',c:'lblBad'}; outLabel={t:'OUT · A TRICKLE',c:'lblBad'}; }
-  else if(o.revIn){ inLabel={t:'IN · NOW LEAKS HOT AIR OUT',c:'lblBad'}; outLabel={t:'OUT · NOW LETS COLD AIR IN',c:'lblBad'}; }
-  else { inLabel={t: ({above:'IN · 20 cm ABOVE THE STONES', middle: state.heater==='open' ? 'IN · 45 cm, INTO THE STONES' : 'IN · 45 cm, AT THE CASING', below:'IN · 10 cm, BY THE HEATER', bottom:'IN · FLOOR, UNDER THE HEATER'})[state.inlet], c:'lblIn'}; outLabel={t: state.fan==='on' ? 'OUT · FAN' : 'OUT · BUOYANCY', c:'lblOut'}; }
+  const inWhere = ({above:'IN · 20 cm ABOVE THE STONES', middle: state.heater==='open' ? 'IN · 45 cm, INTO THE STONES' : 'IN · 45 cm, AT THE CASING', below:'IN · 10 cm, BY THE HEATER', bottom:'IN · FLOOR, UNDER THE HEATER'})[state.inlet];
+  if(Math.abs(qi) <= STILL) inLabel = induct ? {t:'IN · STALLED, A WARM PLUG|SITS IN THE DUCT', c:'lblBad'} : {t:'IN · ALMOST NO FLOW', c:'lblBad'};
+  else if(qi < 0) inLabel = {t:'IN · NOW LEAKS HOT AIR OUT', c:'lblBad'};
+  else inLabel = {t:inWhere, c:'lblIn'};
+  if(Math.abs(qe) <= STILL) outLabel = {t:'OUT · ALMOST NO FLOW', c:'lblBad'};
+  else if(qe > 0) outLabel = {t:'OUT · NOW LETS COLD AIR IN', c:'lblBad'};
+  else outLabel = {t: state.fan==='on' ? 'OUT · FAN' : 'OUT · BUOYANCY', c:'lblOut'};
   if(!none){
   const lblAt = ({above:{}, middle:{x:100,y:233}, below:{x:100,y:280}, bottom:{x:100,y:283}, none:{}})[state.inlet];
-  if(o.leakIn) vents.appendChild(ventEl(LEAK_IN.x,LEAK_IN.y,{t:'DOOR GAP|AIR LEAKS IN',c:'lblIn',x:384,y:277},'vent',false));
-  if(o.leakOut) vents.appendChild(ventEl(LEAK_OUT.x,LEAK_OUT.y,{t:'LEAKS OUT|DOOR TOP, CRACKS',c:'lblOut'},'vent',false));
   if(state.inlet!=='none'){
   if(state.inlet!=='above' && inLabel.t.indexOf('|')<0) inLabel = Object.assign({}, inLabel, {t: inLabel.t.replace(', ','|').replace(' · NOW','|NOW')});
   { const inG = state.inlet==='bottom' ? ventEl(inPos.x,inPos.y,Object.assign({},lblAt,inLabel),inCls,true,false,-90) : ventEl(inPos.x,inPos.y,Object.assign({},lblAt,inLabel),inCls,true, angleEff==='up45'); linkToSwitch(inG,'inlet',()=>cycle('inlet')); vents.appendChild(inG); }
@@ -554,7 +353,7 @@ function render(){
   }
   }
   if(!none){
-    const dry=ventEl(398,22, dryOpen ? {t: 'DRYING VENT|HOT AIR OUT', c:'lblBad'} : {t:'DRYING VENT',c:''}, dryOpen?'vent':'ventIdle', false);
+    const dry=ventEl(398,22, !dryOpen ? {t:'DRYING VENT',c:''} : qd < -STILL ? {t:'DRYING VENT|HOT AIR OUT',c:'lblBad'} : qd > STILL ? {t:'DRYING VENT|COLD AIR IN',c:'lblBad'} : {t:'DRYING VENT|ALMOST NO FLOW',c:'lblBad'}, dryOpen?'vent':'ventIdle', false);
     linkToSwitch(dry,'dry',()=>cycle('dry')); vents.appendChild(dry);
   }
 

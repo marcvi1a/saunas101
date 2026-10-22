@@ -477,7 +477,7 @@ function breathing(state, flows, profileArg, opts) {
     let A = 0; for (const f of arr) { f.cur.ov = f.cur.ov || {}; f.cur.ov[ol.key] = overlap(ol.a, ol.b, f.cur.climb); A += (f.m * f.pL + f.cur.entM) * f.cur.ov[ol.key]; }
     if (A <= 0) continue;
     const Dj = Math.min(ol.m, A); ol.direct = Dj;
-    for (const f of arr) f.cur.s = Math.min(1, (f.cur.s || 0) + Dj / A * f.cur.ov[ol.key]);
+    for (const f of arr) { f.cur.s = Math.min(1, (f.cur.s || 0) + Dj / A * f.cur.ov[ol.key]); f.cur.sBy = f.cur.sBy || {}; f.cur.sBy[ol.key] = (f.cur.sBy[ol.key] || 0) + Dj / A * f.cur.ov[ol.key]; }
   }
   for (const f of curs) f.cur.s = f.cur.s || 0;
   for (const ol of outl) ol.rem = ol.m - ol.direct;
@@ -691,9 +691,132 @@ function breathing(state, flows, profileArg, opts) {
     floorLayerH: layer ? hL : 0,
     layer: layerInfo,
     heater: { P: hb.P, losses: hb, Qc: hm.Qc, radFrac: hm.radFrac, V: hm.V, VpH: hm.VpH, zv: hm.zv },
-    nodes: { fP, fU, fL: SL, fSC, EL, EU, XL: XLrem + sEntL, mpH, deltaP, piL, D, R, J }
+    nodes: { fP, fU, fL: SL, fSC, EL, EU, XL: XLrem + sEntL, mpH, deltaP, piL, D, R, J },
+    /* the zonal routing above, per stream and per outlet, for routes() and the drawing (kg/s) */
+    routing: {
+      layer, hL: layer ? hL : 0, keep, deltaP, piL, EL, XLrem, sEntL, R, J, Pdraw, mpH, rhoPlume: rhoSrc,
+      denom: EL + XLrem + sEntL + R + J,
+      streams: fates.map(f => {
+        let nlU = 0, nlL = 0;
+        for (const n of f.nl) { if (n.hn > hL || !layer) nlU += n.share; else nlL += n.share; }
+        const c = f.cur ? { pL: f.pL, s: f.cur.s, dissolved: !!f.dissolved, sBy: Object.assign({}, f.cur.sBy || {}), entM: f.cur.entM } : null;
+        return { key: f.key, m: f.m, Tin: f.Tin, pP: f.pP, pU: f.pU, nlU, nlL, cur: c, info: f.info };
+      }),
+      outlets: outl.map(ol => {
+        let sEnt = 0;
+        for (const f of curs) if (f.cur.sBy && f.cur.sBy[ol.key]) { const tot = Object.values(f.cur.sBy).reduce((a, v) => a + v, 0); sEnt += f.cur.s * f.cur.entM * f.cur.sBy[ol.key] / tot; }
+        return { key: ol.key, m: ol.m, toP: ol.toP, toL: ol.toL, toU: ol.toU, direct: ol.direct, sEntL: layer ? sEnt : 0 };
+      })
+    }
   };
 }
+
+/* ---------- routes(state, flows, b): the zonal routing as clean numbers for the drawing ----------
+   Uses only what breathing() computed (b.routing, b.layer, b.co2AtMouth); no new physics.
+   Streams, in l/s of outdoor air at 25 °C:
+     q = toHeater + toFloor + toBenches (each stream's outdoor air, split by where it first goes);
+     floorToOutlet ⊂ toFloor: leaves through an outlet without reaching the bench zone (straight along the floor, out of the
+       layer through an outlet in it, or lifted by the heater and taken by a ceiling outlet first); floorOutlet names the largest;
+     heaterToOutlet ⊂ toHeater: carried up by the plume and taken by a ceiling outlet before the plume turns down;
+     reachesMouth = q − floorToOutlet − heaterToOutlet; Σ reachesMouth = qFreshAtBreathingZone.
+   Outlets: q in l/s of room air at its own temperature (flows' q), fromZone the zone supplying most of it.
+   plume: the plume's flux at the ceiling, l/s of room air at the temperature beside the stones' top.
+   stale: 0 at Category I (550 ppm above outdoor), 1 at the sealed room with the same heater, linear in ppm, clamped. */
+const CAT_I_ABOVE_OUTDOOR = 550;                        // ppm, EN 16798-1 Category I (the score's full mark)
+const SEALED_CO2 = {};
+function sealedCO2Of(heater) {
+  if (heater in SEALED_CO2) return SEALED_CO2[heater];
+  let v = null;
+  try { v = require('./evaluate.js').evaluate({ vent: 'none', heater }).breathing.co2AtMouth; } catch (e) { v = null; }
+  return (SEALED_CO2[heater] = v);
+}
+function routeLabel(state, key) {
+  if (key == null) return '';
+  const duct = state.duct === 'inletduct' ? ' (via the inlet duct)' : '';
+  if (key === 'inlet') return ({ above: 'inlet above the stones', middle: "inlet at the heater's middle", below: 'low inlet', bottom: 'floor inlet' })[state.inlet] + duct;
+  if (key === 'exhaust') return (state.exhaust === 'upper' ? 'grille under the upper bench' : 'grille under the lower bench') + (state.duct === 'riser' ? ' (long duct)' : state.duct === 'half' ? ' (short duct)' : '');
+  return ({ dry: 'drying vent', doorLow: 'gap under the door', doorTop: 'gap over the door' })[key] || key;
+}
+function pathOf(f, rt) {                                 // the stream's first move, read from what breathing() recorded
+  const i = f.info || '';
+  const end = t => ({ floor: 'falls to the floor', wall: 'crosses the room to the far wall', dissolved: 'slows and mixes into the room', ceiling: 'rises to the ceiling', plume: 'drifts into the heater plume', heater: 'meets the heater' })[t] || 'mixes into the room';
+  let p;
+  if (/punches through the plume/.test(i)) p = 'crosses the heater plume, mixing with it';
+  else if (/turned inside it/.test(i)) p = 'is turned up inside the heater plume';
+  else if (/hits the stone bed/.test(i)) p = 'hits the stone bed';
+  else if (/hits the casing/.test(i)) p = 'hits the heater casing';
+  else if (/floor inlet under/.test(i)) p = 'rises straight into the heater';
+  else if (/reaches the wall heater intake/.test(i)) p = "rises into the wall heater's intake";
+  else if (/falls back before/.test(i)) p = 'rises, then falls back to the floor';
+  else if (/floor current/.test(i)) p = f.cur && f.cur.dissolved ? "runs along the floor, where the floor's heat lifts it into the room" : 'runs along the floor';
+  else { const m = i.match(/(?:jet ends:?|ends) ([a-z]+)/); p = m ? end(m[1]) : 'mixes into the room'; }
+  return p;
+}
+function routes(state, flows, b, opts) {
+  if (!b || !b.routing) b = breathing(state, flows);
+  const rt = b.routing, mIn = rt.streams.reduce((a, f) => a + f.m, 0);
+  const L = flows && flows.qOutdoorIn > 0 && mIn > 0 ? flows.qOutdoorIn * 1000 / mIn : 1000 / RHO_OUT;   // kg/s → l/s of outdoor air, as flows counts it
+  const Pdraw = rt.Pdraw, denom = rt.denom;
+  const fOut = rt.layer && denom > 0 ? (rt.XLrem + rt.sEntL) / denom : 0;          // layer air leaving through outlets in the layer
+  const fCeil = rt.layer && denom > 0 ? rt.EL * rt.deltaP / denom : 0;              // layer air lifted by the heater, then out at the ceiling
+  const floorWeights = {};
+  let fwSum = 0;
+  for (const o of rt.outlets) { const w = o.toL + o.sEntL; floorWeights[o.key] = w; fwSum += w; }
+  const streams = [], notes = [];
+  for (const f of rt.streams) {
+    const q = f.m * L;
+    const toHeater = f.m * f.pP * L, toBenches = f.m * (f.pU + f.nlU) * L;
+    let toFloor = f.m * f.nlL * L, sc = 0, floorNet = f.m * f.nlL * L;
+    const byOut = {};
+    if (f.cur) {
+      toFloor += f.m * f.cur.pL * L;
+      const sTot = Object.values(f.cur.sBy).reduce((a, v) => a + v, 0);
+      if (f.cur.dissolved) sc = f.m * f.cur.pL * L;     // no stable layer: only the part an outlet took on arrival stays a short circuit
+      else { sc = f.m * f.cur.pL * f.cur.s * L; floorNet += f.m * f.cur.pL * (1 - f.cur.s) * L; }
+      if (sc > 0 && sTot > 0) for (const k in f.cur.sBy) byOut[k] = (byOut[k] || 0) + sc * f.cur.sBy[k] / sTot;
+    }
+    const kept = floorNet * rt.keep;
+    const viaLayerOut = kept * fOut, viaLayerCeil = kept * fCeil;
+    if (viaLayerOut > 0 && fwSum > 0) for (const k in floorWeights) if (floorWeights[k] > 0) byOut[k] = (byOut[k] || 0) + viaLayerOut * floorWeights[k] / fwSum;
+    if (viaLayerCeil > 0 && Pdraw > 0) for (const o of rt.outlets) if (o.toP > 0) byOut[o.key] = (byOut[o.key] || 0) + viaLayerCeil * o.toP / Pdraw;
+    const floorToOutlet = sc + viaLayerOut + viaLayerCeil;
+    const heaterToOutlet = toHeater * rt.deltaP, heaterOutlets = {};
+    if (heaterToOutlet > 0 && Pdraw > 0) for (const o of rt.outlets) if (o.toP > 0) heaterOutlets[o.key] = heaterToOutlet * o.toP / Pdraw;
+    const reachesMouth = Math.max(0, q - floorToOutlet - heaterToOutlet);
+    let floorOutlet = null, best = 0; for (const k in byOut) if (byOut[k] > best) { best = byOut[k]; floorOutlet = k; }
+    const st = {
+      from: f.key, label: routeLabel(state, f.key) + (f.key === 'exhaust' ? ', running backwards' : ''),
+      q, toHeater, toFloor, floorToOutlet, floorOutlet, floorOutlets: byOut, toBenches,
+      heaterToOutlet, heaterOutlets, reachesMouth
+    };
+    streams.push(st);
+    const fx = v => v.toFixed(1), parts = [];
+    if (toHeater > 0.05) parts.push(fx(toHeater) + ' into the heater and its plume' + (heaterToOutlet > 0.05 ? ' (' + fx(heaterToOutlet) + ' of it out at the ceiling)' : ''));
+    if (toBenches > 0.05) parts.push(fx(toBenches) + ' into the bench zone');
+    if (toFloor > 0.05) parts.push(fx(toFloor) + ' onto the floor' + (floorToOutlet > 0.05 ? ', ' + fx(floorToOutlet) + ' of it out through the ' + routeLabel(state, floorOutlet) + ' without reaching the bench' : ''));
+    st.path = pathOf(f, rt);
+    const lab = st.label.charAt(0).toUpperCase() + st.label.slice(1) + ' ' + st.path;
+    notes.push(lab + ': ' + fx(q) + ' l/s in; ' + (parts.length ? parts.join('; ') : 'too little to split') + '. ' + fx(reachesMouth) + ' l/s reaches the bench' + (q > 0 ? ' (' + Math.round(100 * reachesMouth / q) + ' %).' : '.'));
+  }
+  const outlets = [];
+  const qOf = {}; if (flows && Array.isArray(flows.openings)) for (const o of flows.openings) qOf[o.role || o.name] = o.q;
+  for (const o of rt.outlets) {
+    const ceiling = o.toP, floor = o.toL + o.direct, bench = o.toU, tot = (ceiling + floor + bench) || 1;
+    const fromZone = ceiling >= floor && ceiling >= bench ? 'ceiling' : (floor >= bench ? 'floor' : 'bench');
+    outlets.push({
+      to: o.key, label: routeLabel(state, o.key) + (o.key === 'inlet' ? ', running backwards' : ''),
+      q: qOf[o.key] != null ? -qOf[o.key] * 1000 : o.m / RHO_OUT * 1000, fromZone,
+      shares: { ceiling: ceiling / tot, bench: bench / tot, floor: floor / tot }
+    });
+  }
+  const lay = b.layer;
+  const floorLayer = { h: b.floorLayerH || 0, T: lay ? lay.TL : null, stable: !!(rt.layer && lay && lay.stable) };
+  const catI = K.co2Out + CAT_I_ABOVE_OUTDOOR;
+  const sealed = opts && opts.sealedCO2 != null ? opts.sealedCO2 : (state.vent === 'none' ? b.co2AtMouth : sealedCO2Of(state.heater));
+  const stale = state.vent === 'none' ? 1 : (sealed == null ? null : (sealed > catI ? clamp01((b.co2AtMouth - catI) / (sealed - catI)) : 0));
+  return { streams, outlets, plume: rt.mpH / rt.rhoPlume * 1000, floorLayer, stale, notes };
+}
+
 
 /* ---------- a simple stand-in airflow (fan 20 l/s, or stack through orifices), kept for comparison ---------- */
 function standInAirflow(state, profile) {
@@ -749,7 +872,7 @@ function allStates() {
   return out;
 }
 
-module.exports = { breathing, standInAirflow, defaultProfile, allStates, CONST: K, GEO, co2GenPerBather, _heaterModel: heaterModel, _heatBalance: heatBalance };
+module.exports = { breathing, routes, standInAirflow, defaultProfile, allStates, CONST: K, GEO, co2GenPerBather, _heaterModel: heaterModel, _heatBalance: heatBalance };
 
 /* ---------- runner: CSV + sanity checks ---------- */
 if (require.main === module) {
