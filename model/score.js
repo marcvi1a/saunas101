@@ -71,7 +71,7 @@ function mouthValues(breathing) {
   return [breathing.co2AtMouth];
 }
 
-function score({ breathing, feet, zeroCO2, loyly /* , flows, state */ }) {
+function score({ breathing, feet, zeroCO2, loyly, heat /* , flows, state */ }) {
   const cOut = breathing && Number.isFinite(breathing.co2Outdoor) ? breathing.co2Outdoor : C_OUT_DEFAULT;
   const vals = mouthValues(breathing);
   let sum = 0;
@@ -80,8 +80,10 @@ function score({ breathing, feet, zeroCO2, loyly /* , flows, state */ }) {
   const feetFactor = feet ? feet.feetFactor : NaN;
   /* löyly: the share of the heater's steam-carrying rising air that comes down to the benches instead of leaving at the ceiling (evaluate.js, from breathing.routes); 1 when not given */
   const loylyFactor = Number.isFinite(loyly) ? loyly : 1;
-  const raw = 100 * breathingFactor * feetFactor * loylyFactor;
-  return { breathingFactor, feetFactor, loylyFactor, score: Number.isFinite(raw) ? Math.round(raw) : NaN };
+  /* heat: the share of the room's heat (thermostat over outdoor) the bathers sit in, from ankles to mouth (evaluate.js); 1 when not given */
+  const heatFactor = Number.isFinite(heat) ? heat : 1;
+  const raw = 100 * breathingFactor * feetFactor * loylyFactor * heatFactor;
+  return { breathingFactor, feetFactor, loylyFactor, heatFactor, score: Number.isFinite(raw) ? Math.round(raw) : NaN };
 }
 
 /* The mapping as a table, for the report and the page note. */

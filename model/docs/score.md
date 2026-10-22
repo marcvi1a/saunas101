@@ -11,10 +11,10 @@ Status: the self-test passes. The stand-in holds every hard invariant, and all 1
 
 ## 1. The score (what the page note can say)
 
-> **Score = 100 × breathing × feet**, rounded.
+> **Score = 100 × breathing × feet × löyly × heat**, rounded, then scaled so the model's best state is 100; an open drying vent scores no more than the same layout shut (evaluate.js).
 > **Breathing** = (PD(4,580) − PD(ΔCO₂)) / (PD(4,580) − PD(550)), between 0 and 1, where PD(ΔC) = 395·e^(−1.83·q^0.25) and q = 5,556 / ΔC. ΔC is CO₂ above outdoor air at the mouth, 30 minutes in.
 
-In words: breathing is 1 when the air at the mouth is as fresh as EN 16798-1's best category (550 ppm above outdoor, about 970 ppm here) and 0 at the 5,000 ppm workplace limit. In between it follows the share of people who find the air stale.
+In words: breathing is 1 when the air at the mouth is as fresh as EN 16798-1's best category (550 ppm above outdoor, about 970 ppm here) and 0 at the CO₂ of a sealed room with the same heater. Löyly is the share of the heater's rising air that comes down to the benches instead of leaving at the ceiling. Heat is the share of the room's heat, 90 °C at the thermostat over 25 °C outdoor, that the two bathers sit in, averaged from ankles to mouth. In between it follows the share of people who find the air stale.
 
 | CO₂ at mouth (outdoor 420) | 970 | 1,000 | 1,220 | 1,500 | 1,770 | 2,000 | 2,500 | 3,000 | 4,000 | 5,000 |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -104,7 +104,7 @@ Confidence: moderate.
 |---|---|---|---|
 | H1 | hard | every interface field present, finite | interface |
 | H2 | hard | factors in [0, 1]; score an integer in [0, 100] | page structure |
-| H3 | hard | score = round(100·b·f) ±1 | page structure |
+| H3 | hard | score = round(100·min(b·f·l·h, the drying-vent cap)) ±1 | page structure |
 | H4 | hard | qOutdoorIn = Σ inflows, qOutdoorOut = Σ outflows, named flows sum = openings sum | bookkeeping |
 | H5 | hard | Σρ·q = 0 within 1 %. Uses per-opening ρ or T, else `profile(h)`, else a density band: out/in volume between 1 and ρ(25 °C)/ρ(110 °C) = 1.285 | conservation of mass; outgoing air is never colder than incoming |
 | H6 | hard | sealed room: no main or drying-vent flow; result independent of every switch but the heater | brief |

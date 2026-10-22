@@ -13,6 +13,15 @@ if (Math.abs(feet.GEO.door.gapLow - SETTINGS.doorGapLow) > 1e-9) throw new Error
 const SEALED = {};
 function sealedCO2(heater) { if (!(heater in SEALED)) SEALED[heater] = evaluate({ vent: "none", heater }).breathing.co2AtMouth; return SEALED[heater]; }
 
+/* heat: the brief's outdoor air and thermostat (the values airflow.js and feet.js use), and the two bathers' ankles and mouths from feet.js's geometry */
+const T_OUT = 25, T_SET = 90;
+const BATHERS = [[feet.GEO.ankleUpper.h, feet.GEO.ankleUpper.mouth], [feet.GEO.ankleLower.h, feet.GEO.ankleLower.mouth]];
+function heatShare(T){
+  let sum = 0;
+  for (const [a, b] of BATHERS) { let s = 0; const n = 12; for (let i = 0; i <= n; i++) s += (T(a + (b - a) * i / n) - T_OUT) / (T_SET - T_OUT); sum += s / (n + 1); }
+  return Math.max(0, Math.min(1, sum / BATHERS.length));
+}
+
 const ITER = 6, TOL = 1e-5;   /* m³/s on the outdoor inflow: the profile and the flows agree within it */
 function evaluate(state) {
   let prof = airflow.defaultProfile, flows = airflow.airflow(state, prof), last = flows.qOutdoorIn, it, conv = false;
@@ -29,12 +38,13 @@ function evaluate(state) {
   const R = breathing.routes(state, flows, b);
   const ceilingOut = R.outlets.reduce((a, o) => a + o.q * ((o.shares && o.shares.ceiling != null) ? o.shares.ceiling : (o.fromZone === "ceiling" ? 1 : 0)), 0);
   const loyly = R.plume > 0 ? Math.max(0, 1 - ceilingOut / R.plume) : 1;
-  const s = score.score({ breathing: b, feet: f, flows, state, zeroCO2, loyly });
-  const product = s.breathingFactor * s.feetFactor * s.loylyFactor;
+  const heat = heatShare(prof);
+  const s = score.score({ breathing: b, feet: f, flows, state, zeroCO2, loyly, heat });
+  const product = s.breathingFactor * s.feetFactor * s.loylyFactor * s.heatFactor;
   /* the drying vent is for after the session (rule 16): open during one, it can only lower a score, so the layout scores the lower of its own physics and the same layout with the vent shut; the flows and the drawing stay the physics */
   const capRaw = (state.vent === "yes" && state.dry === "open") ? evaluate(Object.assign({}, state, { dry: "closed" })).raw : Infinity;
   const raw = Math.min(product, capRaw);
-  return { flows, breathing: b, feet: f, breathingFactor: s.breathingFactor, feetFactor: s.feetFactor, loylyFactor: s.loylyFactor, product, capRaw: Number.isFinite(capRaw) ? capRaw : null, raw, score: Math.round(100 * raw), iter: it, converged: conv };
+  return { flows, breathing: b, feet: f, breathingFactor: s.breathingFactor, feetFactor: s.feetFactor, loylyFactor: s.loylyFactor, heatFactor: s.heatFactor, product, capRaw: Number.isFinite(capRaw) ? capRaw : null, raw, score: Math.round(100 * raw), iter: it, converged: conv };
 }
 
 /* the page's address words, the same as lab.js uses: 7 words in switch order, no-<heater> for no ventilation */

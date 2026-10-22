@@ -156,9 +156,9 @@ function runInvariants(evaluate, opts = {}) {
   });
 
   /* H3 the page's structure: score = round(100 × breathing × feet) */
-  check('H3', 'hard', 'score = round(100 × min(breathingFactor × feetFactor × loylyFactor, the drying-vent cap))', c => {
+  check('H3', 'hard', 'score = round(100 × min(breathingFactor × feetFactor × loylyFactor × heatFactor, the drying-vent cap))', c => {
     for (const s of okStates) {
-      const r = get(s), prod = r.breathingFactor * r.feetFactor * (r.loylyFactor != null ? r.loylyFactor : 1), want = Math.round(100 * (r.capRaw != null ? Math.min(prod, r.capRaw) : prod));
+      const r = get(s), prod = r.breathingFactor * r.feetFactor * (r.loylyFactor != null ? r.loylyFactor : 1) * (r.heatFactor != null ? r.heatFactor : 1), want = Math.round(100 * (r.capRaw != null ? Math.min(prod, r.capRaw) : prod));
       Math.abs(r.score - want) <= 1 ? c.ok() : c.fail(keyOf(s), 'score ' + r.score + ', product gives ' + want);
     }
   });
@@ -171,6 +171,11 @@ function runInvariants(evaluate, opts = {}) {
       if (!shut) continue;
       r.score <= shut.score ? c.ok() : c.fail(keyOf(s), 'open ' + r.score + ' > shut ' + shut.score);
     }
+  });
+
+  /* H3h heat stays a share */
+  check('H3h', 'hard', 'heatFactor in [0, 1]', c => {
+    for (const s of okStates) { const r = get(s); (r.heatFactor == null || (r.heatFactor >= 0 && r.heatFactor <= 1)) ? c.ok() : c.fail(keyOf(s), 'heatFactor ' + r.heatFactor); }
   });
 
   /* H3l löyly stays a share, and an open drying vent that lets air out at the ceiling never raises it */
@@ -606,7 +611,7 @@ function scaleFlows(f, k) {
 function mutants(base) {
   const ev = base.evaluate;
   const clone = r => Object.assign({}, r, { flows: JSON.parse(JSON.stringify(r.flows)), breathing: Object.assign({}, r.breathing), feet: Object.assign({}, r.feet) });
-  const rescore = r => { r.score = Math.round(100 * r.breathingFactor * r.feetFactor * (r.loylyFactor != null ? r.loylyFactor : 1)); return r; };
+  const rescore = r => { r.score = Math.round(100 * r.breathingFactor * r.feetFactor * (r.loylyFactor != null ? r.loylyFactor : 1) * (r.heatFactor != null ? r.heatFactor : 1)); return r; };
   return [
     { target: 'H1', name: 'NaN feet in one state', evaluate: s => { const r = clone(ev(s)); if (s.inlet === 'middle' && s.fan === 'off' && s.duct === 'half' && s.heater === 'wall' && s.dry === 'open' && s.angle === 'up45' && s.exhaust === 'upper') { r.feetFactor = NaN; r.score = NaN; } return r; } },
     { target: 'H3', name: 'score ignores feet', evaluate: s => { const r = clone(ev(s)); r.score = Math.round(100 * r.breathingFactor); return r; } },
