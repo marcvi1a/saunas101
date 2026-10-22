@@ -53,3 +53,4 @@ Every page ends with "Powered by" and the Lava wordmark, the site's own: `assets
 3. Run `node build.js` before every push and commit the built pages with the sources. The script links carry a hash of the file's content as `?v=`, so a changed file is fetched fresh past GitHub Pages' 10-minute cache and an unchanged one stays cached.
 4. Paths in the pages are absolute (`/styles.css`, `/assets/…`), so the folder must be served over HTTP to be viewed locally.
 5. Line endings are LF (`.gitattributes`). No dependencies.
+6. Google Analytics (property Saunas 101, `G-TEZXYRF856`, account marc@gelohealth.com.br) is the Google tag in the head of `src/layout.html`, so every page carries it once. Consent starts denied for the EEA, the UK and Switzerland, where the site has no banner to ask; Google then receives only cookieless pings from them.
