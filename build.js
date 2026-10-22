@@ -72,7 +72,7 @@ if (!(fs.existsSync("scores.js") && fs.readFileSync("scores.js", "utf8").include
       o: R.outlets.map(x => [code(OP, x.to), r1(x.q), code(ZONE, x.fromZone)]), p: Math.round(R.plume), f: [Math.round(R.floorLayer.h * 100) / 100, Math.round(R.floorLayer.T), R.floorLayer.stable ? 1 : 0], st: Math.round(R.stale * 100) / 100 }; };
   /* only the states the page can reach: the inlet duct, like the floor hole, has no angle to choose */
   const reachable = s => !(s.vent === "yes" && s.duct === "inletduct" && s.angle !== "straight");
-  const rows = MOD.allStates().filter(reachable).map(s => { const r = MOD.evaluate(s); return { s, raw: r.breathingFactor * r.feetFactor, air: pack(s, r) }; });
+  const rows = MOD.allStates().filter(reachable).map(s => { const r = MOD.evaluate(s); return { s, raw: r.raw, air: pack(s, r) }; });
   const best = rows.reduce((a, r) => r.raw > a.raw ? r : a);
   const SC = {}, AIRS = {}; rows.forEach(r => { SC[MOD.hashKey(r.s)] = Math.round(100 * r.raw / best.raw); AIRS[MOD.hashKey(r.s)] = r.air; });
   /* the Absolute best layout: the top score on the page; among layouts tied there, the one that keeps the most points if its fan stops (the score itself never counts a stopped fan) */

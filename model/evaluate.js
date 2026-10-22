@@ -25,8 +25,12 @@ function evaluate(state) {
   }
   const b = breathing.breathing(state, flows), f = feet.feet(state, flows);
   const zeroCO2 = state.vent === "none" ? b.co2AtMouth : sealedCO2(state.heater);
-  const s = score.score({ breathing: b, feet: f, flows, state, zeroCO2 });
-  return { flows, breathing: b, feet: f, breathingFactor: s.breathingFactor, feetFactor: s.feetFactor, score: s.score, iter: it, converged: conv };
+  /* löyly: the heater's plume carries the steam up; whatever leaves through openings at the ceiling (an open drying vent, the gap over the door) never comes down to the benches */
+  const R = breathing.routes(state, flows, b);
+  const ceilingOut = R.outlets.reduce((a, o) => a + o.q * ((o.shares && o.shares.ceiling != null) ? o.shares.ceiling : (o.fromZone === "ceiling" ? 1 : 0)), 0);
+  const loyly = R.plume > 0 ? Math.max(0, 1 - ceilingOut / R.plume) : 1;
+  const s = score.score({ breathing: b, feet: f, flows, state, zeroCO2, loyly });
+  return { flows, breathing: b, feet: f, breathingFactor: s.breathingFactor, feetFactor: s.feetFactor, loylyFactor: s.loylyFactor, raw: s.breathingFactor * s.feetFactor * s.loylyFactor, score: s.score, iter: it, converged: conv };
 }
 
 /* the page's address words, the same as lab.js uses: 7 words in switch order, no-<heater> for no ventilation */

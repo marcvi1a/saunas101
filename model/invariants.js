@@ -156,10 +156,20 @@ function runInvariants(evaluate, opts = {}) {
   });
 
   /* H3 the page's structure: score = round(100 × breathing × feet) */
-  check('H3', 'hard', 'score = round(100 × breathingFactor × feetFactor)', c => {
+  check('H3', 'hard', 'score = round(100 × breathingFactor × feetFactor × loylyFactor)', c => {
     for (const s of okStates) {
-      const r = get(s), want = Math.round(100 * r.breathingFactor * r.feetFactor);
+      const r = get(s), want = Math.round(100 * r.breathingFactor * r.feetFactor * (r.loylyFactor != null ? r.loylyFactor : 1));
       Math.abs(r.score - want) <= 1 ? c.ok() : c.fail(keyOf(s), 'score ' + r.score + ', product gives ' + want);
+    }
+  });
+
+  /* H3l löyly stays a share, and an open drying vent that lets air out at the ceiling never raises it */
+  check('H3l', 'hard', 'loylyFactor in [0, 1]; opening the drying vent where it carries air out never raises it', c => {
+    for (const s of okStates) {
+      const r = get(s); if (r.loylyFactor == null) { c.ok(); continue; }
+      if (!(r.loylyFactor >= 0 && r.loylyFactor <= 1)) { c.fail(keyOf(s), 'loylyFactor ' + r.loylyFactor); continue; }
+      if (s.vent === 'yes' && s.dry === 'open') { const shut = get(Object.assign({}, s, { dry: 'closed' })); if (shut && r.flows.dryQ < 0 && r.loylyFactor > shut.loylyFactor + 1e-9) { c.fail(keyOf(s), 'open vent raises löyly ' + shut.loylyFactor.toFixed(4) + ' -> ' + r.loylyFactor.toFixed(4)); continue; } }
+      c.ok();
     }
   });
 
@@ -582,7 +592,7 @@ function scaleFlows(f, k) {
 function mutants(base) {
   const ev = base.evaluate;
   const clone = r => Object.assign({}, r, { flows: JSON.parse(JSON.stringify(r.flows)), breathing: Object.assign({}, r.breathing), feet: Object.assign({}, r.feet) });
-  const rescore = r => { r.score = Math.round(100 * r.breathingFactor * r.feetFactor); return r; };
+  const rescore = r => { r.score = Math.round(100 * r.breathingFactor * r.feetFactor * (r.loylyFactor != null ? r.loylyFactor : 1)); return r; };
   return [
     { target: 'H1', name: 'NaN feet in one state', evaluate: s => { const r = clone(ev(s)); if (s.inlet === 'middle' && s.fan === 'off' && s.duct === 'half' && s.heater === 'wall' && s.dry === 'open' && s.angle === 'up45' && s.exhaust === 'upper') { r.feetFactor = NaN; r.score = NaN; } return r; } },
     { target: 'H3', name: 'score ignores feet', evaluate: s => { const r = clone(ev(s)); r.score = Math.round(100 * r.breathingFactor); return r; } },

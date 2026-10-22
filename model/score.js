@@ -71,15 +71,17 @@ function mouthValues(breathing) {
   return [breathing.co2AtMouth];
 }
 
-function score({ breathing, feet, zeroCO2 /* , flows, state */ }) {
+function score({ breathing, feet, zeroCO2, loyly /* , flows, state */ }) {
   const cOut = breathing && Number.isFinite(breathing.co2Outdoor) ? breathing.co2Outdoor : C_OUT_DEFAULT;
   const vals = mouthValues(breathing);
   let sum = 0;
   for (const c of vals) sum += breathingFactorFromCO2(c, cOut, zeroCO2);
   const breathingFactor = sum / vals.length;
   const feetFactor = feet ? feet.feetFactor : NaN;
-  const raw = 100 * breathingFactor * feetFactor;
-  return { breathingFactor, feetFactor, score: Number.isFinite(raw) ? Math.round(raw) : NaN };
+  /* löyly: the share of the heater's steam-carrying rising air that comes down to the benches instead of leaving at the ceiling (evaluate.js, from breathing.routes); 1 when not given */
+  const loylyFactor = Number.isFinite(loyly) ? loyly : 1;
+  const raw = 100 * breathingFactor * feetFactor * loylyFactor;
+  return { breathingFactor, feetFactor, loylyFactor, score: Number.isFinite(raw) ? Math.round(raw) : NaN };
 }
 
 /* The mapping as a table, for the report and the page note. */
