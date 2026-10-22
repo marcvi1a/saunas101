@@ -65,7 +65,7 @@ const f = D.feet(state, flows);      // { ankleT_upper, ankleT_lower, ankleV, fe
 | 8 no ventilation | 0 / 0 / 1.2 | 52.0 / 62.3 / 87.8 | 25.5 / 30.3 | 23.9 / 27.5 | 55 / 59 | **0.429** | **0.449** | 0.587 |
 
 - The upper bather's head-to-ankle difference without a fan is now 26–27 K, inside VTT's measured "typical 25–30 K" (version 1: 17–19 K). The boundary layers cool the 0.55 m level.
-- Over all 651 states: feetFactor (equal weight) is 0.347–0.621 (median 0.393), and upper-only is 0.349–0.815. Means by heater: open stones 0.44, closed 0.40, wall 0.39.
+- Over all 651 states, with the gradient term the score no longer uses: (1 − PPD_VG)(1 − PPD_AD) (equal weight) is 0.347–0.621 (median 0.393), and upper-only is 0.349–0.815. Means by heater: open stones 0.44, closed 0.40, wall 0.39.
 - The new mapping compresses the scale. ASHRAE's gradient model caps dissatisfaction at 65.5 %, so the floor is 0.345, and every no-fan wall-inlet layout lands at 0.40–0.43.
 - With TS = +2 instead of +3, every factor rises by 0.01–0.03; the ranking is unchanged.
 
@@ -157,7 +157,7 @@ Two ASHRAE 55 models, both conditioned on the whole-body thermal sensation TS:
   PPD_AD = 100·e^y/(1 + e^y), y = −2.58 + 3.05 v_ankle − 1.06 TS
 
   This agrees with the published reference implementation's example (18.6 % at v = 0.3 m/s near neutral TS).
-- feetFactor_k = (1 − PPD_VG/100)(1 − PPD_AD/100). feetFactor is the mean of the two bathers; feetFactor_upper is the upper bather alone.
+- feetFactor_k = 1 − PPD_AD/100, the ankle draught only. PPD_VG is still computed and reported, but the score leaves it out: the heat factor (evaluate.js) already measures how warm the body is from ankles to mouth, and the gradient would count the same cold lower zone twice. At TS +3 the draught term is 0.98–1.00 in every state. feetFactor is the mean of the two bathers; feetFactor_upper is the upper bather alone.
 
 **TS = +3.** PMV cannot be computed at 60–90 °C air (the model's range ends at 30 °C), and a sauna bather's whole-body sensation is at least "hot", the top of the seven-point scale these models were fitted on.
 

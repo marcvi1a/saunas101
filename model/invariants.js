@@ -373,16 +373,16 @@ function runInvariants(evaluate, opts = {}) {
     (r.flows.mainInletQ > 0 && r.flows.reversed === false) ? c.ok() : c.fail(keyOf(REFERENCE), 'inlet ' + ls(r.flows.mainInletQ) + ', reversed ' + r.flows.reversed);
   });
 
-  /* H14 the brief: opening the drying vent never raises feetFactor.
+  /* H14 the brief: opening the drying vent never warms the bathers (heatFactor, the warmth from ankles to mouth).
      Fan off: a high outlet raises the neutral plane, so more outdoor air enters below it: expected to hold.
      Fan on: the room is depressurised to above 1.94 m, the vent becomes a second inlet at the ceiling and takes inflow from the low openings;
-     feet can get warmer. Reported, not failed. */
-  check('H14', 'expected', 'fan off: opening the drying vent never raises feetFactor', c => {
+     the bathers can get warmer. Reported, not failed. */
+  check('H14', 'expected', 'fan off: opening the drying vent never raises heatFactor', c => {
     for (const s of vented) {
       if (s.dry !== 'closed') continue;
       const a = get(s), so = withSw(s, { dry: 'open' }), b = get(so); if (!a || !b) continue;
-      if (s.fan === 'off') b.feetFactor <= a.feetFactor + 1e-9 ? c.ok() : c.fail(keyOf(so), 'feet ' + a.feetFactor.toFixed(4) + ' → ' + b.feetFactor.toFixed(4));
-      else if (b.feetFactor > a.feetFactor + 1e-9) c.note(keyOf(so), 'fan on, feet rise ' + a.feetFactor.toFixed(4) + ' → ' + b.feetFactor.toFixed(4) + ' (drying vent dryQ ' + ls(b.flows.dryQ) + ')');
+      if (s.fan === 'off') b.heatFactor <= a.heatFactor + 1e-9 ? c.ok() : c.fail(keyOf(so), 'heat ' + a.heatFactor.toFixed(4) + ' → ' + b.heatFactor.toFixed(4));
+      else if (b.heatFactor > a.heatFactor + 1e-9) c.note(keyOf(so), 'fan on, heat rises ' + a.heatFactor.toFixed(4) + ' → ' + b.heatFactor.toFixed(4) + ' (drying vent dryQ ' + ls(b.flows.dryQ) + ')');
     }
   });
 
@@ -585,18 +585,18 @@ function makeStandIn() {
     const cool = qLow / (qLow + Q_MIX);
     const up = T(0.55) - (T(0.55) - T_OUT) * cool, lowT = T(0.10) - (T(0.10) - T_OUT) * cool;
     const head = T(1.70);
-    const f = Math.min(1, Math.max(0, ((up + lowT) / 2 - T_OUT) / (head - T_OUT)));
-    return { ankleT_upper: up, ankleT_lower: lowT, ankleV: 0, feetFactor: f, notes: 'STAND-IN' };
+    const warmth = Math.min(1, Math.max(0, ((up + lowT) / 2 - T_OUT) / (head - T_OUT)));
+    return { ankleT_upper: up, ankleT_lower: lowT, ankleV: 0, feetFactor: 1, warmth, notes: 'STAND-IN' };   // still air at the ankles: no draught
   }
   const scoreMod = require('./score.js');
   function evaluate(state) {
     const flows = airflow(state), b = breathing(state, flows), ft = feet(state, flows);
-    const sc = scoreMod.score({ breathing: b, feet: ft, flows, state });
+    const sc = scoreMod.score({ breathing: b, feet: ft, flows, state, heat: ft.warmth });
     /* the page's rule: an open drying vent can only lower a score */
-    const product = sc.breathingFactor * sc.feetFactor;
+    const product = sc.breathingFactor * sc.feetFactor * sc.heatFactor;
     const capRaw = (state.vent === 'yes' && state.dry === 'open') ? evaluate(Object.assign({}, state, { dry: 'closed' })).raw : null;
     const raw = capRaw != null ? Math.min(product, capRaw) : product;
-    return { flows, breathing: b, feet: ft, breathingFactor: sc.breathingFactor, feetFactor: sc.feetFactor, capRaw, raw, score: Math.round(100 * raw), profile: T };
+    return { flows, breathing: b, feet: ft, breathingFactor: sc.breathingFactor, feetFactor: sc.feetFactor, heatFactor: sc.heatFactor, capRaw, raw, score: Math.round(100 * raw), profile: T };
   }
   return { evaluate, airflow };
 }
@@ -622,7 +622,7 @@ function mutants(base) {
     { target: 'H12', name: 'long duct below short duct (the duct paradox)', evaluate: s => { const r = clone(ev(s)); if (s.fan === 'off' && s.duct === 'riser') r.flows = scaleFlows(r.flows, 0.6); return r; } },
     { target: 'H11', name: 'upper grille below lower grille', evaluate: s => { const r = clone(ev(s)); if (s.fan === 'off' && s.exhaust === 'upper' && s.duct === 'straight') r.flows = scaleFlows(r.flows, 0.5); return r; } },
     { target: 'H13', name: 'fan three times its free-air flow', evaluate: s => { const r = clone(ev(s)); if (s.vent === 'yes' && s.fan === 'on') r.flows = scaleFlows(r.flows, 3); return r; } },
-    { target: 'H14', name: 'drying vent warms the feet without a fan', evaluate: s => { const r = clone(ev(s)); if (s.vent === 'yes' && s.fan === 'off' && s.dry === 'open') { r.feetFactor = Math.min(1, r.feetFactor + 0.2); r.feet.feetFactor = r.feetFactor; rescore(r); } return r; } },
+    { target: 'H14', name: 'drying vent warms the bathers without a fan', evaluate: s => { const r = clone(ev(s)); if (s.vent === 'yes' && s.fan === 'off' && s.dry === 'open') { r.heatFactor = Math.min(1, r.heatFactor + 0.2); rescore(r); } return r; } },
     { target: 'H15', name: 'breathing rises with CO₂', evaluate: s => { const r = clone(ev(s)); r.breathingFactor = Math.min(1, Math.max(0, (r.breathing.co2AtMouth - 420) / 4580)); return rescore(r); } },
     { target: 'H17', name: 'more fresh air at the mouth than enters the room', evaluate: s => { const r = clone(ev(s)); r.breathing.qFreshAtBreathingZone = r.flows.qOutdoorIn * 1.5; return r; } },
     { target: 'H21', name: 'non-deterministic', evaluate: (() => { let n = 0; return s => { const r = clone(ev(s)); r.flows.notes = 'x'; r.breathingFactor = Math.max(0, Math.min(1, r.breathingFactor) - 1e-9 * (++n)); return rescore(r); }; })() }

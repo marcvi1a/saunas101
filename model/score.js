@@ -13,7 +13,7 @@
        PD(ΔC) = 395 · exp(−1.83 · q^0.25)  %,   q = G / ΔC = 5,556 / ΔC   (l/s per person, ΔC in ppm above outdoor)
        breathing = (PD(5,000 − C_out) − PD(ΔC)) / (PD(5,000 − C_out) − PD(550)),  clamped to [0, 1]
 
-   feet: agent D's feetFactor, passed through unchanged (no floor, no clamp) so the harness sees what D produced.
+   feet: agent D's feetFactor, the ankle draught only, passed through unchanged (no floor, no clamp) so the harness sees what D produced.
 
    Every number below is a cited standard value or a unit conversion; see E_report.md. */
 
