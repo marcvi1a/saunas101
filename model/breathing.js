@@ -731,15 +731,9 @@ function breathing(state, flows, profileArg, opts) {
      reachesMouth = q − floorToOutlet − heaterToOutlet; Σ reachesMouth = qFreshAtBreathingZone.
    Outlets: q in l/s of room air at its own temperature (flows' q), fromZone the zone supplying most of it.
    plume: the plume's flux at the ceiling, l/s of room air at the temperature beside the stones' top.
-   stale: 0 at Category I (550 ppm above outdoor), 1 at the sealed room with the same heater, linear in ppm, clamped. */
-const CAT_I_ABOVE_OUTDOOR = 550;                        // ppm, EN 16798-1 Category I (the score's full mark)
-const SEALED_CO2 = {};
-function sealedCO2Of(heater) {
-  if (heater in SEALED_CO2) return SEALED_CO2[heater];
-  let v = null;
-  try { v = require('./evaluate.js').evaluate({ vent: 'none', heater }).breathing.co2AtMouth; } catch (e) { v = null; }
-  return (SEALED_CO2[heater] = v);
-}
+   stale: the grey dots, counted against outdoor air: none up to 500 ppm of CO₂ at the mouth (outdoor air is about 426 ppm),
+     then one per 500 ppm, rounded; so every occupied room shows at least one. */
+const DOT_FREE = 500, DOT_PPM = 500;                     // ppm at the mouth: no grey dot up to DOT_FREE, then one per DOT_PPM
 function routeLabel(state, key) {
   if (key == null) return '';
   const duct = state.duct === 'inletduct' ? ' (via the inlet duct)' : '';
@@ -762,7 +756,7 @@ function pathOf(f, rt) {                                 // the stream's first m
   else { const m = i.match(/(?:jet ends:?|ends) ([a-z]+)/); p = m ? end(m[1]) : 'mixes into the room'; }
   return p;
 }
-function routes(state, flows, b, opts) {
+function routes(state, flows, b) {
   if (!b || !b.routing) b = breathing(state, flows);
   const rt = b.routing, mIn = rt.streams.reduce((a, f) => a + f.m, 0);
   const L = flows && flows.qOutdoorIn > 0 && mIn > 0 ? flows.qOutdoorIn * 1000 / mIn : 1000 / RHO_OUT;   // kg/s → l/s of outdoor air, as flows counts it
@@ -821,9 +815,7 @@ function routes(state, flows, b, opts) {
   }
   const lay = b.layer;
   const floorLayer = { h: b.floorLayerH || 0, T: lay ? lay.TL : null, stable: !!(rt.layer && lay && lay.stable) };
-  const catI = K.co2Out + CAT_I_ABOVE_OUTDOOR;
-  const sealed = opts && opts.sealedCO2 != null ? opts.sealedCO2 : (state.vent === 'none' ? b.co2AtMouth : sealedCO2Of(state.heater));
-  const stale = state.vent === 'none' ? 1 : (sealed == null ? null : (sealed > catI ? clamp01((b.co2AtMouth - catI) / (sealed - catI)) : 0));
+  const stale = Number.isFinite(b.co2AtMouth) ? Math.max(0, Math.round((b.co2AtMouth - DOT_FREE) / DOT_PPM)) : null;
   return { streams, outlets, plume: rt.mpH / rt.rhoPlume * 1000, floorLayer, stale, notes };
 }
 

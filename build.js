@@ -63,13 +63,13 @@ if (!(fs.existsSync("scores.js") && fs.readFileSync("scores.js", "utf8").include
   if (run.hardFail) { INV.report(run); fail("the ventilation model breaks a physical invariant"); }
   try { require("child_process").execFileSync(process.execPath, ["model/check/routes.js"], { stdio: "pipe" }); } catch (e) { console.error(String(e.stdout || "").slice(-2000)); fail("the air routes the drawing follows break a check"); }
   const BR = require("./model/breathing.js");
-  /* the drawing's air, packed (openings i inlet, e exhaust, d drying vent, l door gap low, t door gap top; zones c ceiling, b bench, f floor): q = [inlet, exhaust, drying vent, door gap low, door gap top] in l/s, + into the room; s = streams [from, q, toHeater, toFloor, floorToOutlet, floorOutlet, toBenches, heaterToOutlet]; o = outlets [to, q, zone]; p = plume l/s; f = floor layer [h m, T °C, stable]; st = how stale, 0 to 1 */
+  /* the drawing's air, packed (openings i inlet, e exhaust, d drying vent, l door gap low, t door gap top; zones c ceiling, b bench, f floor): q = [inlet, exhaust, drying vent, door gap low, door gap top] in l/s, + into the room; s = streams [from, q, toHeater, toFloor, floorToOutlet, floorOutlet, toBenches, heaterToOutlet]; o = outlets [to, q, zone]; p = plume l/s; f = floor layer [h m, T °C, stable]; st = grey dots, one per 500 ppm of CO₂ at the mouth beyond the first 500 */
   const r1 = x => Math.round(x * 10) / 10, OP = { inlet: "i", exhaust: "e", dry: "d", doorLow: "l", doorTop: "t" }, ZONE = { ceiling: "c", bench: "b", floor: "f" };
   const code = (m, k) => { if (!(k in m)) fail("the drawing has no code for " + k); return m[k]; };
   const pack = (s, r) => { const R = BR.routes(s, r.flows, r.breathing), f = r.flows;
     return { q: [f.mainInletQ, f.mainExhaustQ, f.dryQ, f.doorLowQ, f.doorTopQ].map(v => r1((v || 0) * 1000)),
       s: R.streams.map(x => [code(OP, x.from), r1(x.q), r1(x.toHeater), r1(x.toFloor), r1(x.floorToOutlet), x.floorOutlet ? code(OP, x.floorOutlet) : "", r1(x.toBenches), r1(x.heaterToOutlet)]),
-      o: R.outlets.map(x => [code(OP, x.to), r1(x.q), code(ZONE, x.fromZone)]), p: Math.round(R.plume), f: [Math.round(R.floorLayer.h * 100) / 100, Math.round(R.floorLayer.T), R.floorLayer.stable ? 1 : 0], st: Math.round(R.stale * 100) / 100 }; };
+      o: R.outlets.map(x => [code(OP, x.to), r1(x.q), code(ZONE, x.fromZone)]), p: Math.round(R.plume), f: [Math.round(R.floorLayer.h * 100) / 100, Math.round(R.floorLayer.T), R.floorLayer.stable ? 1 : 0], st: R.stale }; };
   /* only the states the page can reach: the inlet duct, like the floor hole, has no angle to choose */
   const reachable = s => !(s.vent === "yes" && s.duct === "inletduct" && s.angle !== "straight");
   const rows = MOD.allStates().filter(reachable).map(s => { const r = MOD.evaluate(s); return { s, raw: r.raw, air: pack(s, r) }; });

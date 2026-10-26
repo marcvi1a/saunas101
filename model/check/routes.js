@@ -6,7 +6,7 @@
      3. every stream enters and every outlet leaves through an opening that runs that way in flows, and every opening
         carrying air in flows is listed once;
      4. Σ reachesMouth = breathing.qFreshAtBreathingZone (1e-6 relative), so the drawing and the score tell the same story;
-     5. stale lies in [0, 1], the plume and the floor layer are finite.
+     5. stale (the grey dots) is a whole number from 0, the plume and the floor layer are finite.
    Run: node check/routes.js  (prints the failures, a summary, and the routes of five reference layouts) */
 const path = require('path');
 const ev = require(path.join(__dirname, '..', 'evaluate.js'));
@@ -42,7 +42,7 @@ for (const st of ev.allStates()) {
   const rr = Math.abs(reach - qBZ) / Math.max(qBZ, 1e-9); worstReach = Math.max(worstReach, rr);
   if (rr > 1e-6) fails.reach.push(key + ': Σ reachesMouth ' + reach.toFixed(4) + ' l/s vs qFreshAtBreathingZone ' + qBZ.toFixed(4));
   /* 5. bounds */
-  if (!(R.stale >= 0 && R.stale <= 1) || !isFinite(R.plume) || !(R.floorLayer.h >= 0)) fails.bounds.push(key + ': stale ' + R.stale + ' plume ' + R.plume + ' layer ' + JSON.stringify(R.floorLayer));
+  if (!(Number.isInteger(R.stale) && R.stale >= 0) || !isFinite(R.plume) || !(R.floorLayer.h >= 0)) fails.bounds.push(key + ': stale ' + R.stale + ' plume ' + R.plume + ' layer ' + JSON.stringify(R.floorLayer));
 }
 let total = 0;
 for (const k in fails) { total += fails[k].length; console.log((fails[k].length ? 'FAIL ' : 'ok   ') + k.padEnd(10) + fails[k].length + ' failing'); fails[k].slice(0, 5).forEach(x => console.log('        ' + x)); }
@@ -59,7 +59,7 @@ const show = [
 const f1 = v => (v == null ? '-' : v.toFixed(1));
 for (const [name, st] of show) {
   const r = ev.evaluate(st), R = br.routes(st, r.flows, r.breathing);
-  console.log('\n' + name + '  [' + ev.hashKey(st) + ']  CO₂ ' + Math.round(r.breathing.co2AtMouth) + ' ppm, fraction ' + r.breathing.fractionToBreathingZone.toFixed(2) + ', stale ' + R.stale.toFixed(2) + ', plume ' + f1(R.plume) + ' l/s, floor layer ' + (R.floorLayer.stable ? (100 * R.floorLayer.h).toFixed(0) + ' cm at ' + f1(R.floorLayer.T) + ' °C' : 'none'));
+  console.log('\n' + name + '  [' + ev.hashKey(st) + ']  CO₂ ' + Math.round(r.breathing.co2AtMouth) + ' ppm, fraction ' + r.breathing.fractionToBreathingZone.toFixed(2) + ', grey dots ' + R.stale + ', plume ' + f1(R.plume) + ' l/s, floor layer ' + (R.floorLayer.stable ? (100 * R.floorLayer.h).toFixed(0) + ' cm at ' + f1(R.floorLayer.T) + ' °C' : 'none'));
   for (const s of R.streams) console.log('  in  ' + s.from.padEnd(8) + ' q ' + f1(s.q).padStart(5) + ' | heater ' + f1(s.toHeater).padStart(5) + ' floor ' + f1(s.toFloor).padStart(5) + ' (short ' + f1(s.floorToOutlet) + (s.floorOutlet ? ' → ' + s.floorOutlet : '') + ') benches ' + f1(s.toBenches).padStart(5) + ' | reaches mouth ' + f1(s.reachesMouth));
   for (const o of R.outlets) console.log('  out ' + o.to.padEnd(8) + ' q ' + f1(o.q).padStart(5) + ' from ' + o.fromZone);
   R.notes.forEach(x => console.log('  · ' + x));

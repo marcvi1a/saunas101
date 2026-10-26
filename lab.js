@@ -318,8 +318,8 @@ function render(){
   drawHeater();
   const dyn=document.getElementById('dyn'); dyn.innerHTML='';
   const glow=document.getElementById('glow'); glow.innerHTML=''; glow.appendChild(el('path',{d:'M52 200 C 40 140, 60 48, 100 26 L 130 16 C 100 80, 110 140, 94 200 Z',class:'heatglow'}));
-  // stale air: grey dots circling in the bench zone, as many as the model's staleness says (none at the best air, 10 in a sealed room)
-  const nStale = Math.round(A.st*10);
+  // CO₂: grey dots circling in the bench zone, as many as the model counts (one per 500 ppm at the mouth beyond the first 500; 20 in a sealed room)
+  const nStale = A.st;
   if(nStale){
     const zx=105, zy=24, zw=291, zh=220;
     let seed=zx*7+zy*13+zw; const rnd=()=>{ seed=(seed*9301+49297)%233280; return seed/233280; };
