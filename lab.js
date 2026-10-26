@@ -98,9 +98,11 @@ const el=(t,a={})=>{const e=document.createElementNS(ns,t);for(const k in a)e.se
   for(let m=0.2;m<2.1;m+=0.2){const y=298-m*138; g.appendChild(el('line',{x1:22,y1:y,x2:398,y2:y,class:'plank'}));}
 })();
 
-function particle(pathD,color,dur,offset,size){
-  const c=el('circle',{r:size||3.2}); c.setAttribute('fill',color); c.setAttribute('opacity','0.9');
-  c.appendChild(el('animateMotion',{dur:dur+'s',repeatCount:'indefinite',begin:(-offset)+'s',path:pathD}));
+function particle(pathD,color,dur,offset,size,kp,km,lane){
+  const c=el('circle',{r:size||3.2}); if(lane){ c.setAttribute('cx',lane.toFixed(1)); c.setAttribute('cy',(-0.8*lane).toFixed(1)); } c.setAttribute('fill',color); c.setAttribute('opacity','0.9');
+  const m=el('animateMotion',{dur:dur+'s',repeatCount:'indefinite',begin:(-offset)+'s',path:pathD});
+  if(kp){ m.setAttribute('calcMode','linear'); m.setAttribute('keyPoints',kp); m.setAttribute('keyTimes',km); }
+  c.appendChild(m);
   return c;
 }
 /* ---------- the air the drawing shows ----------
@@ -171,7 +173,8 @@ function heaterPts(op, P0){
   if(h==='closed') return floorIn ? [[73,294],[73,240],[73,200],[73,PLUME_TOP]] : [[right?90:56,294],[73,280],[73,230],[73,198],[73,PLUME_TOP]];
   return floorIn ? [[73,286],[73,262],[73,230],[73,198],[73,PLUME_TOP]] : [[right?86:60,264],[73,260],[73,230],[73,198],[73,PLUME_TOP]];   // wall heater, its intake 30 cm up
 }
-const PLUME_UP = [[80,150],[94,98],[122,52],[200,38],[300,40]], PLUME_DOWN = [[348,54],[368,98],[366,160]], BENCH = [312,118];
+const PLUME_UP = [[76,150],[76,96],[78,44],[96,24],[200,28],[300,36]],   // straight up the heater's column (x 46-100) to just under the ceiling, then along it
+      PLUME_DOWN = [[358,50],[378,96],[380,160]], BENCH = [312,118];
 /* the floor stretch from where a stream comes in, and its rise into the room once the floor has warmed it */
 function floorPts(op, P0){
   if(op==='d' || op==='t') return [[358,66],[340,170],[330,FLOOR_Y],[215,FLOOR_Y]];   // cold air from high up falls clear of the wall, then spreads
@@ -185,7 +188,7 @@ function benchPts(op){
   const y = inletY(), gy = outPos().y;
   if(op==='i'){
     if(state.inlet==='bottom') return [[100,282],[180,236],[250,170]];
-    if(state.inlet==='above') return [[48,y+4],[78,y-4],[98,112],[150,78],[240,86]];   // the jet crosses the plume, which heats and lifts it, then settles on the benches
+    if(state.inlet==='above') return [[50,y+4],[68,y-8],[84,y-42],[100,y-76],[126,y-94],[190,y-98],[240,y-96],[282,y-94],[305,y-87],[324,y-68],[337,y-40],[342,y-6],[342,y+28]];   // the jet crosses the plume inside the column, which heats and lifts it (hot by its right edge, the 4th point), arcs across at head height, turns down on evenly spaced points of a quarter ellipse (60 across, 88 down), the same as the heater loop's corner, so it never rises before it falls, and drops steeply in front of the bather to the benches
     if(state.inlet==='below') return [[60,FLOOR_Y-2],[140,FLOOR_Y],[200,268],[215,215]];   // the warm floor lifts it
     return [[60,y-8],[150,y-40],[230,170]];
   }
@@ -203,10 +206,50 @@ function share(f, outs){
   return res.filter(r=>r[1]>0).map(r=>[r[0], r[1]]);
 }
 /* a stream: its points, how many dots, and where its air warms (kt) or that it stays cold or hot */
-function stream(P, n, v, warm){
+/* a stream of dots along the points P at speed v (units a second); warm: 'cold', 'hot' or the two point indices between which it
+   turns from fresh to hot; inCol: the two point indices where it runs inside the heater's column, where it moves FAST times quicker.
+   Long, nearly level stretches meander a little (WAVE_AMP units across, a wave every WAVE_LEN units), as room air does; through
+   the inlet and into the outlet the dots move OPEN times quicker; BAND spreads a stream's dots across a narrow band (lane spacing
+   in units) instead of single file. */
+const FAST = 2.2, WAVE_AMP = 1.4, WAVE_LEN = 70, OPEN = 1.8, BAND = 1.1;
+function wavy(P){
+  if(!(WAVE_AMP > 0)) return { P, map: P.map((p, i) => i) };
+  const out = [P[0]], map = [0];
+  for(let i = 1; i < P.length; i++){
+    const a = P[i-1], b = P[i], dx = b[0]-a[0], dy = b[1]-a[1], L = Math.hypot(dx, dy);
+    if(L > 50 && Math.abs(dy) < 0.4*Math.abs(dx)){
+      const k = Math.max(2, Math.round(2*L/WAVE_LEN)), nx = -dy/L, ny = dx/L;
+      for(let j = 1; j < k; j++){ const t = j/k, w = (j%2 ? 1 : -1)*WAVE_AMP; out.push([a[0]+dx*t+nx*w, a[1]+dy*t+ny*w]); }
+    }
+    out.push(b); map.push(out.length-1);
+  }
+  return { P: out, map };
+}
+function stream(P0, n, v, warm, inCol){
+  const W = wavy(P0), P = W.P, ix = i => W.map[i];
   const L = polyLen(P), s = {d: spline(P), n, dur: Math.max(2.5, L/v), size: 3};
+  const frac = i => polyLen(P, i)/L, segs = [];
+  const inside = p => p[0] > 30 && p[0] < 390 && p[1] > 16 && p[1] < 290;
+  if(OPEN > 1){
+    const i0 = P.findIndex(inside), i1 = P.length-1-P.slice().reverse().findIndex(inside);
+    if(i0 > 0) segs.push([0, frac(i0), OPEN]);
+    if(i0 >= 0 && i1 < P.length-1) segs.push([frac(i1), 1, OPEN]);
+  }
+  if(inCol && FAST > 1) segs.push([frac(ix(inCol[0])), frac(ix(inCol[1])), FAST]);
+  segs.sort((p, q) => p[0]-q[0]);
+  let at = x => x;
+  if(segs.length){
+    const pieces = []; let x = 0;
+    for(const [a, b, k] of segs){ const a2 = Math.max(a, x); if(b <= a2) continue; if(a2 > x) pieces.push([x, a2, 1]); pieces.push([a2, b, k]); x = b; }
+    if(x < 1) pieces.push([x, 1, 1]);
+    const T = pieces.reduce((t, p) => t + (p[1]-p[0])/p[2], 0);
+    at = u => { let t = 0; for(const [a, b, k] of pieces){ if(u <= b){ t += (u-a)/k; break; } t += (b-a)/k; } return Math.min(1, t/T); };
+    s.dur = Math.max(2.5, L/v*T);
+    const kp = [0].concat(pieces.map(p => p[1])).filter((u, i, A) => i === 0 || u > A[i-1] + 1e-4); kp[kp.length-1] = 1;
+    s.kp = kp.map(u => u.toFixed(4)).join(';'); s.km = kp.map(u => at(u).toFixed(4)).join(';');
+  }
   if(warm==='cold') s.color='fresh'; else if(warm==='hot') s.color='hot';
-  else { const a = Math.min(0.9, Math.max(0.01, polyLen(P, warm[0])/L)), b = Math.min(0.99, Math.max(a+0.03, polyLen(P, warm[1])/L)); s.kt = '0;'+a.toFixed(3)+';'+b.toFixed(3)+';1'; }
+  else { const a = Math.min(0.9, Math.max(0.01, frac(ix(warm[0])))), b = Math.min(0.99, Math.max(a+0.03, frac(ix(warm[1])))); s.kt = '0;'+at(a).toFixed(3)+';'+at(b).toFixed(3)+';1'; }
   return s;
 }
 function airStreams(A){
@@ -228,11 +271,11 @@ function airStreams(A){
     const iIn = E.length + pre.length, iTop = viaHeater.length-1;
     for(const [dst, n] of share(toHeater-heaterShort, downOuts.length ? downOuts : outs)){
       const P = viaHeater.concat(PLUME_UP, (dst==='d'||dst==='t') ? [] : PLUME_DOWN, approachPts(dst), exitPts(dst));
-      out.push(stream(P, n, v, [iIn, iTop]));
+      out.push(stream(P, n, v, [iIn, iTop], [iTop, iTop+4]));
     }
     for(const [dst, n] of share(heaterShort, ceilOuts.length ? ceilOuts : outs)){
       const P = viaHeater.concat(PLUME_UP, approachPts(dst), exitPts(dst));
-      out.push(stream(P, n, v, [iIn, iTop]));
+      out.push(stream(P, n, v, [iIn, iTop], [iTop, iTop+4]));
     }
     /* along the floor: the part the outlets drain before it reaches the benches stays cold all the way out */
     const F = E.concat(floorPts(op, P0));
@@ -242,10 +285,13 @@ function airStreams(A){
       out.push(stream(P, n, v*0.8, [F.length-1, F.length+RISE.length]));
     }
     /* straight to the benches, warming as it mixes */
-    const B = E.concat(benchPts(op), [BENCH]);
+    /* the jet from above the stones is heated in the column, not along the way, and drops steeply on its own line, so it skips the
+       bench point and any approach point not below where it ends */
+    const crosses = op==='i' && state.inlet==='above';
+    const B = E.concat(benchPts(op), crosses ? [] : [BENCH]);
     for(const [dst, n] of share(toBenches, downOuts.length ? downOuts : outs)){
-      const P = B.concat(approachPts(dst), exitPts(dst));
-      out.push(stream(P, n, v, [E.length-1, B.length-1]));
+      const P = B.concat(crosses ? approachPts(dst).filter(p => p[1] > B[B.length-1][1] + 10 && p[0] >= B[B.length-1][0]) : approachPts(dst), exitPts(dst));
+      out.push(stream(P, n, v, crosses ? [E.length, E.length+3] : [E.length-1, B.length-1], crosses ? [E.length, E.length+3] : null));
     }
   }
   out.push(heaterLoop(A));
@@ -253,14 +299,14 @@ function airStreams(A){
 }
 /* the heater's own loop: up the plume, across the ceiling, down past the benches and back along the floor */
 function heaterLoop(A){
-  const loop = [[73,PLUME_TOP],[86,120],[115,54],[200,38],[320,40],[362,85],[368,160],[350,226],[260,252],[160,262],[110,254],[100,226],[88,200],[73,PLUME_TOP]];
-  return Object.assign(stream(loop, Math.max(2, Math.min(6, Math.round(A.p/25))), 70, 'hot'), {size: 2.8});
+  const loop = [[73,PLUME_TOP],[74,120],[76,52],[94,26],[200,30],[322,38],[345,45],[364,64],[377,92],[382,126],[382,160],[370,204],[340,234],[260,252],[160,262],[110,254],[100,226],[88,200],[73,PLUME_TOP]];
+  return Object.assign(stream(loop, Math.max(2, Math.min(6, Math.round(A.p/25))), 70, 'hot', [0, 3]), {size: 2.8});
 }
 function drawStream(g, s){
   for(let k=0;k<s.n;k++){
-    const off=(s.dur/s.n)*k;
-    if(s.kt){ const a=particle(s.d,FRESH_HEX,s.dur,off,s.size); a.appendChild(el('animate',{attributeName:'fill',values:FRESH_HEX+';'+FRESH_HEX+';'+HOT_HEX+';'+HOT_HEX,keyTimes:s.kt,dur:s.dur+'s',repeatCount:'indefinite',begin:(-off)+'s'})); g.appendChild(a); }
-    else g.appendChild(particle(s.d,'var(--'+s.color+')',s.dur,off,s.size));
+    const off=(s.dur/s.n)*k, lane=BAND ? ((k*3)%5-2)*BAND : 0;
+    if(s.kt){ const a=particle(s.d,FRESH_HEX,s.dur,off,s.size,s.kp,s.km,lane); a.appendChild(el('animate',{attributeName:'fill',values:FRESH_HEX+';'+FRESH_HEX+';'+HOT_HEX+';'+HOT_HEX,keyTimes:s.kt,dur:s.dur+'s',repeatCount:'indefinite',begin:(-off)+'s'})); g.appendChild(a); }
+    else g.appendChild(particle(s.d,'var(--'+s.color+')',s.dur,off,s.size,s.kp,s.km,lane));
   }
 }
 function ventEl(x,y,label,cls,onLeft,slope,rot){
