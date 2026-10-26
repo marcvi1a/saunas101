@@ -211,7 +211,10 @@ function share(f, outs){
    Long, nearly level stretches meander a little (WAVE_AMP units across, a wave every WAVE_LEN units), as room air does; through
    the inlet and into the outlet the dots move OPEN times quicker; BAND spreads a stream's dots across a narrow band (lane spacing
    in units) instead of single file. */
-const FAST = 2.2, WAVE_AMP = 1.4, WAVE_LEN = 70, OPEN = 1.8, BAND = 1.1;
+/* speeds (138 units a metre): room air moves at ROOM of the airflow-scaled speed, so the fan layout crosses the room at about 0.36 m/s
+   and gravity at about 0.19 m/s; inside the column FAST brings it to about 1.2 m/s (the plume) and through the openings OPEN to
+   about 1 m/s (the jets) */
+const ROOM = 0.65, FAST = 3.4, WAVE_AMP = 1.4, WAVE_LEN = 70, OPEN = 2.8, BAND = 1.1;
 function wavy(P){
   if(!(WAVE_AMP > 0)) return { P, map: P.map((p, i) => i) };
   const out = [P[0]], map = [0];
@@ -253,7 +256,7 @@ function stream(P0, n, v, warm, inCol){
   return s;
 }
 function airStreams(A){
-  const qIn = A.s.reduce((a,s)=>a+s[1],0), v = 30 + 50*Math.min(1, qIn/20), out = [];
+  const qIn = A.s.reduce((a,s)=>a+s[1],0), v = (30 + 50*Math.min(1, qIn/20))*ROOM, out = [];
   /* the door's gaps are in the model and the score but not in the drawing: their streams are left out, and what leaves through them is drawn leaving through the designed outlets */
   const DOOR = {l:1, t:1};
   const outs = A.o.filter(o=>!DOOR[o[0]]).map(o=>[o[0], o[1], o[2]]);
@@ -300,7 +303,7 @@ function airStreams(A){
 /* the heater's own loop: up the plume, across the ceiling, down past the benches and back along the floor */
 function heaterLoop(A){
   const loop = [[73,PLUME_TOP],[74,120],[76,52],[94,26],[200,30],[322,38],[345,45],[364,64],[377,92],[382,126],[382,160],[370,204],[340,234],[260,252],[160,262],[110,254],[100,226],[88,200],[73,PLUME_TOP]];
-  return Object.assign(stream(loop, Math.max(2, Math.min(6, Math.round(A.p/25))), 70, 'hot', [0, 3]), {size: 2.8});
+  return Object.assign(stream(loop, Math.max(2, Math.min(6, Math.round(A.p/25))), 70*ROOM, 'hot', [0, 3]), {size: 2.8});
 }
 function drawStream(g, s){
   for(let k=0;k<s.n;k++){
