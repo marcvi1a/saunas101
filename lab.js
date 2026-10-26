@@ -207,14 +207,17 @@ function share(f, outs){
 }
 /* a stream: its points, how many dots, and where its air warms (kt) or that it stays cold or hot */
 /* a stream of dots along the points P at speed v (units a second); warm: 'cold', 'hot' or the two point indices between which it
-   turns from fresh to hot; inCol: the two point indices where it runs inside the heater's column, where it moves FAST times quicker.
-   Long, nearly level stretches meander a little (WAVE_AMP units across, a wave every WAVE_LEN units), as room air does; through
-   the inlet and into the outlet the dots move OPEN times quicker; BAND spreads a stream's dots across a narrow band (lane spacing
-   in units) instead of single file. */
+   turns from fresh to hot; inCol: the two point indices where it runs inside the heater's column. Long, nearly level stretches meander
+   a little (WAVE_AMP units across, a wave every WAVE_LEN units), as room air does; BAND spreads a stream's dots across a narrow band
+   (lane spacing in units) instead of single file. */
 /* speeds (138 units a metre): room air moves at ROOM of the airflow-scaled speed, so the fan layout crosses the room at about 0.36 m/s
    and gravity at about 0.19 m/s; inside the column FAST brings it to about 1.2 m/s (the plume) and through the openings OPEN to
-   about 1 m/s (the jets) */
+   about 1 m/s (the jets). The speed changes smoothly (stretches in units): after an inlet it falls to the room's over JET_OUT, as the
+   jet spreads; it rises into the column over COL_IN and falls back over COL_OUT, as the plume mixes with the room; toward an outlet
+   it rises only over the last SINK_IN, as air drawn into an opening does. ROOM_R is the room's right wall. */
 const ROOM = 0.65, FAST = 3.4, WAVE_AMP = 1.4, WAVE_LEN = 70, OPEN = 2.8, BAND = 1.1;
+const JET_OUT = 34, COL_IN = 14, COL_OUT = 48, SINK_IN = 28;
+const ROOM_R = 398;
 function wavy(P){
   if(!(WAVE_AMP > 0)) return { P, map: P.map((p, i) => i) };
   const out = [P[0]], map = [0];
@@ -231,25 +234,43 @@ function wavy(P){
 function stream(P0, n, v, warm, inCol){
   const W = wavy(P0), P = W.P, ix = i => W.map[i];
   const L = polyLen(P), s = {d: spline(P), n, dur: Math.max(2.5, L/v), size: 3};
-  const frac = i => polyLen(P, i)/L, segs = [];
-  const inside = p => p[0] > 30 && p[0] < 390 && p[1] > 16 && p[1] < 290;
-  if(OPEN > 1){
-    const i0 = P.findIndex(inside), i1 = P.length-1-P.slice().reverse().findIndex(inside);
-    if(i0 > 0) segs.push([0, frac(i0), OPEN]);
-    if(i0 >= 0 && i1 < P.length-1) segs.push([frac(i1), 1, OPEN]);
-  }
-  if(inCol && FAST > 1) segs.push([frac(ix(inCol[0])), frac(ix(inCol[1])), FAST]);
-  segs.sort((p, q) => p[0]-q[0]);
-  let at = x => x;
-  if(segs.length){
-    const pieces = []; let x = 0;
-    for(const [a, b, k] of segs){ const a2 = Math.max(a, x); if(b <= a2) continue; if(a2 > x) pieces.push([x, a2, 1]); pieces.push([a2, b, k]); x = b; }
-    if(x < 1) pieces.push([x, 1, 1]);
-    const T = pieces.reduce((t, p) => t + (p[1]-p[0])/p[2], 0);
-    at = u => { let t = 0; for(const [a, b, k] of pieces){ if(u <= b){ t += (u-a)/k; break; } t += (b-a)/k; } return Math.min(1, t/T); };
-    s.dur = Math.max(2.5, L/v*T);
-    const kp = [0].concat(pieces.map(p => p[1])).filter((u, i, A) => i === 0 || u > A[i-1] + 1e-4); kp[kp.length-1] = 1;
-    s.kp = kp.map(u => u.toFixed(4)).join(';'); s.km = kp.map(u => at(u).toFixed(4)).join(';');
+  const len = i => polyLen(P, i), frac = i => len(i)/L;
+  const inside = p => p[0] > 30 && p[0] < ROOM_R - 8 && p[1] > 16 && p[1] < 290;
+  const ease = t => 0.5 - 0.5*Math.cos(Math.PI*Math.max(0, Math.min(1, t)));   /* 0 → 1, smooth at both ends */
+  /* the openings: the path's wall points (the last point outside before the room, the first one outside after it) */
+  const i0 = P.findIndex(inside), i1 = P.length-1-P.slice().reverse().findIndex(inside);
+  const wallIn = OPEN > 1 && i0 > 0 ? len(i0-1) : null, wallOut = OPEN > 1 && i0 >= 0 && i1 < P.length-1 ? len(i1+1) : null;
+  const ca = inCol && FAST > 1 ? len(ix(inCol[0])) : null, cb = inCol && FAST > 1 ? len(ix(inCol[1])) : null;
+  const loop = Math.hypot(P[0][0]-P[P.length-1][0], P[0][1]-P[P.length-1][1]) < 1;
+  /* a jet that reaches the column before it has slowed goes straight from the jet's speed to the plume's */
+  const bridge = wallIn != null && ca != null && ca > wallIn && ca - wallIn < JET_OUT + COL_IN;
+  const speed = x => {
+    if(bridge && x >= wallIn && x <= ca) return OPEN + (FAST-OPEN)*ease((x-wallIn)/(ca-wallIn));
+    let m = 1;
+    if(wallIn != null) m = Math.max(m, x <= wallIn ? OPEN : 1 + (OPEN-1)*(1 - ease((x-wallIn)/JET_OUT)));
+    if(wallOut != null) m = Math.max(m, x >= wallOut ? OPEN : 1 + (OPEN-1)*Math.pow(Math.max(0, 1 - (wallOut-x)/SINK_IN), 2));
+    if(ca != null){
+      let c = x < ca ? 1 + (FAST-1)*ease(1 - (ca-x)/COL_IN) : x <= cb ? FAST : 1 + (FAST-1)*(1 - ease((x-cb)/COL_OUT));
+      if(loop && ca < 1e-6) c = Math.max(c, 1 + (FAST-1)*ease(1 - (L-x)/COL_IN));   /* a closed loop eases back into the column at its end */
+      m = Math.max(m, c);
+    }
+    return m;
+  };
+  /* where the speed can change: the ramps get a point every 5 units, the rest only its ends */
+  const xs = new Set([0, L]), addRamp = (x0, x1) => { const a = Math.max(0, Math.min(x0, x1)), b = Math.min(L, Math.max(x0, x1)); for(let x = a; x < b; x += 5) xs.add(x); xs.add(b); };
+  if(wallIn != null){ xs.add(wallIn); if(!bridge) addRamp(wallIn, wallIn + JET_OUT); }
+  if(wallOut != null){ xs.add(wallOut); addRamp(wallOut - SINK_IN, wallOut); }
+  if(ca != null){ addRamp(ca - COL_IN, ca); xs.add(cb); addRamp(cb, cb + COL_OUT); if(loop && ca < 1e-6) addRamp(L - COL_IN, L); }
+  const X0 = [...xs].filter(x => x >= 0 && x <= L).sort((p, q) => p - q), X = X0.filter((x, i) => i === 0 || i === X0.length-1 || (x - X0[i-1] > 2.5 && X0[X0.length-1] - x > 2.5));   /* no stretch shorter than 2.5 units */
+  let at = u => u;
+  if(X.length > 2 && (wallIn != null || wallOut != null || ca != null)){
+    /* time per stretch: ∫ dx / speed, by Simpson's rule */
+    const T = [0];
+    for(let i = 1; i < X.length; i++){ const a = X[i-1], b = X[i], h = b - a; T.push(T[i-1] + h/6*(1/speed(a) + 4/speed((a+b)/2) + 1/speed(b))); }
+    const total = T[T.length-1];
+    at = u => { const x = u*L; let i = 1; while(i < X.length-1 && X[i] < x) i++; const t = T[i-1] + (T[i]-T[i-1])*(x-X[i-1])/Math.max(1e-9, X[i]-X[i-1]); return Math.min(1, t/total); };
+    s.dur = Math.max(2.5, total/v);
+    s.kp = X.map(x => (x/L).toFixed(4)).join(';'); s.km = T.map(t => (t/total).toFixed(4)).join(';');
   }
   if(warm==='cold') s.color='fresh'; else if(warm==='hot') s.color='hot';
   else { const a = Math.min(0.9, Math.max(0.01, frac(ix(warm[0])))), b = Math.min(0.99, Math.max(a+0.03, frac(ix(warm[1])))); s.kt = '0;'+at(a).toFixed(3)+';'+at(b).toFixed(3)+';1'; }
