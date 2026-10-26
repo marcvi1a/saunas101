@@ -31,7 +31,7 @@ const GEOM = {
   ceiling: (300 - 8) * 2.1 / 300,                       // 2.044 m
   volume: 12,
   inletH: { above: 0.98, middle: 0.45, below: 0.12, bottom: 0 },
-  exhaustH: { lower: 0.25, upper: 0.69 },
+  exhaustH: { lower: 0.20, upper: 0.64 },
   ductTop: { riser: 2.17, half: 1.18 },
   dryH: 1.94,
   doorW: 0.70, doorH: 1.90, doorGapLow: 0.010, doorGapTop: 0.002,

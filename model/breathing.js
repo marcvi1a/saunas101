@@ -77,7 +77,7 @@ const GEO = {
   H: (300 - 8) * S,                      // 2.044 m
   D: 0.125,                              // Ø of inlet, grilles, drying vent
   inletH: { above: 0.98, middle: 0.45, below: 0.12, bottom: 0 },
-  grilleH: { lower: 0.25, upper: 0.69 },
+  grilleH: { lower: 0.20, upper: 0.64 },
   dryH: 1.94,
   door: { w: 0.70, low0: 0, low1: 0.010, top0: 1.900, top1: 1.902, x: 0.875 },  // door in a side wall (assumption, see report)
   mouthUpper: 1.62, mouthLower: 1.20,

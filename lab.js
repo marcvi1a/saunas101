@@ -84,9 +84,9 @@ const darkUI = document.documentElement.dataset.theme==='dark' || (document.docu
 const FRESH_HEX = darkUI ? '#63B3D6' : '#378DE2', HOT_HEX = darkUI ? '#F09A52' : '#E8603A';
 
 /* ---------- geometry ---------- */
-const IN_ABOVE={x:22,y:160}, IN_MIDDLE={x:22,y:236}, IN_BELOW={x:22,y:283}, IN_BOTTOM={x:73,y:298}, OUT={x:398,y:264}, SENSOR={x:73,y:22};
+const IN_ABOVE={x:22,y:160}, IN_MIDDLE={x:22,y:236}, IN_BELOW={x:22,y:283}, IN_BOTTOM={x:73,y:298}, OUT={x:398,y:270.4}, SENSOR={x:73,y:22};
 const HALF_TOP = 132;   // 1.2 m
-const OUT_HI={x:398,y:202}, LEAK_IN={x:398,y:290}, LEAK_OUT={x:398,y:60};
+const OUT_HI={x:398,y:209.7}, LEAK_IN={x:398,y:290}, LEAK_OUT={x:398,y:60};
 function outPos(){ return state.exhaust==='upper' ? OUT_HI : OUT; }
 /* ---------- drawing helpers ---------- */
 const ns='http://www.w3.org/2000/svg';

@@ -20,7 +20,7 @@ Do not edit anything under `C:\Users\marcv\dev\saunas101`. Read it freely. Write
 |---|---|---|
 | vent | `yes`, `none` | `none` = no inlet, no exhaust, door gaps only; then only `heater` matters |
 | inlet | `above`, `middle`, `below`, `bottom` | Above = 20 cm above the stones, centre 0.98 m off the floor, heater wall. Middle = 0.45 m, facing the heater's side. Low (`below`) = 0.12 m, beside the heater. Floor (`bottom`) = through the floor directly under the heater; the floor is open to outside air or ducted to an outside wall |
-| exhaust | `lower`, `upper` | grille on the wall opposite the heater, under the lower bench (centre 0.25 m) or under the upper bench (centre 0.69 m); each grille's top edge is 5 cm under its bench |
+| exhaust | `lower`, `upper` | grille on the wall opposite the heater, under the lower bench (centre 0.20 m) or under the upper bench (centre 0.64 m); each grille's top edge is 5 cm under its bench (benches 15 cm thick) |
 | fan | `on`, `off` | an exhaust fan in the exhaust path, outside the hot room, runs whenever the heater runs |
 | duct | `straight`, `riser`, `half`, `inletduct` | None; Long = bare Ø125 duct from the grille up to an outlet at 2.17 m (above the room); Short = same to an outlet at 1.18 m; Inlet = a bare duct from a mouth at floor level up to the inlet (read the comment above `IDUCT` in lab.js for how it is meant; flag any ambiguity) |
 | heater | `open`, `closed`, `wall` | Open = stone pillar, no casing, stones exposed on every side (Harvia Legend, HUUM Hive type). Closed = floor-standing casing heater, a sheet-metal chimney with the elements inside, air drawn in at the base, stones on top. Wall = short casing heater hung on the wall, its intake 30 cm off the floor |

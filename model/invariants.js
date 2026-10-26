@@ -505,7 +505,7 @@ function makeStandIn() {
   const FREE = 0.6;                         // STAND-IN grille free-area ratio
   const CDA_VENT = CD * A125 * FREE;
   const DOOR = { low: { h: 0.005, a: 0.70 * 0.010 }, top: { h: 1.899, a: 0.70 * 0.002 } };
-  const H_IN = { above: 0.98, middle: 0.45, below: 0.12, bottom: 0 }, H_EX = { lower: 0.25, upper: 0.69 }, H_TOP = { riser: 2.17, half: 1.18 };
+  const H_IN = { above: 0.98, middle: 0.45, below: 0.12, bottom: 0 }, H_EX = { lower: 0.20, upper: 0.64 }, H_TOP = { riser: 2.17, half: 1.18 };
   const T_FLOOR = 45;                       // STAND-IN profile: linear 45 °C at the floor to 90 °C at the ceiling
   const T = h => T_FLOOR + (T_SENSOR - T_FLOOR) * Math.min(Math.max(h, 0), CEILING) / CEILING;
   const rhoIn = h => rhoAt(T(h));
