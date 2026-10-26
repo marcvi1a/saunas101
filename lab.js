@@ -329,8 +329,11 @@ function render(){
       const b=particle(d,'var(--stale)',dur,rnd()*dur,2.7); b.setAttribute('opacity','0.7'); dyn.appendChild(b);
     }
   }
-  const legStale=document.getElementById('legStale'); if(legStale) legStale.hidden=!nStale;
-  airStreams(A).forEach(s=>drawStream(dyn, s));
+  const streams=airStreams(A); streams.forEach(s=>drawStream(dyn, s));
+  // the legend lists only the dots drawn; a stream that warms on its way shows both fresh and heated air
+  const drawn = c => streams.some(s=>s.n>0 && (s.kt || s.color===c));
+  const leg = {legFresh: drawn('fresh'), legHot: drawn('hot'), legStale: nStale>0};
+  for(const id in leg){ const e=document.getElementById(id); if(e) e.hidden=!leg[id]; }
 
   // duct
   const dg=document.getElementById('duct'); dg.innerHTML='';
