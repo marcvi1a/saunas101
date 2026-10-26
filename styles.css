@@ -225,7 +225,7 @@ h1{font-size:30px;font-weight:400;letter-spacing:0;line-height:1.1}
 .modelnote-foot b{font-weight:600}
 
 /* SVG parts */
-.wall{fill:none;stroke:var(--ink);stroke-width:4}
+.wall{fill:none;stroke:var(--ink);stroke-width:2}
 .plank{stroke:var(--wood2);stroke-width:1}
 .bench{fill:var(--bench);stroke:var(--bench-edge);stroke-width:1.5}
 .stoveBody{fill:var(--stone)} .stones{fill:var(--ink)}
