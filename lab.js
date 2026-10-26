@@ -7,6 +7,32 @@ function rock(cx,cy,R,rnd){
   for(let i=0;i<k;i++){ const a=rot+i*2*Math.PI/k+(rnd()-0.5)*0.5, r=R*(0.72+rnd()*0.5); pts.push((cx+Math.cos(a)*r*sx).toFixed(1)+','+(cy+Math.sin(a)*r).toFixed(1)); }
   const p=el('polygon',{points:pts.join(' '),class:'rock'}); p.setAttribute('fill',ROCK_FILLS[Math.floor(rnd()*ROCK_FILLS.length)]); return p;
 }
+/* the heater's plume: straight up over the stones (the model's plume has no tilt), widening a little from the stones (x 52-94 at
+   y 200) to a flat top under the ceiling (x 46-100 at y 10), strongest on the stones and fading up (#heatFade). Its edges ripple
+   with a wave that climbs the column, still at the stones and 6 units at most near the top, the two edges out of phase (8 frames
+   over 4.5 s, the last equal to the first); it breathes from 100 to 70 % over 6.3 s and a light haze bends it by up to 2 units
+   (#heatHaze). Slower and fainter than the air, so the dots stay the thing to watch. */
+let HEAT_D=null;
+function heatFrames(){
+  const r1=v=>Math.round(v*10)/10, N=7, TOP=10, AMP=6, FRAMES=8, out=[];
+  const chain=pts=>{ let d=''; for(let i=0;i<pts.length-1;i++){ const p0=pts[Math.max(0,i-1)], p1=pts[i], p2=pts[i+1], p3=pts[Math.min(pts.length-1,i+2)];
+    d+=' C '+r1(p1[0]+(p2[0]-p0[0])/6)+' '+r1(p1[1]+(p2[1]-p0[1])/6)+', '+r1(p2[0]-(p3[0]-p1[0])/6)+' '+r1(p2[1]-(p3[1]-p1[1])/6)+', '+r1(p2[0])+' '+r1(p2[1]); } return d; };
+  for(let f=0;f<=FRAMES;f++){
+    const tau=f/FRAMES, L=[], R=[];
+    for(let i=0;i<=N;i++){ const h=i/N, y=200+(TOP-200)*h, a=i===0?0:AMP*(0.15+h), w=2*Math.PI*(1.4*h-tau);
+      L.push([52-6*h+a*Math.sin(w), y]); R.push([94+6*h+a*Math.sin(w+1.9), y]); }
+    out.push('M'+r1(L[0][0])+' '+r1(L[0][1])+chain(L)+' L'+r1(R[N][0])+' '+r1(R[N][1])+chain(R.slice().reverse())+' Z');
+  }
+  return out;
+}
+function heatColumn(){
+  if(!HEAT_D) HEAT_D=heatFrames();
+  const g=el('g',{});
+  g.appendChild(el('animate',{attributeName:'opacity',dur:'6.3s',repeatCount:'indefinite',calcMode:'spline',keyTimes:'0;.5;1',keySplines:'.45 0 .55 1;.45 0 .55 1',values:'1;.7;1'}));
+  const p=el('path',{d:HEAT_D[0],class:'heatglow',fill:'url(#heatFade)',filter:'url(#heatHaze)'});
+  p.appendChild(el('animate',{attributeName:'d',dur:'4.5s',repeatCount:'indefinite',values:HEAT_D.join(';')}));
+  g.appendChild(p); return g;
+}
 function drawHeater(){
   const g=document.getElementById('heaterg'); g.innerHTML='';
   if(state.heater==='open'){
@@ -317,7 +343,7 @@ function render(){
   const A = AIRS[hashOf(state)];
   drawHeater();
   const dyn=document.getElementById('dyn'); dyn.innerHTML='';
-  const glow=document.getElementById('glow'); glow.innerHTML=''; glow.appendChild(el('path',{d:'M52 200 C 40 140, 60 48, 100 26 L 130 16 C 100 80, 110 140, 94 200 Z',class:'heatglow'}));
+  const glow=document.getElementById('glow'); glow.innerHTML=''; glow.appendChild(heatColumn());
   // CO₂: grey dots circling in the bench zone, as many as the model counts (one per 500 ppm at the mouth beyond the first 500; 20 in a sealed room)
   const nStale = A.st;
   if(nStale){

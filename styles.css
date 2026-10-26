@@ -239,7 +239,7 @@ h1{font-size:30px;font-weight:400;letter-spacing:0;line-height:1.1}
 .lblIn{fill:var(--fresh)} .lblOut{fill:var(--hot)} .lblBad{fill:var(--bad)}
 .lblHalo{paint-order:stroke;stroke:var(--wood1);stroke-width:3px;stroke-linejoin:round}
 .stagnant{fill:var(--stale);opacity:.16}
-.heatglow{fill:var(--hot);opacity:.10}
+.heatglow{pointer-events:none}   /* fill, fade and motion come from #heatFade, #heatHaze and lab.js heatColumn() */
 .fanBlade{fill:none;stroke:var(--ink);stroke-width:2}
 .fanOff{stroke:var(--muted)}
 .pathGuide{fill:none;stroke:#d9cfc4;stroke-width:1;stroke-dasharray:3 4}
