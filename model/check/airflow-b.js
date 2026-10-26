@@ -24,7 +24,7 @@ const ROOM_V = 12;                 // m3
 const D_OPEN = 0.125;              // m, every opening and duct
 const A_OPEN = Math.PI * D_OPEN * D_OPEN / 4;
 const H_INLET = { above: 0.98, middle: 0.45, below: 0.12, bottom: 0 };
-const H_GRILLE = { lower: 0.20, upper: 0.64 };
+const H_GRILLE = { lower: 0.25, upper: 0.69 };
 const H_DUCT_TOP = { riser: 2.17, half: 1.18 };
 const H_DRY = 1.94;
 const H_SENSOR = (300 - 22) * 2.1 / 300;   // 1.946 m, the drawing's sensor (lab.js SENSOR y = 22)

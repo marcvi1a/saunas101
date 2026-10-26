@@ -82,7 +82,7 @@ const TU = 40;             // turbulence intensity % (ISO 7730 default for mixin
 const GEO = {
   W: 2.63, D: 2.24, H: 2.04,
   inletH: { above: 0.98, middle: 0.45, below: 0.12, bottom: 0.0 },
-  exhaustH: { lower: 0.20, upper: 0.64 },
+  exhaustH: { lower: 0.25, upper: 0.69 },
   ductTop: { riser: 2.17, half: 1.18 },
   dryH: 1.94,
   door: { w: 0.70, h0: 0.002, h1: 1.902, gapLow: 0.002, gapTop: 0.002 },   // integrator's ruling: 2 mm under the door (agent A's PARAMS.doorGapLow)
