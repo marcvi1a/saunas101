@@ -1,10 +1,10 @@
 /* Saunas 101 · site script: units, the footer wordmark, the heater calculator, the masthead, rule anchors. */
 
 /* ---------- units ---------- */
-let units = 'metric';
-try{ if(new URLSearchParams(location.search).get('units')==='imperial') units='imperial'; else if(localStorage.getItem('units')==='imperial') units='imperial'; }catch(e){}
-/* the address says when Imperial is on, so a copied address carries the units; Metric, the default, carries nothing */
-function syncUnitsUrl(){ try{ history.replaceState(null, '', location.pathname + (units==='imperial' ? '?units=imperial' : '') + location.hash); }catch(e){} }
+let units = 'imperial';
+try{ const asked = new URLSearchParams(location.search).get('units'); if(asked==='metric' || asked==='imperial') units=asked; else if(localStorage.getItem('units')==='metric') units='metric'; }catch(e){}
+/* the address says when Metric is on, so a copied address carries the units; Imperial, the default, carries nothing */
+function syncUnitsUrl(){ try{ history.replaceState(null, '', location.pathname + (units==='metric' ? '?units=metric' : '') + location.hash); }catch(e){} }
 syncUnitsUrl();
 const numOf = s => parseFloat(String(s).replace(',',''));
 function inFrac(inches){
@@ -95,7 +95,7 @@ renderCalc(true);
 (function(){
   const copy = text => (navigator.clipboard && navigator.clipboard.writeText) ? navigator.clipboard.writeText(text) : Promise.reject(new Error('no clipboard'));
   const canonical = () => { const l = document.querySelector('link[rel="canonical"]'); return l ? l.href : location.origin + location.pathname; };
-  const q = () => units==='imperial' ? '?units=imperial' : '';   // a shared link carries the sender's units when they are not the default
+  const q = () => units==='metric' ? '?units=metric' : '';   // a shared link carries the sender's units when they are not the default
   const payload = {
     calc: () => ({ text: 'Saunas 101: Electric heater calculator ' + calc.kw + '\u202FkW.', url: location.origin + '/heater' + q() + calcHash() }),
     page: b => ({ text: 'Saunas 101: ' + (b.dataset.text || document.title) + '.', url: canonical() + q() }),
